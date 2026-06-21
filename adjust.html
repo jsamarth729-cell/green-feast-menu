@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Green Feast — Bowl Image Adjuster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #EDE8DF;
+      color: #283F28;
+      padding: 28px 32px 80px;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      margin-bottom: 6px;
+    }
+    .sub { font-size: 14px; color: #5C7C5C; margin-bottom: 24px; line-height: 1.5; max-width: 720px; }
+    .sub b { color: #283F28; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 2px 12px rgba(40,63,40,0.08);
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .preview {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #C8D8C8;
+    }
+    .preview img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .preview.err {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: #5C7C5C; text-align: center; padding: 8px;
+    }
+    .controls { flex: 1; min-width: 0; }
+    .bowl-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ctrl { margin-bottom: 10px; }
+    .ctrl-head {
+      display: flex; justify-content: space-between;
+      font-size: 12px; font-weight: 600; margin-bottom: 3px;
+    }
+    .ctrl-head .val { color: #B8956A; font-variant-numeric: tabular-nums; }
+    input[type=range] {
+      width: 100%;
+      accent-color: #3D5E3D;
+      cursor: pointer;
+    }
+    .reset {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #5C7C5C;
+      background: none; border: none; cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      background: #223322;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.18);
+    }
+    .bar .info { color: rgba(255,255,255,0.7); font-size: 13px; flex: 1; }
+    .bar button {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 600;
+      padding: 11px 22px;
+      border-radius: 10px;
+      border: none; cursor: pointer;
+    }
+    .btn-csv { background: #B8956A; color: #fff; }
+    .btn-copy { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25) !important; }
+    .toast {
+      position: fixed; bottom: 78px; left: 50%; transform: translateX(-50%);
+      background: #3D5E3D; color: #fff; padding: 10px 20px; border-radius: 8px;
+      font-size: 13px; opacity: 0; transition: opacity .25s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <h1>Bowl Image Adjuster</h1>
+  <p class="sub">
+    Drag the sliders to position and zoom each bowl inside its circle — changes preview <b>instantly</b>, no waiting on Google.
+    When every bowl looks right, click <b>Download updated CSV</b>, then in Google Sheets do
+    <b>File → Import → Upload → Replace current sheet</b>.
+  </p>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="bar">
+    <span class="info" id="info">Loading bowls…</span>
+    <button class="btn-copy" id="copyBtn">Copy values table</button>
+    <button class="btn-csv" id="csvBtn">⬇ Download updated CSV</button>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const CSV_URL = 'data/bowls-sheet.csv';
+    let HEADERS = [];
+    let ROWS = [];   // array of objects keyed by header
+
+    function splitCSVLine(line) {
+      const out = []; let cur = '', q = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { if (q && line[i+1] === '"') { cur += '"'; i++; } else q = !q; }
+        else if (c === ',' && !q) { out.push(cur); cur = ''; }
+        else cur += c;
+      }
+      out.push(cur); return out;
+    }
+    function parseCSV(text) {
+      const lines = text.replace(/\r/g, '').trim().split('\n');
+      HEADERS = splitCSVLine(lines[0]).map(h => h.trim());
+      return lines.slice(1).filter(l => l.trim()).map(line => {
+        const v = splitCSVLine(line);
+        return Object.fromEntries(HEADERS.map((h, i) => [h, (v[i] ?? '').trim()]));
+      });
+    }
+    function csvEscape(s) {
+      s = String(s ?? '');
+      return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }
+    function num(v, d) { return v !== '' && v != null && !isNaN(v) ? Number(v) : d; }
+
+    function applyImg(img, r) {
+      img.style.objectPosition = `${num(r.img_x,50)}% ${num(r.img_y,50)}%`;
+      img.style.transform = `scale(${num(r.img_scale,1)})`;
+    }
+
+    function slider(label, key, min, max, step, r, img, valEl) {
+      const wrap = document.createElement('div'); wrap.className = 'ctrl';
+      const head = document.createElement('div'); head.className = 'ctrl-head';
+      const valSpan = document.createElement('span'); valSpan.className = 'val';
+      valSpan.textContent = num(r[key], key==='img_scale'?1:50);
+      head.innerHTML = `<span>${label}</span>`; head.appendChild(valSpan);
+      const inp = document.createElement('input');
+      inp.type = 'range'; inp.min = min; inp.max = max; inp.step = step;
+      inp.value = num(r[key], key==='img_scale'?1:50);
+      inp.addEventListener('input', () => {
+        r[key] = inp.value;
+        valSpan.textContent = inp.value;
+        applyImg(img, r);
+      });
+      wrap.appendChild(head); wrap.appendChild(inp);
+      return wrap;
+    }
+
+    function render() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      ROWS.forEach(r => {
+        const card = document.createElement('div'); card.className = 'card';
+
+        const prev = document.createElement('div'); prev.className = 'preview';
+        const img = document.createElement('img');
+        img.src = 'images/' + r.image; img.alt = r.name;
+        img.onerror = () => { prev.classList.add('err'); prev.innerHTML = 'image not<br>uploaded yet'; };
+        applyImg(img, r);
+        prev.appendChild(img);
+
+        const ctrls = document.createElement('div'); ctrls.className = 'controls';
+        const nm = document.createElement('div'); nm.className = 'bowl-name'; nm.textContent = r.name;
+        ctrls.appendChild(nm);
+        ctrls.appendChild(slider('Horizontal (img_x)', 'img_x', 0, 100, 1, r, img));
+        ctrls.appendChild(slider('Vertical (img_y)',   'img_y', 0, 100, 1, r, img));
+        ctrls.appendChild(slider('Zoom (img_scale)', 'img_scale', 0.5, 2.5, 0.05, r, img));
+
+        const reset = document.createElement('button'); reset.className = 'reset';
+        reset.textContent = 'reset to centre';
+        reset.onclick = () => { r.img_x = 50; r.img_y = 50; r.img_scale = 1; render(); };
+        ctrls.appendChild(reset);
+
+        card.appendChild(prev); card.appendChild(ctrls);
+        grid.appendChild(card);
+      });
+      document.getElementById('info').textContent =
+        ROWS.length + ' bowls — adjust, then download the CSV and re-import to Sheets.';
+    }
+
+    function buildCSV() {
+      const head = HEADERS.join(',');
+      const body = ROWS.map(r => HEADERS.map(h => csvEscape(r[h])).join(',')).join('\n');
+      return head + '\n' + body + '\n';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    document.getElementById('csvBtn').onclick = () => {
+      const blob = new Blob([buildCSV()], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'bowls-sheet.csv';
+      a.click();
+      showToast('Downloaded — now File → Import → Replace in Sheets');
+    };
+
+    document.getElementById('copyBtn').onclick = async () => {
+      const tbl = 'name\timg_x\timg_y\timg_scale\n' +
+        ROWS.map(r => `${r.name}\t${num(r.img_x,50)}\t${num(r.img_y,50)}\t${num(r.img_scale,1)}`).join('\n');
+      try { await navigator.clipboard.writeText(tbl); showToast('Values copied to clipboard'); }
+      catch { showToast('Copy failed — use the CSV download instead'); }
+    };
+
+    fetch(CSV_URL + '?_=' + Date.now())
+      .then(r => r.text())
+      .then(t => { ROWS = parseCSV(t); render(); })
+      .catch(() => { document.getElementById('info').textContent = 'Could not load data/bowls-sheet.csv'; });
+  </script>
+</body>
+</html>
