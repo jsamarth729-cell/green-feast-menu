@@ -1,4 +1,4 @@
-id,name,description,price,kcal,protein,fibre,tags,badge,image,featured,img_x,img_y
+id,name,description,price,kcal,protein,fibre,tags,badge,image,featured,img_x,img_y,img_scale
 1,Mediterranean Bliss Bowl,"Chickpeas, couscous, roasted veggies, feta, hummus, tahini",329,380,24,12,GF,Chef's Spotlight,mediterranean-bliss.jpg,TRUE
 2,Italian Harvest Bowl,"Herbed pasta, grilled veggies, parmesan, creamy pesto yogurt",329,380,24,12,,,italian-harvest.jpg,TRUE
 3,Thai Zen Bowl,"Chilli tofu, crunchy veggies, peanut crunch on brown rice",329,380,24,12,V,,thai-zen.jpg,TRUE
