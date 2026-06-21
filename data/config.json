@@ -1,0 +1,12 @@
+{
+  "buildYourOwn": {
+    "name": "Build Your Own Bowl",
+    "description": "Choose base, protein, toppings and dressing.",
+    "price": 329
+  },
+  "upsell": [
+    "Bowl + any smoothie | ₹549 | save ₹79",
+    "Add extra protein | +₹99",
+    "Add a cold press | +₹99"
+  ]
+}

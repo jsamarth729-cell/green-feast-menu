@@ -1,0 +1,10 @@
+id,name,description,price,kcal,protein,fibre,tags,badge,image,featured
+1,Mediterranean Bliss Bowl,"Chickpeas, couscous, roasted veggies, feta, hummus, tahini",329,380,24,12,GF,Chef's Spotlight,mediterranean-bliss.jpg,TRUE
+2,Italian Harvest Bowl,"Herbed pasta, grilled veggies, parmesan, creamy pesto yogurt",329,380,24,12,,,italian-harvest.jpg,TRUE
+3,Thai Zen Bowl,"Chilli tofu, crunchy veggies, peanut crunch on brown rice",329,380,24,12,V,,thai-zen.jpg,TRUE
+4,Avo Protein Bowl,"Tofu, quinoa, sweet potato, avocado, walnuts, honey mustard",329,380,24,12,,,avo-protein.jpg,TRUE
+5,Mexican Fiesta Bowl,"Smoky beans, rice, corn, salsa, nachos, avocado, chipotle",329,380,24,12,GF,,mexican-fiesta.jpg,TRUE
+6,Quinoa Buddha Bowl,"Quinoa, chickpeas, paneer, roasted veg, sweet mango dressing",329,380,24,12,GF,,quinoa-buddha.jpg,TRUE
+7,Umami Soba Bowl,"Soba noodles, tofu, crunchy veg, creamy peanut dressing",329,380,24,12,,Most Loved,umami-soba.jpg,TRUE
+8,Chilli Asian Tofu Bowl,"Chilli tofu, sauteed veggies, herbed rice or soba",329,380,24,12,V,,chilli-asian-tofu.jpg,TRUE
+9,Burrito Bowl,"Rajma, rice, corn, salsa, paneer or tofu, guacamole, nachos",329,380,24,12,,,burrito-bowl.jpg,TRUE
