@@ -66,7 +66,9 @@ function csvRowToBowl(row) {
     tags:        row.tags ? row.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
     badge:       row.badge  || '',
     image:       row.image  || '',
-    featured:    ['true','TRUE','1','yes','YES'].includes((row.featured || '').trim())
+    featured:    ['true','TRUE','1','yes','YES'].includes((row.featured || '').trim()),
+    img_x:       row.img_x !== '' && row.img_x != null ? Number(row.img_x) : 50,
+    img_y:       row.img_y !== '' && row.img_y != null ? Number(row.img_y) : 50
   };
 }
 
@@ -124,6 +126,7 @@ function heroSlideHTML(bowl) {
         : `<div class="hero-badge-spacer"></div>`}
       <div class="hero-photo-wrap">
         <img src="images/${bowl.image}" alt="${bowl.name}"
+             style="object-position: ${bowl.img_x}% ${bowl.img_y}%"
              onerror="this.closest('.hero-photo-wrap').classList.add('photo-error');this.remove()">
       </div>
       <div class="hero-name">${bowl.name}</div>
@@ -164,6 +167,7 @@ function tileHTML(bowl) {
       ${hasBadge ? `<div class="tile-badge ${badgeClass}">${bowl.badge}</div>` : ''}
       <div class="tile-photo-wrap">
         <img src="images/${bowl.image}" alt="${bowl.name}"
+             style="object-position: ${bowl.img_x}% ${bowl.img_y}%"
              onerror="this.closest('.tile-photo-wrap').classList.add('photo-error');this.remove()">
       </div>
       <div class="tile-body">
