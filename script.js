@@ -127,7 +127,7 @@ function heroSlideHTML(bowl) {
         : `<div class="hero-badge-spacer"></div>`}
       <div class="hero-photo-wrap">
         <img src="images/${bowl.image}" alt="${bowl.name}"
-             style="object-position: ${bowl.img_x}% ${bowl.img_y}%; transform: scale(${bowl.img_scale})"
+             style="transform: translate(${bowl.img_x - 50}%, ${bowl.img_y - 50}%) scale(${bowl.img_scale})"
              onerror="this.closest('.hero-photo-wrap').classList.add('photo-error');this.remove()">
       </div>
       <div class="hero-name">${bowl.name}</div>
@@ -168,7 +168,7 @@ function tileHTML(bowl) {
       ${hasBadge ? `<div class="tile-badge ${badgeClass}">${bowl.badge}</div>` : ''}
       <div class="tile-photo-wrap">
         <img src="images/${bowl.image}" alt="${bowl.name}"
-             style="object-position: ${bowl.img_x}% ${bowl.img_y}%; transform: scale(${bowl.img_scale})"
+             style="transform: translate(${bowl.img_x - 50}%, ${bowl.img_y - 50}%) scale(${bowl.img_scale})"
              onerror="this.closest('.tile-photo-wrap').classList.add('photo-error');this.remove()">
       </div>
       <div class="tile-body">

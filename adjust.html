@@ -156,8 +156,8 @@
     function num(v, d) { return v !== '' && v != null && !isNaN(v) ? Number(v) : d; }
 
     function applyImg(img, r) {
-      img.style.objectPosition = `${num(r.img_x,50)}% ${num(r.img_y,50)}%`;
-      img.style.transform = `scale(${num(r.img_scale,1)})`;
+      img.style.transform =
+        `translate(${num(r.img_x,50) - 50}%, ${num(r.img_y,50) - 50}%) scale(${num(r.img_scale,1)})`;
     }
 
     function slider(label, key, min, max, step, r, img, valEl) {
