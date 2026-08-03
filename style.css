@@ -270,9 +270,6 @@ body {
   display: flex;
   align-items: center;
   padding: 14px 18px;
-}
-.bowl-tile > * + * {
-  margin-left: 15px;
   position: relative;
   overflow: hidden;
 }
@@ -303,6 +300,7 @@ body {
 .tile-body {
   flex: 1;
   min-width: 0;
+  margin-left: 15px;
   display: flex;
   flex-direction: column;
 }
@@ -375,6 +373,7 @@ body {
   font-size: 20px;
   font-weight: 600;
   color: var(--forest);
+  margin-left: 15px;
   flex-shrink: 0;
   align-self: center;
   font-family: 'Inter', sans-serif;
