@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Green Feast - TV Diagnostic</title>
+  <style>
+    /* Deliberately old-school CSS only - must render on ancient engines */
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 26px;
+      line-height: 1.5;
+      margin: 0;
+      padding: 24px;
+    }
+    h1 { font-size: 34px; margin: 0 0 4px 0; color: #7ec87e; }
+    p.sub { font-size: 20px; color: #aaa; margin: 0 0 20px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 10px 8px; border-bottom: 1px solid #333; vertical-align: top; }
+    td.label { color: #ddd; }
+    td.result { text-align: right; font-weight: bold; white-space: nowrap; }
+    .pass { color: #5ee65e; }
+    .fail { color: #ff6b6b; }
+    .wait { color: #ffd166; }
+    #ua { font-size: 16px; color: #888; word-wrap: break-word; margin-top: 20px; }
+    #verdict { font-size: 30px; margin-top: 22px; padding: 16px; border: 3px solid #444; }
+  </style>
+</head>
+<body>
+
+  <h1>Green Feast - TV Diagnostic</h1>
+  <p class="sub">Read the PASS / FAIL column. Report the FAIL lines.</p>
+
+  <table>
+    <tr><td class="label">1. Page loaded (HTML + CSS)</td><td class="result pass" id="t1">PASS</td></tr>
+    <tr><td class="label">2. JavaScript runs at all</td><td class="result wait" id="t2">...</td></tr>
+    <tr><td class="label">3. Modern syntax: optional chaining <b>?.</b></td><td class="result wait" id="t3">...</td></tr>
+    <tr><td class="label">4. Modern syntax: nullish <b>??</b></td><td class="result wait" id="t4">...</td></tr>
+    <tr><td class="label">5. Object.fromEntries exists</td><td class="result wait" id="t5">...</td></tr>
+    <tr><td class="label">6. fetch() exists</td><td class="result wait" id="t6">...</td></tr>
+    <tr><td class="label">7. localStorage works</td><td class="result wait" id="t7">...</td></tr>
+    <tr><td class="label">8. Can load local config.json</td><td class="result wait" id="t8">...</td></tr>
+    <tr><td class="label">9. <b>Can reach Google Sheet</b></td><td class="result wait" id="t9">...</td></tr>
+    <tr><td class="label">10. Can load a bowl image</td><td class="result wait" id="t10">...</td></tr>
+  </table>
+
+  <div id="verdict">Running tests...</div>
+  <div id="ua"></div>
+
+<script>
+/* ES5 ONLY. No arrow functions, no let/const, no template literals,
+   no fetch, no optional chaining. This file must run on ANY engine. */
+
+function setResult(id, ok, text) {
+  var el = document.getElementById(id);
+  if (!el) { return; }
+  el.className = 'result ' + (ok ? 'pass' : 'fail');
+  el.innerHTML = text ? text : (ok ? 'PASS' : 'FAIL');
+}
+
+/* Test 2 - if this line runs, JS works */
+setResult('t2', true, 'PASS');
+
+/* Tests 3 and 4 - syntax support.
+   These MUST be tested via Function() so a parse error is caught,
+   not thrown at load time. */
+var syntaxOptionalChaining = false;
+var syntaxNullish = false;
+
+try {
+  new Function('var o = {a:1}; return o?.a;')();
+  syntaxOptionalChaining = true;
+} catch (e) {
+  syntaxOptionalChaining = false;
+}
+setResult('t3', syntaxOptionalChaining);
+
+try {
+  new Function('var x = null; return x ?? 5;')();
+  syntaxNullish = true;
+} catch (e) {
+  syntaxNullish = false;
+}
+setResult('t4', syntaxNullish);
+
+/* Test 5 */
+var hasFromEntries = (typeof Object.fromEntries === 'function');
+setResult('t5', hasFromEntries);
+
+/* Test 6 */
+var hasFetch = (typeof window.fetch === 'function');
+setResult('t6', hasFetch);
+
+/* Test 7 */
+var hasStorage = false;
+try {
+  window.localStorage.setItem('gf_test', '1');
+  window.localStorage.removeItem('gf_test');
+  hasStorage = true;
+} catch (e) {
+  hasStorage = false;
+}
+setResult('t7', hasStorage);
+
+/* Network tests use XMLHttpRequest - works everywhere */
+function testUrl(id, url, done) {
+  var xhr;
+  try {
+    xhr = new XMLHttpRequest();
+  } catch (e) {
+    setResult(id, false, 'NO XHR');
+    if (done) { done(false); }
+    return;
+  }
+
+  var finished = false;
+
+  function finish(ok, msg) {
+    if (finished) { return; }
+    finished = true;
+    setResult(id, ok, msg);
+    if (done) { done(ok); }
+  }
+
+  try {
+    xhr.open('GET', url, true);
+    xhr.timeout = 15000;
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status >= 200 && xhr.status < 400) {
+          finish(true, 'PASS (' + xhr.status + ')');
+        } else if (xhr.status === 0) {
+          finish(false, 'BLOCKED');
+        } else {
+          finish(false, 'FAIL (' + xhr.status + ')');
+        }
+      }
+    };
+
+    xhr.ontimeout = function () { finish(false, 'TIMEOUT'); };
+    xhr.onerror   = function () { finish(false, 'NO NETWORK'); };
+
+    xhr.send();
+  } catch (e) {
+    finish(false, 'ERROR');
+  }
+}
+
+var SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NTFd2KLI2oVsU_jJYP6X-nbLaq1M4Woqpb_gqMudOWUarZlIImnYpXfSrh5cblNmhcNOcUTDaTSw/pub?gid=2092061156&single=true&output=csv';
+
+var sheetOk = null;
+
+testUrl('t8', 'data/config.json?_=' + (new Date()).getTime(), null);
+testUrl('t9', SHEET_URL + '&_=' + (new Date()).getTime(), function (ok) {
+  sheetOk = ok;
+  showVerdict();
+});
+
+/* Test 10 - image load */
+var img = new Image();
+img.onload  = function () { setResult('t10', true); };
+img.onerror = function () { setResult('t10', false); };
+img.src = 'images/mediterranean-bliss.jpg?_=' + (new Date()).getTime();
+
+/* Verdict */
+function showVerdict() {
+  var v = document.getElementById('verdict');
+  var msg;
+  var color;
+
+  var syntaxOk = syntaxOptionalChaining && syntaxNullish && hasFromEntries;
+
+  if (!syntaxOk && sheetOk === false) {
+    msg = 'CAUSE: Browser too old AND Sheet unreachable.';
+    color = '#ff6b6b';
+  } else if (!syntaxOk) {
+    msg = 'CAUSE: Browser is too old for the menu code. Fixable in code.';
+    color = '#ffd166';
+  } else if (sheetOk === false) {
+    msg = 'CAUSE: This TV cannot reach Google Sheets. Network issue.';
+    color = '#ffd166';
+  } else {
+    msg = 'All core checks passed. The menu should work on this TV.';
+    color = '#5ee65e';
+  }
+
+  v.innerHTML = msg;
+  v.style.borderColor = color;
+  v.style.color = color;
+}
+
+/* Show browser identity - this tells us the real engine version */
+document.getElementById('ua').innerHTML = 'Browser: ' + navigator.userAgent;
+
+/* Fallback verdict in case the sheet test never calls back */
+setTimeout(function () {
+  if (sheetOk === null) {
+    sheetOk = false;
+    showVerdict();
+  }
+}, 20000);
+</script>
+
+</body>
+</html>
