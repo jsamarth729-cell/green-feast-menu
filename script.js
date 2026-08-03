@@ -50,7 +50,12 @@ function parseCSV(text) {
   const headers = splitCSVLine(lines[0]).map(h => h.trim().replace(/^"|"$/g, ''));
   return lines.slice(1).filter(l => l.trim()).map(line => {
     const vals = splitCSVLine(line);
-    return Object.fromEntries(headers.map((h, i) => [h, (vals[i] ?? '').trim().replace(/^"|"$/g, '')]));
+    const obj = {};
+    headers.forEach(function (h, i) {
+      const v = vals[i];
+      obj[h] = (v === undefined || v === null ? '' : v).trim().replace(/^"|"$/g, '');
+    });
+    return obj;
   });
 }
 
@@ -206,8 +211,10 @@ function byobTileHTML(byob) {
 function goToSlide(index) {
   document.querySelectorAll('.hero-slide').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.hero-dot').forEach(el  => el.classList.remove('active'));
-  document.querySelectorAll('.hero-slide')[index]?.classList.add('active');
-  document.querySelectorAll('.hero-dot')[index]?.classList.add('active');
+  const slide = document.querySelectorAll('.hero-slide')[index];
+  if (slide) slide.classList.add('active');
+  const dot = document.querySelectorAll('.hero-dot')[index];
+  if (dot) dot.classList.add('active');
   currentSlide = index;
 }
 

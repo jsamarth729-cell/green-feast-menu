@@ -146,11 +146,16 @@
       HEADERS = splitCSVLine(lines[0]).map(h => h.trim());
       return lines.slice(1).filter(l => l.trim()).map(line => {
         const v = splitCSVLine(line);
-        return Object.fromEntries(HEADERS.map((h, i) => [h, (v[i] ?? '').trim()]));
+        const obj = {};
+        HEADERS.forEach(function (h, i) {
+          const val = v[i];
+          obj[h] = (val === undefined || val === null ? '' : val).trim();
+        });
+        return obj;
       });
     }
     function csvEscape(s) {
-      s = String(s ?? '');
+      s = String(s === undefined || s === null ? '' : s);
       return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
     }
     function num(v, d) { return v !== '' && v != null && !isNaN(v) ? Number(v) : d; }
