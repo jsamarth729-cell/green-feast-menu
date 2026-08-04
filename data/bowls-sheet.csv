@@ -1,10 +1,10 @@
 id,name,description,price,kcal,protein,fibre,tags,badge,image,featured,img_x,img_y,img_scale
-1,Mediterranean Bliss Bowl,"Chickpeas, couscous, roasted veggies, feta, hummus, tahini",329,380,24,12,GF,Chef's Spotlight,mediterranean-bliss.jpg,TRUE,50,50,1
-2,Italian Harvest Bowl,"Herbed pasta, grilled veggies, parmesan, creamy pesto yogurt",329,380,24,12,,,italian-harvest.jpg,TRUE,50,50,1
-3,Thai Zen Bowl,"Chilli tofu, crunchy veggies, peanut crunch on brown rice",329,380,24,12,V,,thai-zen.jpg,TRUE,50,50,1
-4,Avo Protein Bowl,"Tofu, quinoa, sweet potato, avocado, walnuts, honey mustard",329,380,24,12,,,avo-protein.jpg,TRUE,50,50,1
-5,Mexican Fiesta Bowl,"Smoky beans, rice, corn, salsa, nachos, avocado, chipotle",329,380,24,12,GF,,mexican-fiesta.jpg,TRUE,50,50,1
-6,Quinoa Buddha Bowl,"Quinoa, chickpeas, paneer, roasted veg, sweet mango dressing",329,380,24,12,GF,,quinoa-buddha.jpg,TRUE,50,50,1
-7,Umami Soba Bowl,"Soba noodles, tofu, crunchy veg, creamy peanut dressing",329,380,24,12,,Most Loved,umami-soba.jpg,TRUE,50,50,1
-8,Chilli Asian Tofu Bowl,"Chilli tofu, sauteed veggies, herbed rice or soba",329,380,24,12,V,,chilli-asian-tofu.jpg,TRUE,50,50,1
-9,Burrito Bowl,"Rajma, rice, corn, salsa, paneer or tofu, guacamole, nachos",329,380,24,12,,,burrito-bowl.jpg,TRUE,50,50,1
+1,Avo Protein Bowl,"Tofu, quinoa, sweet potato, avocado, walnuts, honey mustard",349,380,24,12,Less Spicy,,avo-protein,TRUE,50,50,1
+2,Umami Soba Bowl,"Soba noodles, tofu, crunchy veg, creamy peanut dressing",349,400,24,12,,Most Loved,umami-soba,TRUE,50,50,1
+3,Thai Zen Bowl,"Chilli tofu, crunchy veggies, peanut crunch on brown rice",349,380,24,12,"Vegan,Low Calorie",,thai-zen,TRUE,50,50,1
+4,Italian Harvest Bowl,"Herbed pasta, grilled veggies, parmesan, creamy pesto yogurt",349,380,24,12,Low Calorie,,italian-harvest,TRUE,50,50,1
+5,Quinoa Buddha Bowl,"Quinoa, chickpeas, paneer, roasted veg, sweet mango dressing",349,380,24,12,Gluten Free,,quinoa-buddha,TRUE,50,50,1
+6,Mexican Fiesta Bowl,"Smoky beans, rice, corn, salsa, nachos, avocado, chipotle",349,380,24,12,Gluten Free,,mexican-fiesta,TRUE,50,50,1
+7,Mediterranean Bliss Bowl,"Chickpeas, couscous, roasted veggies, feta, hummus, tahini",349,380,24,12,Less Spicy,Chef's Spotlight,mediterranean-bliss,TRUE,50,50,1
+8,Healthy Burrito Bowl,"Rajma, rice, corn, salsa, paneer or tofu, guacamole, nachos",349,380,24,12,Gluten Free,,burrito-bowl,TRUE,50,50,1
+9,Tropical Fruit Salad,"Pineapple, kiwi, pomegranate, grapes, berries, citrus mint dressing",349,180,3,6,Low Calorie,,tropical-fruit-salad,TRUE,50,50,1

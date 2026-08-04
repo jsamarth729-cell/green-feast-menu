@@ -14,6 +14,8 @@
   --brass:       #B8956A;
   --badge-green: #3D5E3D;
   --badge-warm:  #7A5230;
+  --hero-bg:     #163019;
+  --gold:        #FEFA67;
 }
 
 body {
@@ -44,15 +46,14 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   HERO PANEL (left 720 px)
+   HERO PANEL (left 525 px, dark)
 ══════════════════════════════════════════════════════════════════ */
 .hero-panel {
-  width: 720px;
+  width: 525px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, #EDE8DF 0%, #F5F0E8 60%);
-  border-right: 1px solid rgba(90,120,90,0.12);
+  background: var(--hero-bg);
   position: relative;
 }
 
@@ -63,15 +64,14 @@ body {
   overflow: hidden;
 }
 
-/* Individual slide */
+/* Individual slide — text block at top, cut-out photo fills the rest */
 .hero-slide {
   position: absolute;
   top: 0; right: 0; bottom: 0; left: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 36px 60px 20px;
+  align-items: flex-start;
+  padding: 56px 44px 32px 61px;
   opacity: 0;
   transition: opacity 0.9s ease-in-out;
   pointer-events: none;
@@ -81,114 +81,86 @@ body {
   pointer-events: auto;
 }
 
-/* Badge */
-.hero-badge {
-  align-self: flex-start;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #fff;
-  padding: 6px 16px;
-  border-radius: 20px;
-  margin-bottom: 22px;
-}
-.hero-badge                 { background: var(--sage); }
-.hero-badge.badge-spotlight { background: var(--badge-green); }
-.hero-badge.badge-loved     { background: var(--badge-warm); }
-.hero-badge-spacer          { height: 32px; margin-bottom: 22px; }
-
-/* Circular photo */
-.hero-photo-wrap {
-  width: 330px;
-  height: 330px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-bottom: 30px;
-  box-shadow: 0 20px 60px rgba(40,63,40,0.18), 0 4px 16px rgba(40,63,40,0.10);
-  background: var(--sage-pale);
-  flex-shrink: 0;
-}
-.hero-photo-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-.hero-photo-wrap.photo-error {
-  background: var(--sage-pale);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Bowl name */
 .hero-name {
   font-family: 'Playfair Display', serif;
-  font-size: 40px;
+  font-size: 49px;
   font-weight: 600;
-  color: var(--forest);
-  text-align: center;
-  line-height: 1.18;
-  margin-bottom: 10px;
+  color: #FFFFFF;
+  text-align: left;
+  line-height: 1.16;
+  margin-bottom: 12px;
 }
 
 /* Bowl description */
 .hero-desc {
-  font-size: 15px;
+  font-size: 23px;
   font-weight: 400;
-  color: var(--sage);
-  text-align: center;
-  line-height: 1.45;
-  margin-bottom: 22px;
+  color: var(--gold);
+  text-align: left;
+  line-height: 1.4;
+  margin-bottom: 24px;
 }
 
-/* Macro chips */
+/* Macro chips — outlined gold */
 .hero-macros {
   display: flex;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 .hero-macros > * + * {
-  margin-left: 10px;
+  margin-left: 12px;
 }
 .macro-chip {
-  background: rgba(88,120,88,0.10);
-  border: 1px solid rgba(88,120,88,0.15);
-  border-radius: 24px;
-  padding: 7px 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid var(--gold);
+  border-radius: 26px;
+  padding: 13px 20px;
   display: flex;
   align-items: baseline;
 }
 .macro-chip > * + * {
-  margin-left: 5px;
+  margin-left: 6px;
 }
 .macro-value {
   font-size: 19px;
-  font-weight: 600;
-  color: var(--forest);
+  font-weight: 700;
+  color: var(--gold);
 }
 .macro-label {
   font-size: 12px;
   font-weight: 400;
-  color: var(--sage);
+  color: rgba(254,250,103,0.75);
 }
 
-/* Price */
-.hero-price {
-  font-family: 'Playfair Display', serif;
-  font-size: 44px;
-  font-weight: 700;
-  color: var(--forest);
+/* Cut-out bowl photo — fills remaining panel space, no crop/mask */
+.hero-photo-wrap {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
+  justify-content: center;
 }
-.hero-rupee {
-  font-size: 28px;
-  font-weight: 600;
-  margin-top: 6px;
-  margin-right: 2px;
-  font-family: 'Inter', sans-serif;
+.hero-photo-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.35));
+}
+/* Fallback for the one bowl whose cut-out isn't usable yet: its photo
+   still has the marble background, so it needs its own contained box
+   instead of floating free like the cut-outs. */
+.hero-photo-wrap.has-bg img {
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  filter: none;
+}
+.hero-photo-wrap.photo-error {
+  align-items: center;
+  justify-content: center;
 }
 
 /* Slide-indicator dots */
@@ -206,11 +178,11 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--sage-pale);
+  background: rgba(255,255,255,0.25);
   transition: background 0.3s, transform 0.3s;
 }
 .hero-dot.active {
-  background: var(--sage);
+  background: var(--gold);
   transform: scale(1.3);
 }
 
@@ -238,7 +210,7 @@ body {
 }
 .grid-title {
   font-family: 'Playfair Display', serif;
-  font-size: 42px;
+  font-size: 46px;
   font-weight: 600;
   color: var(--forest);
   line-height: 1;
@@ -257,8 +229,8 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(5, 1fr);
-  grid-gap: 10px;
-  gap: 10px;
+  grid-gap: 8px;
+  gap: 8px;
   padding-bottom: 22px;
 }
 
@@ -269,15 +241,15 @@ body {
   box-shadow: 0 2px 10px rgba(40,63,40,0.06), 0 1px 3px rgba(40,63,40,0.04);
   display: flex;
   align-items: center;
-  padding: 14px 18px;
+  padding: 14px 15px;
   position: relative;
   overflow: hidden;
 }
 
 /* Circular photo in tile */
 .tile-photo-wrap {
-  width: 96px;
-  height: 96px;
+  width: 123px;
+  height: 123px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -317,7 +289,7 @@ body {
 }
 .tile-name {
   font-family: 'Playfair Display', serif;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--forest);
   white-space: nowrap;
@@ -328,12 +300,13 @@ body {
   min-width: 0;
 }
 .tile-desc {
-  font-size: 12px;
+  font-size: 16px;
   color: var(--sage);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 .tile-macros {
   display: flex;
@@ -342,13 +315,13 @@ body {
   margin-left: 5px;
 }
 .tile-macro {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #1E3D1A;
   background: rgba(100,160,90,0.18);
   border: 1.5px solid rgba(70,120,60,0.40);
-  padding: 2px 9px;
-  border-radius: 10px;
+  padding: 4px 11px;
+  border-radius: 12px;
 }
 .tile-tags {
   display: flex;
@@ -370,7 +343,7 @@ body {
 
 /* Price — right-aligned */
 .tile-price {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 600;
   color: var(--forest);
   margin-left: 15px;
@@ -379,7 +352,7 @@ body {
   font-family: 'Inter', sans-serif;
 }
 .tile-rupee {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
   vertical-align: super;
   margin-right: 1px;
@@ -406,22 +379,22 @@ body {
 .bowl-tile.byob-tile {
   background: var(--forest);
 }
-.byob-tile .tile-name { color: #D8ECD8; }
-.byob-tile .tile-desc { color: var(--sage-light); }
-.byob-tile .tile-price { color: #A8C8A8; }
+.byob-tile .tile-name { color: var(--gold); }
+.byob-tile .tile-desc { color: var(--gold); -webkit-line-clamp: 3; }
+.byob-tile .tile-price { color: var(--gold); }
 
 .byob-icon {
-  width: 96px;
-  height: 96px;
+  width: 123px;
+  height: 123px;
   border-radius: 50%;
   background: rgba(255,255,255,0.10);
-  border: 2px solid rgba(255,255,255,0.18);
+  border: 2px solid var(--gold);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 40px;
-  color: rgba(255,255,255,0.65);
+  font-size: 44px;
+  color: var(--gold);
   font-weight: 300;
   line-height: 1;
 }

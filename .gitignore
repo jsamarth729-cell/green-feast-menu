@@ -2,3 +2,15 @@ node_modules/
 drive-download-20260620T212546Z-3-001/
 images_compressed/
 *.bat
+
+# local tooling / caches
+.claude/
+.playwright-mcp/
+
+# design reference exports and working screenshots — kept locally only.
+# "QSR Menu Display.png" in particular is ~24 MB.
+/ChatGPT Image*.png
+/QSR Menu Display.png
+/final-*.png
+/redesign-*.png
+/greenfeast-screen1-*.png

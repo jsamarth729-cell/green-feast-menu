@@ -7,8 +7,15 @@ const BOWLS_SOURCE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NTFd2KL
 const CONFIG_URL   = 'data/config.json';  // BYOB tile + upsell (edit here directly)
 
 const CACHE_KEY  = 'gf_bowls_v2';
-const SLIDE_MS   = 15000;
+const SLIDE_MS   = 7000;
 const REFRESH_MS = 5 * 60 * 1000;
+
+/* Escape hatch: any bowl listed here uses its original photo (marble
+   background and all) in the hero instead of the transparent cut-out.
+   Empty now that fix-cutout-alpha.mjs repairs the ghosted alpha the
+   background-removal tool produces — but kept so a bad cut-out can be
+   sidelined without a code change. */
+const HERO_CUTOUT_UNAVAILABLE = [];
 
 let currentSlide = 0;
 let featuredCount = 0;
@@ -161,23 +168,27 @@ async function fetchData() {
   }
 }
 
+/* ── Image path helpers ──────────────────────────────────────────
+   bowl.image is a slug (e.g. "mediterranean-bliss"), not a filename —
+   the two shots produced by import-bowl-shots.mjs are named
+   <slug>-top.jpg (grid tile, circular crop, has its marble background)
+   and <slug>-side.jpg / images/nobg/<slug>-side.png (hero — the cut-out
+   PNG where available, see HERO_CUTOUT_UNAVAILABLE above).           */
+function tileImageSrc(bowl) {
+  return `images/${bowl.image}-top.jpg`;
+}
+function heroImageSrc(bowl) {
+  return HERO_CUTOUT_UNAVAILABLE.includes(bowl.image)
+    ? `images/${bowl.image}-side.jpg`
+    : `images/nobg/${bowl.image}-side.png`;
+}
+
 /* ── Build hero slide HTML ───────────────────────────────────── */
 function heroSlideHTML(bowl) {
-  const hasBadge = bowl.badge && bowl.badge.trim();
-  let badgeClass = '';
-  if (bowl.badge === "Chef's Spotlight") badgeClass = 'badge-spotlight';
-  if (bowl.badge === 'Most Loved')       badgeClass = 'badge-loved';
+  const hasBg = HERO_CUTOUT_UNAVAILABLE.includes(bowl.image);
 
   return `
     <div class="hero-slide">
-      ${hasBadge
-        ? `<div class="hero-badge ${badgeClass}">${bowl.badge}</div>`
-        : `<div class="hero-badge-spacer"></div>`}
-      <div class="hero-photo-wrap">
-        <img src="images/${bowl.image}" alt="${bowl.name}"
-             style="transform: translate(${bowl.img_x - 50}%, ${bowl.img_y - 50}%) scale(${bowl.img_scale})"
-             onerror="this.closest('.hero-photo-wrap').classList.add('photo-error');this.remove()">
-      </div>
       <div class="hero-name">${bowl.name}</div>
       <div class="hero-desc">${bowl.description}</div>
       <div class="hero-macros">
@@ -194,8 +205,9 @@ function heroSlideHTML(bowl) {
           <span class="macro-label">fibre</span>
         </div>
       </div>
-      <div class="hero-price">
-        <span class="hero-rupee">₹</span>${bowl.price}
+      <div class="hero-photo-wrap${hasBg ? ' has-bg' : ''}">
+        <img src="${heroImageSrc(bowl)}" alt="${bowl.name}"
+             onerror="this.closest('.hero-photo-wrap').classList.add('photo-error');this.remove()">
       </div>
     </div>`;
 }
@@ -215,7 +227,7 @@ function tileHTML(bowl) {
     <div class="bowl-tile">
       ${hasBadge ? `<div class="tile-badge ${badgeClass}">${bowl.badge}</div>` : ''}
       <div class="tile-photo-wrap">
-        <img src="images/${bowl.image}" alt="${bowl.name}"
+        <img src="${tileImageSrc(bowl)}" alt="${bowl.name}"
              style="transform: translate(${bowl.img_x - 50}%, ${bowl.img_y - 50}%) scale(${bowl.img_scale})"
              onerror="this.closest('.tile-photo-wrap').classList.add('photo-error');this.remove()">
       </div>
