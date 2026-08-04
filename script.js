@@ -273,10 +273,32 @@ function render(data) {
   renderUpsell(data.upsell);
 }
 
+/* ── Fullscreen (kiosk) ──────────────────────────────────────────
+   TV browsers show an address bar that eats screen space. The
+   Fullscreen API can hide it, but browsers only allow it in
+   response to a real user gesture — so we listen for any remote
+   button press or click and go fullscreen then.
+   NOTE: Chrome 69 (the store TVs) only has the webkit-prefixed
+   version; unprefixed requestFullscreen landed in Chrome 71.     */
+function goFullscreen() {
+  const el = document.documentElement;
+  const req = el.requestFullscreen
+           || el.webkitRequestFullscreen
+           || el.webkitRequestFullScreen
+           || el.mozRequestFullScreen
+           || el.msRequestFullscreen;
+  if (!req) return;
+  try { req.call(el); } catch (e) { /* denied or unsupported */ }
+}
+
 /* ── Boot ────────────────────────────────────────────────────── */
 async function init() {
   scaleScreen();
   window.addEventListener('resize', scaleScreen);
+
+  // Any remote key / click puts the board fullscreen.
+  document.addEventListener('click',   goFullscreen);
+  document.addEventListener('keydown', goFullscreen);
 
   try {
     const data = await fetchData();
