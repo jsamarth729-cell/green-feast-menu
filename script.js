@@ -15,15 +15,41 @@ let featuredCount = 0;
 let slideTimer    = null;
 
 /* ── Scale 1920×1080 canvas to fill viewport ─────────────────── */
+let lastW = 0, lastH = 0;
+
 function scaleScreen() {
-  const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-  const left  = (window.innerWidth  - 1920 * scale) / 2;
-  const top   = (window.innerHeight - 1080 * scale) / 2;
-  const el    = document.getElementById('screen');
+  const el = document.getElementById('screen');
+  if (!el) return;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  if (!vw || !vh) return;
+  lastW = vw; lastH = vh;
+
+  const scale = Math.min(vw / 1920, vh / 1080);
   el.style.transform       = `scale(${scale})`;
   el.style.transformOrigin = 'top left';
-  el.style.left            = left + 'px';
-  el.style.top             = top  + 'px';
+  el.style.left            = (vw - 1920 * scale) / 2 + 'px';
+  el.style.top             = (vh - 1080 * scale) / 2 + 'px';
+}
+
+/* Kiosk WebViews report their final viewport size late — often only
+   after entering fullscreen. A single scale at boot therefore locks
+   in wrong numbers and the board stays mis-sized until someone
+   presses a key. So: re-scale on every event that can change the
+   viewport, retry over the first few seconds, then keep a cheap
+   watchdog running (the board is on 24/7 and never reloads).      */
+function watchViewport() {
+  ['resize', 'orientationchange', 'fullscreenchange',
+   'webkitfullscreenchange'].forEach(evt =>
+    window.addEventListener(evt, scaleScreen));
+
+  [50, 150, 400, 800, 1500, 3000].forEach(ms =>
+    setTimeout(scaleScreen, ms));
+
+  setInterval(() => {
+    if (window.innerWidth !== lastW || window.innerHeight !== lastH) {
+      scaleScreen();
+    }
+  }, 1000);
 }
 
 /* ── CSV parser (used when BOWLS_SOURCE is a Google Sheet URL) ── */
@@ -294,7 +320,7 @@ function goFullscreen() {
 /* ── Boot ────────────────────────────────────────────────────── */
 async function init() {
   scaleScreen();
-  window.addEventListener('resize', scaleScreen);
+  watchViewport();
 
   // Any remote key / click puts the board fullscreen.
   document.addEventListener('click',   goFullscreen);
