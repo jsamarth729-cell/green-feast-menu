@@ -17,10 +17,21 @@ let slideTimer    = null;
 /* ── Scale 1920×1080 canvas to fill viewport ─────────────────── */
 let lastW = 0, lastH = 0;
 
+/* Kiosk WebViews often paint at their own zoom level until the page
+   goes fullscreen — window.innerWidth still reports 1920, so it can't
+   detect this and the board renders oversized. visualViewport reports
+   the area actually visible (zoom included), so fitting to that is
+   correct both before and after fullscreen. Chrome 61+.            */
+function viewportSize() {
+  const vp = window.visualViewport;
+  if (vp && vp.width && vp.height) return [vp.width, vp.height];
+  return [window.innerWidth, window.innerHeight];
+}
+
 function scaleScreen() {
   const el = document.getElementById('screen');
   if (!el) return;
-  const vw = window.innerWidth, vh = window.innerHeight;
+  const [vw, vh] = viewportSize();
   if (!vw || !vh) return;
   lastW = vw; lastH = vh;
 
@@ -42,13 +53,19 @@ function watchViewport() {
    'webkitfullscreenchange'].forEach(evt =>
     window.addEventListener(evt, scaleScreen));
 
+  // Fires when the WebView's own zoom changes — the case innerWidth misses.
+  const vp = window.visualViewport;
+  if (vp) {
+    vp.addEventListener('resize', scaleScreen);
+    vp.addEventListener('scroll', scaleScreen);
+  }
+
   [50, 150, 400, 800, 1500, 3000].forEach(ms =>
     setTimeout(scaleScreen, ms));
 
   setInterval(() => {
-    if (window.innerWidth !== lastW || window.innerHeight !== lastH) {
-      scaleScreen();
-    }
+    const [vw, vh] = viewportSize();
+    if (vw !== lastW || vh !== lastH) scaleScreen();
   }, 1000);
 }
 
