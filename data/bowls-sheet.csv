@@ -6,5 +6,5 @@ id,name,description,price,kcal,protein,fibre,tags,badge,image,featured,img_x,img
 5,Quinoa Buddha Bowl,"Quinoa, chickpeas, paneer, roasted veg, sweet mango dressing",349,380,24,12,Gluten Free,,quinoa-buddha,TRUE,50,50,1
 6,Mexican Fiesta Bowl,"Smoky beans, rice, corn, salsa, nachos, avocado, chipotle",349,380,24,12,Gluten Free,,mexican-fiesta,TRUE,50,50,1
 7,Mediterranean Bliss Bowl,"Chickpeas, couscous, roasted veggies, feta, hummus, tahini",349,380,24,12,Less Spicy,Chef's Spotlight,mediterranean-bliss,TRUE,50,50,1
-8,Healthy Burrito Bowl,"Rajma, rice, corn, salsa, paneer or tofu, guacamole, nachos",349,380,24,12,Gluten Free,,burrito-bowl,TRUE,50,50,1
-9,Tropical Fruit Salad,"Pineapple, kiwi, pomegranate, grapes, berries, citrus mint dressing",349,180,3,6,Low Calorie,,tropical-fruit-salad,TRUE,50,50,1
+8,Healthy Burrito Bowl,"Rajma, rice, corn, salsa, paneer or tofu, guacamole, nachos",349,380,24,12,Gluten Free,,burrito-bowl,FALSE,50,50,1
+9,Tropical Fruit Salad,"Pineapple, kiwi, pomegranate, grapes, berries, citrus mint dressing",349,180,3,6,Low Calorie,,tropical-fruit-salad,FALSE,50,50,1

@@ -7,7 +7,7 @@ const BOWLS_SOURCE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NTFd2KL
 const CONFIG_URL   = 'data/config.json';  // BYOB tile + upsell (edit here directly)
 
 const CACHE_KEY  = 'gf_bowls_v2';
-const SLIDE_MS   = 7000;
+const SLIDE_MS   = 10000;
 const REFRESH_MS = 5 * 60 * 1000;
 
 /* Escape hatch: any bowl listed here uses its original photo (marble
@@ -16,6 +16,16 @@ const REFRESH_MS = 5 * 60 * 1000;
    background-removal tool produces — but kept so a bad cut-out can be
    sidelined without a code change. */
 const HERO_CUTOUT_UNAVAILABLE = [];
+
+/* Tile pills are too small for full words at wall-viewing distance, so they
+   show an abbreviation and the footer carries the glossary. Mapping lives here
+   rather than in the Sheet so the owner keeps writing readable names. */
+const TAG_ABBREV = {
+  'Gluten Free': 'GF',
+  'Less Spicy':  'LS',
+  'Vegan':       'V',
+  'Low Calorie': 'LC',
+};
 
 let currentSlide = 0;
 let featuredCount = 0;
@@ -175,7 +185,7 @@ async function fetchData() {
    and <slug>-side.jpg / images/nobg/<slug>-side.png (hero — the cut-out
    PNG where available, see HERO_CUTOUT_UNAVAILABLE above).           */
 function tileImageSrc(bowl) {
-  return `images/${bowl.image}-top.jpg`;
+  return `images/nobg/${bowl.image}-top.png`;
 }
 function heroImageSrc(bowl) {
   return HERO_CUTOUT_UNAVAILABLE.includes(bowl.image)
@@ -220,7 +230,7 @@ function tileHTML(bowl) {
   if (bowl.badge === 'Most Loved')       badgeClass = 'badge-loved';
 
   const tags = (bowl.tags || [])
-    .map(t => `<span class="tile-tag">${t}</span>`)
+    .map(t => `<span class="tile-tag">${TAG_ABBREV[t] || t}</span>`)
     .join('');
 
   return `
