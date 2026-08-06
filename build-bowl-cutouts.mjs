@@ -19,7 +19,7 @@ const OUT = './images/nobg';
 
 const WORK_PX  = 1800;   // downscale before removal — originals are up to 16 MB
 const CANVAS   = 900;    // output canvas, square
-const ALPHA_LO = 24;     // alpha repair curve (see fix-cutout-alpha.mjs)
+const ALPHA_LO = 24;     // alpha repair curve — see cutout() below
 const ALPHA_HI = 96;
 
 const HERO_W          = 0.86;  // bowl width as fraction of canvas, hero

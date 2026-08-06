@@ -50,19 +50,22 @@ script.js  ──fetch──►  parses CSV  ──►  builds HTML  ──►  
 
 | File | What it does |
 |------|--------------|
+| `DESIGN-PRINCIPLES.md` | **Read before designing any new screen.** The design rules distilled from building Screen 1 — legibility, tags, photography, colour, Chrome 69 limits. |
 | `bowls.html` | The Screen 1 markup (the actual menu board). |
 | `style.css` | All styling. 1920×1080 layout, colors, fonts, tile/hero design. |
 | `script.js` | The brain: fetches data, parses CSV, builds & renders HTML, auto-refresh. |
+| `tvtest.html` | **On-TV diagnostic.** ES5-only page reporting browser engine + feature support in large text. Open this first when a board renders wrong. |
 | `adjust.html` | **Image adjuster tool** — local page with live sliders to frame each bowl photo, then export a finished CSV. (See "Image framing" below.) |
 | `data/config.json` | Static content: Build-Your-Own tile + upsell rail items. |
-| `data/bowls-sheet.csv` | The CSV template / current snapshot of the Sheet. Used to seed or re-import the Google Sheet. |
-| `data/bowls.json` | **Legacy** Phase-1 local data (before Google Sheets). No longer the live source. |
-| `images/` | The 8 compressed, square-cropped bowl photos served on screen. |
-| `compress-images.mjs` | One-off Node script: shrinks huge originals (50MB → ~800KB). |
-| `crop-bowls.mjs` | One-off Node script: crops raw photos to centered squares. |
+| `data/bowls-sheet.csv` | Local snapshot/template of the Sheet. **Not what the live boards read** — see the caching note below. |
+| `images/nobg/` | The transparent cut-outs actually served: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
+| `images/` | The square JPG crops these were built from. Kept as the `HERO_CUTOUT_UNAVAILABLE` fallback source. |
+| `build-bowl-cutouts.mjs` | **The image pipeline.** Original photo → background removal → alpha repair → isolate subject → trim → normalize. Run from the repo root. |
+| `ingest-manual-cutout.mjs` | Normalizes a hand-cut transparent PNG through the same path, for when the remover fails on a photo (see DESIGN-PRINCIPLES §6). |
 
 ### Not committed / local-only
-- `node_modules/`, `drive-download-…/` (raw photo dump), `images_compressed/`, `*.bat` —
+- `node_modules/`, `drive-download-…/` (raw photo dump), `images_compressed/`, `*.bat`,
+  `.claude/`, `.playwright-mcp/`, and loose reference screenshots/mockups in the root —
   all in `.gitignore`.
 
 ---
@@ -74,13 +77,20 @@ Header row (exact order):
 id, name, description, price, kcal, protein, fibre, tags, badge, image, featured, img_x, img_y, img_scale
 ```
 
-- **tags** — fully flexible. Any text (`V`, `GF`, `DF`, …) renders as a pill. Comma-separate
-  for multiple (`V,GF`).
+- **tags** — write the **full readable name** (`Gluten Free`, `Less Spicy`, `Vegan`,
+  `Low Calorie`). `TAG_ABBREV` in `script.js` shortens them to `GF`/`LS`/`V`/`LC` for the
+  tile pills, and the footer glossary spells them back out. Comma-separate for multiple
+  (`Vegan,Low Calorie`). An unmapped tag renders as written — add it to `TAG_ABBREV` and
+  the footer legend in `bowls.html` together.
 - **badge** — flexible. `Chef's Spotlight` → green, `Most Loved` → brown, anything else →
-  default sage green. Blank = no badge.
-- **featured** — `TRUE` puts the bowl in the rotating hero slideshow (left panel).
-- **image** — the filename in `images/` (e.g. `thai-zen.jpg`).
-- **img_x / img_y / img_scale** — per-bowl photo framing (see below). Blank = 50/50/1.
+  default sage green. Blank = no badge. Badges show on the grid tile only, not the hero.
+- **featured** — `TRUE` puts the bowl in the rotating hero slideshow (left panel). Not every
+  bowl needs to be featured; weak photos can stay in the grid and be left out of rotation.
+- **image** — the **slug**, with no extension (e.g. `thai-zen`). The code appends
+  `-side.png` / `-top.png` and the `images/nobg/` path itself.
+- **img_x / img_y / img_scale** — per-bowl framing nudge on the tile (see below).
+  Blank = 50/50/1. Rarely needed now that `build-bowl-cutouts.mjs` normalizes size
+  and position automatically.
 
 ⚠️ **Important caching note:** Google's published-CSV link is cached on **Google's servers
 for ~5 minutes**. After editing the Sheet, the live screen updates within ~5 min on its own.
@@ -125,20 +135,30 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/bowls.htm
 ## Project phases
 - **Phase 1 ✅** — Build Screen 1 from local JSON data.
 - **Phase 2 ✅** — Swap data source to Google Sheets (live, auto-refresh).
-- **Phase 3 ✅ (in progress)** — Push to GitHub Pages; kiosk setup on physical screens.
+- **Phase 3 ✅** — GitHub Pages + kiosk setup on the physical screens.
+- **Phase 3.5 ✅** — Screen 1 redesigned for wall-distance legibility (dark hero, cut-out
+  photography, abbreviated tags + glossary). Rules captured in `DESIGN-PRINCIPLES.md`.
 - **Phase 4 ⏳** — Build Screens 2 (Wraps & Paninis), 3 (Beverages), 4 (Salads & Toasts),
-  reusing this same structure.
+  reusing this same structure **and `DESIGN-PRINCIPLES.md`**.
 
 ## Known TODO
-- `images/chilli-asian-tofu.jpg` is **not uploaded yet** — that bowl shows a placeholder.
-  When the photo is ready: drop it in `images/`, optionally run it through `crop-bowls.mjs`,
-  then `git push`.
+- `tropical-fruit-salad` has only one photo (a 3/4 angle), so its grid tile shows that
+  angle rather than a true overhead like the other eight. Needs a new photograph.
+- Cut-out PNGs are 900×900 regardless of use; tiles display them at 123px. Downscaling the
+  `-top.png` files would cut first-paint time on store wifi if the boards ever feel slow.
 
 ---
 
 ## Conventions for working in this repo
+- **Read `DESIGN-PRINCIPLES.md` before designing a new screen.** It records not just the
+  rules but which of them came from mistakes worth not repeating.
+- **Check every web feature against Chrome 69** — the store TVs are new but their WebView
+  is from 2018. A JS syntax error there is fatal *and silent*: the page renders static HTML
+  with no console anyone can see. See DESIGN-PRINCIPLES §9 for the banned list.
 - Keep it **dependency-free** on the live site. Node scripts are offline tooling only.
 - When changing how images are framed, **update `script.js` and `adjust.html` together**.
 - The owner is **non-technical** — prefer solutions they can drive from the Sheet or a simple
   local tool over anything requiring code edits.
+- **Verify at real display size**, and with Playwright rather than the Browser pane (its
+  screenshots are unreliable in this environment).
 - Commit messages: short, present-tense summary line.

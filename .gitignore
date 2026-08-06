@@ -7,10 +7,10 @@ images_compressed/
 .claude/
 .playwright-mcp/
 
-# design reference exports and working screenshots — kept locally only.
-# "QSR Menu Display.png" in particular is ~24 MB.
-/ChatGPT Image*.png
-/QSR Menu Display.png
-/final-*.png
-/redesign-*.png
-/greenfeast-screen1-*.png
+# Design references, mockups, review screenshots and hand-cut source art.
+# All working files — the committed assets live in images/ and images/nobg/.
+# Any loose PNG in the repo root is scratch by definition; the real ones are
+# never stored here. ("QSR Menu Display.png" alone is ~24 MB.)
+/*.png
+/*.jpg
+/*.jpeg

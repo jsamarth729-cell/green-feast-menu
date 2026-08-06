@@ -1,7 +1,8 @@
 // ═══════════════════════════════════════════════════════════════
-//  DATA SOURCE
-//  Phase 1 (local):  'data/bowls.json'
-//  Phase 2 (sheets): paste your published Google Sheet CSV URL below
+//  DATA SOURCE — the published Google Sheet CSV.
+//  Swap for a local path (e.g. 'data/bowls-sheet.csv') to preview
+//  offline, but ALWAYS restore the Sheet URL before shipping: the
+//  local CSV is a snapshot, not what the boards read.
 // ═══════════════════════════════════════════════════════════════
 const BOWLS_SOURCE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NTFd2KLI2oVsU_jJYP6X-nbLaq1M4Woqpb_gqMudOWUarZlIImnYpXfSrh5cblNmhcNOcUTDaTSw/pub?gid=2092061156&single=true&output=csv';
 const CONFIG_URL   = 'data/config.json';  // BYOB tile + upsell (edit here directly)
@@ -11,10 +12,9 @@ const SLIDE_MS   = 10000;
 const REFRESH_MS = 5 * 60 * 1000;
 
 /* Escape hatch: any bowl listed here uses its original photo (marble
-   background and all) in the hero instead of the transparent cut-out.
-   Empty now that fix-cutout-alpha.mjs repairs the ghosted alpha the
-   background-removal tool produces — but kept so a bad cut-out can be
-   sidelined without a code change. */
+   background and all) from images/<slug>-side.jpg in the hero, instead of
+   the transparent cut-out. Empty because all nine cut-outs are good — but
+   kept so a bad one can be sidelined instantly without a code rewrite. */
 const HERO_CUTOUT_UNAVAILABLE = [];
 
 /* Tile pills are too small for full words at wall-viewing distance, so they
@@ -179,11 +179,12 @@ async function fetchData() {
 }
 
 /* ── Image path helpers ──────────────────────────────────────────
-   bowl.image is a slug (e.g. "mediterranean-bliss"), not a filename —
-   the two shots produced by import-bowl-shots.mjs are named
-   <slug>-top.jpg (grid tile, circular crop, has its marble background)
-   and <slug>-side.jpg / images/nobg/<slug>-side.png (hero — the cut-out
-   PNG where available, see HERO_CUTOUT_UNAVAILABLE above).           */
+   bowl.image is a slug (e.g. "mediterranean-bliss"), not a filename.
+   build-bowl-cutouts.mjs produces two transparent cut-outs per item:
+     images/nobg/<slug>-top.png   flat overhead, for the grid tile
+     images/nobg/<slug>-side.png  3/4 angle,    for the hero
+   images/<slug>-side.jpg is the un-cut original, used only by the
+   HERO_CUTOUT_UNAVAILABLE fallback above.                          */
 function tileImageSrc(bowl) {
   return `images/nobg/${bowl.image}-top.png`;
 }
