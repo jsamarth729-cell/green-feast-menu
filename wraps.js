@@ -5,11 +5,12 @@
 ══════════════════════════════════════════════════════════════════ */
 
 // ═══════════════════════════════════════════════════════════════
-//  DATA SOURCE — local snapshot for now. Swap for the published
-//  Google Sheet CSV (its own tab/gid, per DESIGN-PRINCIPLES §8) once
-//  that tab exists, exactly as BOWLS_SOURCE does in bowls.js.
+//  DATA SOURCE — the published Google Sheet CSV (own tab/gid, same
+//  doc as BOWLS_SOURCE in bowls.js, per DESIGN-PRINCIPLES §8).
+//  Swap for a local path (e.g. 'data/wraps-sheet.csv') to preview
+//  offline, but ALWAYS restore the Sheet URL before shipping.
 // ═══════════════════════════════════════════════════════════════
-const WRAPS_SOURCE = 'data/wraps-sheet.csv';
+const WRAPS_SOURCE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NTFd2KLI2oVsU_jJYP6X-nbLaq1M4Woqpb_gqMudOWUarZlIImnYpXfSrh5cblNmhcNOcUTDaTSw/pub?gid=280369028&single=true&output=csv';
 const CONFIG_URL   = 'data/screen2-config.json';
 
 const CACHE_KEY  = 'gf_wraps_v1';
