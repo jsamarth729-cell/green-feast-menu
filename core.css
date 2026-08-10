@@ -1,0 +1,303 @@
+/* ═══════════════════════════════════════════════════════════════
+   CORE — shared by every menu board (Screens 1-4).
+
+   Everything in here looks identical on all four boards: colour
+   tokens, fonts, the 1920x1080 canvas, tag/badge/macro pill styling,
+   the upsell rail, the footer strip. The four boards hang side by
+   side in the store, so these must not drift apart.
+
+   Screen-specific layout (hero, grid, feature panel, category
+   blocks) lives in its own file (bowls.css, wraps.css, …). If a rule
+   is only true for one screen, it does NOT belong here.
+══════════════════════════════════════════════════════════════════ */
+
+/* ─── Reset & base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:       #F5F0E8;
+  --forest:      #283F28;
+  --forest-mid:  #3A5A3A;
+  --sage:        #5C7C5C;
+  --sage-light:  #8AAA8A;
+  --sage-pale:   #C8D8C8;
+  --bar:         #223322;
+  --bar-dark:    #1A2A1A;
+  --card:        #FFFFFF;
+  --brass:       #B8956A;
+  --badge-green: #3D5E3D;
+  --badge-warm:  #7A5230;
+  --hero-bg:     #163019;
+  --gold:        #FEFA67;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--cream);
+  font-family: 'Inter', sans-serif;
+}
+
+/* ─── Screen canvas (1920×1080, scaled to viewport) ─────────── */
+.screen {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1920px;
+  height: 1080px;
+  display: flex;
+  flex-direction: column;
+  background: var(--cream);
+  transform-origin: top left;
+}
+
+/* Content area above the two bottom strips. Each screen fills this
+   differently — Screen 1 puts a hero beside a grid, Screen 2 puts a
+   feature panel beside stacked category blocks. */
+.main-content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHARED PILLS — tags, macros, badges
+══════════════════════════════════════════════════════════════════ */
+
+/* Dietary tag abbreviation (V / GF / LC / LS) — spelled out once in
+   the footer glossary. See DESIGN-PRINCIPLES §5. */
+.tile-tags {
+  display: flex;
+  flex-shrink: 0;
+}
+.tile-tags > * + * {
+  margin-left: 4px;
+}
+.tile-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--forest);
+  background: rgba(40,63,40,0.10);
+  border: 1.5px solid rgba(40,63,40,0.50);
+  padding: 2px 7px;
+  border-radius: 7px;
+  letter-spacing: 0.04em;
+}
+
+/* Macro pill row, on cream backgrounds */
+.tile-macros {
+  display: flex;
+}
+.tile-macros > * + * {
+  margin-left: 5px;
+}
+.tile-macro {
+  font-size: 14px;
+  font-weight: 600;
+  color: #14290F;
+  background: rgba(100,160,90,0.30);
+  border: 1.5px solid rgba(55,100,45,0.65);
+  padding: 4px 11px;
+  border-radius: 12px;
+}
+
+/* Macro chip, on the dark panel — outlined gold */
+.hero-macros {
+  display: flex;
+}
+.hero-macros > * + * {
+  margin-left: 12px;
+}
+.macro-chip {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid var(--gold);
+  border-radius: 26px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: baseline;
+}
+.macro-chip > * + * {
+  margin-left: 6px;
+}
+.macro-value {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.macro-label {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(254,250,103,0.75);
+}
+
+/* Corner badge (Chef's Spotlight / Most Loved) */
+.tile-badge {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: var(--sage);
+}
+.tile-badge.badge-spotlight { background: var(--badge-green); }
+.tile-badge.badge-loved     { background: var(--badge-warm); }
+
+/* Rupee mark — superscript, slightly smaller than the number */
+.tile-rupee {
+  font-size: 18px;
+  font-weight: 500;
+  vertical-align: super;
+  margin-right: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UPSELL RAIL — identical on every screen
+══════════════════════════════════════════════════════════════════ */
+.upsell-rail {
+  height: 64px;
+  background: var(--bar);
+  display: flex;
+  align-items: center;
+  padding: 0 44px;
+  flex-shrink: 0;
+}
+.upsell-rail > * + * {
+  margin-left: 22px;
+}
+
+.upsell-heading {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage-light);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Main combo card */
+.upsell-combo {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 12px;
+  padding: 10px 24px;
+  flex-shrink: 0;
+}
+.upsell-combo > * + * {
+  margin-left: 14px;
+}
+.combo-text {
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.86);
+  letter-spacing: 0.01em;
+}
+.combo-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+}
+.combo-save {
+  font-size: 12px;
+  font-weight: 600;
+  color: #CCA96E;
+  background: rgba(184,149,106,0.18);
+  border: 1px solid rgba(184,149,106,0.32);
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Vertical divider */
+.upsell-vdiv {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,0.14);
+  flex-shrink: 0;
+}
+
+/* Add-on items */
+.upsell-addon {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.upsell-addon > * + * {
+  margin-left: 10px;
+}
+.addon-text {
+  font-size: 15px;
+  color: rgba(255,255,255,0.68);
+}
+.addon-price {
+  font-size: 17px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.92);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER STRIP — identical on every screen
+══════════════════════════════════════════════════════════════════ */
+.footer-strip {
+  height: 42px;
+  background: var(--bar-dark);
+  display: flex;
+  align-items: center;
+  padding: 0 44px;
+  flex-shrink: 0;
+}
+.footer-legend {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+.footer-legend > * + * {
+  margin-left: 26px;
+}
+.legend-item {
+  font-size: 15px;
+  color: rgba(255,255,255,0.75);
+  display: flex;
+  align-items: center;
+}
+.legend-item > * + * {
+  margin-left: 5px;
+}
+.legend-tag {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255,255,255,0.18);
+  padding: 2px 6px;
+  border-radius: 5px;
+  letter-spacing: 0.04em;
+}
+.legend-dot {
+  color: rgba(255,255,255,0.25);
+  font-size: 18px;
+}
+.footer-note {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.38);
+  letter-spacing: 0.02em;
+}
+.footer-wordmark {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.70);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,383 @@
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN 2 — Wraps, Paninis & Open Toasts. Layout only.
+   Shared tokens, pills, upsell rail and footer live in core.css —
+   wraps.html loads core.css first, then this file.
+
+   No slideshow here (unlike Screen 1's hero) — the left panel is a
+   static feature block. The right side stacks two category blocks
+   (Open Toasts, Wraps) instead of Screen 1's 2x5 tile grid.
+══════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   PANINI PANEL (left 525px, dark — matches Screen 1's hero-panel
+   width, so the dark/cream seam lines up across both boards)
+══════════════════════════════════════════════════════════════════ */
+.panini-panel {
+  width: 525px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--hero-bg);
+  position: relative;
+  overflow: hidden; /* the feature photo intentionally bleeds off-frame */
+}
+
+.panini-header {
+  padding: 56px 44px 20px 61px;
+}
+.panini-eyebrow {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.panini-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.15;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.16);
+}
+
+/* Three panini items */
+.panini-list {
+  padding: 0 44px 0 61px;
+  flex-shrink: 0;
+}
+.panini-item {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+.panini-item:first-child {
+  padding-top: 0;
+}
+.panini-item:last-child {
+  border-bottom: none;
+}
+.panini-item-row {
+  display: flex;
+  align-items: baseline;
+}
+.panini-item-row > * + * {
+  margin-left: 8px;
+}
+.panini-item-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.25;
+}
+/* .tile-tag is styled for cream tiles (core.css) — on the dark panel
+   that reads as a near-invisible dark-on-dark pill, so recolor gold
+   here to match the panel's accent. */
+.panini-item-row .tile-tag {
+  color: var(--gold);
+  background: rgba(254,250,103,0.12);
+  border-color: rgba(254,250,103,0.55);
+}
+.panini-item-price {
+  margin-left: auto;
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+.panini-item-desc {
+  font-size: 17px;
+  color: var(--gold);
+  opacity: 0.82;
+  line-height: 1.3;
+  margin-top: 4px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* Three summary stat chips — stacked value-over-label, unlike the
+   baseline macro-chip. Paninis share these instead of per-item
+   macros (mockup intent: less repetition, more room per item). */
+.panini-stats {
+  display: flex;
+  padding: 18px 44px 0 61px;
+  flex-shrink: 0;
+}
+.panini-stats > * + * {
+  margin-left: 10px;
+}
+.stat-chip {
+  flex: 1;
+  min-width: 0;
+  border: 1.5px solid var(--gold);
+  border-radius: 14px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(254,250,103,0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+/* Feature photo — bleeds off the panel's bottom-left edge, clipped
+   by overflow:hidden on .panini-panel. This is what buys back the
+   height the panel loses vs the mockup's wider, shorter proportions. */
+.panini-photo-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  margin-top: 8px;
+}
+.panini-photo-wrap img {
+  position: absolute;
+  left: -28px;
+  bottom: -18px;
+  width: calc(100% + 56px);
+  max-height: 118%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.35));
+}
+.panini-photo-wrap.photo-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTENT PANEL (right — fills remaining width, stacks two blocks)
+══════════════════════════════════════════════════════════════════ */
+.content-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 44px 20px;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  padding-top: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(88,120,88,0.14);
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  font-weight: 600;
+  color: var(--forest);
+  line-height: 1;
+}
+
+/* ─── Open Toasts — 3-up card grid ──────────────────────────── */
+/* flex:1 lets this block absorb whatever vertical slack the column has
+   left over, and .toast-photo-wrap below (flex:1 too) is what actually
+   spends it — so the photo grows automatically instead of leaving dead
+   space, and a longer description typed into the Sheet later shrinks
+   the photo instead of overflowing the board. */
+.toast-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 16px;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+.toast-card {
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(40,63,40,0.06), 0 1px 3px rgba(40,63,40,0.04);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  /* Grid items get an implicit min-height:auto (= content size), which
+     blocks the row from actually stretching this card down to the
+     grid's stretched track height — it overflows into whatever sits
+     below the grid instead of shrinking. min-height:0 here is what
+     lets .toast-photo-wrap's flex:1 below actually take effect. */
+  min-height: 0;
+}
+.toast-photo-wrap {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.toast-photo-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+.toast-photo-wrap.photo-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.toast-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.toast-name-row > * + * {
+  margin-left: 6px;
+}
+.toast-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--forest);
+  line-height: 1.2;
+}
+.toast-desc {
+  font-size: 16px;
+  color: var(--sage);
+  line-height: 1.32;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.toast-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(88,120,88,0.12);
+}
+.toast-price {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--forest);
+  font-family: 'Inter', sans-serif;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+/* ─── Wraps — text rows beside one shared photo ─────────────── */
+/* align-items: flex-start (not center) — centering a short list in a
+   tall box was the source of ~86px of dead space above/below the
+   rows. Natural height now; flex-shrink:0 keeps the toast grid above
+   as the one thing that absorbs leftover column slack. */
+.wrap-block {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+/* Fixed width, not flex-basis-as-percentage: the row's price sat up to
+   547px away from the name because the text column (808px) was far
+   wider than any description needs. 580px is a hard cap the widest
+   current description (~400px at 16px) fits inside with room to grow;
+   .wrap-photo-wrap takes whatever's left. */
+.wrap-list {
+  flex: 0 0 580px;
+  min-width: 0;
+}
+.wrap-row {
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(88,120,88,0.12);
+}
+.wrap-row:first-child {
+  padding-top: 0;
+}
+.wrap-row:last-child {
+  border-bottom: none;
+}
+.wrap-row-top {
+  display: flex;
+  align-items: baseline;
+}
+.wrap-row-top > * + * {
+  margin-left: 8px;
+}
+.wrap-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--forest);
+  line-height: 1.2;
+}
+.wrap-price {
+  margin-left: auto;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--forest);
+  font-family: 'Inter', sans-serif;
+  flex-shrink: 0;
+}
+.wrap-desc {
+  font-size: 16px;
+  color: var(--sage);
+  line-height: 1.3;
+  margin: 4px 0 8px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.wrap-photo-wrap {
+  flex: 1;
+  min-width: 0;
+  margin-left: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.wrap-photo-wrap img {
+  width: 100%;
+  max-width: 620px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 14px 30px rgba(40,63,40,0.22));
+}
+.wrap-photo-wrap.photo-error {
+  align-items: center;
+  justify-content: center;
+}
+.wrap-note {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--sage);
+  text-align: center;
+  line-height: 1.4;
+  margin-top: 14px;
+}

@@ -1,3 +1,9 @@
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN 1 — Power Bowls.
+   Loads after core.js (scaling, CSV parsing, fetch+cache, fullscreen,
+   tag abbreviations all live there).
+══════════════════════════════════════════════════════════════════ */
+
 // ═══════════════════════════════════════════════════════════════
 //  DATA SOURCE — the published Google Sheet CSV.
 //  Swap for a local path (e.g. 'data/bowls-sheet.csv') to preview
@@ -17,107 +23,9 @@ const REFRESH_MS = 5 * 60 * 1000;
    kept so a bad one can be sidelined instantly without a code rewrite. */
 const HERO_CUTOUT_UNAVAILABLE = [];
 
-/* Tile pills are too small for full words at wall-viewing distance, so they
-   show an abbreviation and the footer carries the glossary. Mapping lives here
-   rather than in the Sheet so the owner keeps writing readable names. */
-const TAG_ABBREV = {
-  'Gluten Free': 'GF',
-  'Less Spicy':  'LS',
-  'Vegan':       'V',
-  'Low Calorie': 'LC',
-};
-
 let currentSlide = 0;
 let featuredCount = 0;
 let slideTimer    = null;
-
-/* ── Scale 1920×1080 canvas to fill viewport ─────────────────── */
-let lastW = 0, lastH = 0;
-
-/* Kiosk WebViews often paint at their own zoom level until the page
-   goes fullscreen — window.innerWidth still reports 1920, so it can't
-   detect this and the board renders oversized. visualViewport reports
-   the area actually visible (zoom included), so fitting to that is
-   correct both before and after fullscreen. Chrome 61+.            */
-function viewportSize() {
-  const vp = window.visualViewport;
-  if (vp && vp.width && vp.height) return [vp.width, vp.height];
-  return [window.innerWidth, window.innerHeight];
-}
-
-function scaleScreen() {
-  const el = document.getElementById('screen');
-  if (!el) return;
-  const [vw, vh] = viewportSize();
-  if (!vw || !vh) return;
-  lastW = vw; lastH = vh;
-
-  const scale = Math.min(vw / 1920, vh / 1080);
-  el.style.transform       = `scale(${scale})`;
-  el.style.transformOrigin = 'top left';
-  el.style.left            = (vw - 1920 * scale) / 2 + 'px';
-  el.style.top             = (vh - 1080 * scale) / 2 + 'px';
-}
-
-/* Kiosk WebViews report their final viewport size late — often only
-   after entering fullscreen. A single scale at boot therefore locks
-   in wrong numbers and the board stays mis-sized until someone
-   presses a key. So: re-scale on every event that can change the
-   viewport, retry over the first few seconds, then keep a cheap
-   watchdog running (the board is on 24/7 and never reloads).      */
-function watchViewport() {
-  ['resize', 'orientationchange', 'fullscreenchange',
-   'webkitfullscreenchange'].forEach(evt =>
-    window.addEventListener(evt, scaleScreen));
-
-  // Fires when the WebView's own zoom changes — the case innerWidth misses.
-  const vp = window.visualViewport;
-  if (vp) {
-    vp.addEventListener('resize', scaleScreen);
-    vp.addEventListener('scroll', scaleScreen);
-  }
-
-  [50, 150, 400, 800, 1500, 3000].forEach(ms =>
-    setTimeout(scaleScreen, ms));
-
-  setInterval(() => {
-    const [vw, vh] = viewportSize();
-    if (vw !== lastW || vh !== lastH) scaleScreen();
-  }, 1000);
-}
-
-/* ── CSV parser (used when BOWLS_SOURCE is a Google Sheet URL) ── */
-function splitCSVLine(line) {
-  const result = [];
-  let current = '', inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
-      else { inQuotes = !inQuotes; }
-    } else if (ch === ',' && !inQuotes) {
-      result.push(current); current = '';
-    } else {
-      current += ch;
-    }
-  }
-  result.push(current);
-  return result;
-}
-
-function parseCSV(text) {
-  const lines   = text.trim().split('\n');
-  const headers = splitCSVLine(lines[0]).map(h => h.trim().replace(/^"|"$/g, ''));
-  return lines.slice(1).filter(l => l.trim()).map(line => {
-    const vals = splitCSVLine(line);
-    const obj = {};
-    headers.forEach(function (h, i) {
-      const v = vals[i];
-      obj[h] = (v === undefined || v === null ? '' : v).trim().replace(/^"|"$/g, '');
-    });
-    return obj;
-  });
-}
 
 function csvRowToBowl(row) {
   return {
@@ -138,44 +46,31 @@ function csvRowToBowl(row) {
   };
 }
 
-/* ── Fetch with localStorage fallback ────────────────────────── */
-async function fetchData() {
-  try {
-    const cacheBust = (url) =>
-      url + (url.includes('?') ? '&' : '?') + '_=' + Date.now();
+async function fetchBowlsData() {
+  const [bowlsRes, configRes] = await Promise.all([
+    fetch(cacheBust(BOWLS_SOURCE)),
+    fetch(CONFIG_URL)
+  ]);
+  if (!bowlsRes.ok || !configRes.ok) throw new Error('fetch failed');
 
-    const [bowlsRes, configRes] = await Promise.all([
-      fetch(cacheBust(BOWLS_SOURCE)),
-      fetch(CONFIG_URL)
-    ]);
-    if (!bowlsRes.ok || !configRes.ok) throw new Error('fetch failed');
+  const config = await configRes.json();
+  let bowls;
 
-    const config = await configRes.json();
-    let bowls;
-
-    if (BOWLS_SOURCE.endsWith('.json')) {
-      // Phase 1 — local JSON
-      const json = await bowlsRes.json();
-      bowls = json.bowls;
-    } else {
-      // Phase 2 — Google Sheet CSV
-      const csv = await bowlsRes.text();
-      bowls = parseCSV(csv).map(csvRowToBowl);
-    }
-
-    const data = {
-      bowls,
-      buildYourOwn: config.buildYourOwn,
-      upsell:       config.upsell
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-    return data;
-
-  } catch {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) return JSON.parse(cached);
-    throw new Error('No data and no cache');
+  if (BOWLS_SOURCE.endsWith('.json')) {
+    // Phase 1 — local JSON
+    const json = await bowlsRes.json();
+    bowls = json.bowls;
+  } else {
+    // Phase 2 — Google Sheet CSV
+    const csv = await bowlsRes.text();
+    bowls = parseCSV(csv).map(csvRowToBowl);
   }
+
+  return {
+    bowls,
+    buildYourOwn: config.buildYourOwn,
+    upsell:       config.upsell
+  };
 }
 
 /* ── Image path helpers ──────────────────────────────────────────
@@ -230,9 +125,7 @@ function tileHTML(bowl) {
   if (bowl.badge === "Chef's Spotlight") badgeClass = 'badge-spotlight';
   if (bowl.badge === 'Most Loved')       badgeClass = 'badge-loved';
 
-  const tags = (bowl.tags || [])
-    .map(t => `<span class="tile-tag">${TAG_ABBREV[t] || t}</span>`)
-    .join('');
+  const tags = tagsHTML(bowl.tags);
 
   return `
     <div class="bowl-tile">
@@ -339,42 +232,21 @@ function render(data) {
   renderUpsell(data.upsell);
 }
 
-/* ── Fullscreen (kiosk) ──────────────────────────────────────────
-   TV browsers show an address bar that eats screen space. The
-   Fullscreen API can hide it, but browsers only allow it in
-   response to a real user gesture — so we listen for any remote
-   button press or click and go fullscreen then.
-   NOTE: Chrome 69 (the store TVs) only has the webkit-prefixed
-   version; unprefixed requestFullscreen landed in Chrome 71.     */
-function goFullscreen() {
-  const el = document.documentElement;
-  const req = el.requestFullscreen
-           || el.webkitRequestFullscreen
-           || el.webkitRequestFullScreen
-           || el.mozRequestFullScreen
-           || el.msRequestFullscreen;
-  if (!req) return;
-  try { req.call(el); } catch (e) { /* denied or unsupported */ }
-}
-
 /* ── Boot ────────────────────────────────────────────────────── */
 async function init() {
   scaleScreen();
   watchViewport();
-
-  // Any remote key / click puts the board fullscreen.
-  document.addEventListener('click',   goFullscreen);
-  document.addEventListener('keydown', goFullscreen);
+  initFullscreenTrigger();
 
   try {
-    const data = await fetchData();
+    const data = await loadData(fetchBowlsData, CACHE_KEY);
     render(data);
   } catch (err) {
     console.error('Green Feast: could not load menu data', err);
   }
 
   setInterval(async () => {
-    try { render(await fetchData()); }
+    try { render(await loadData(fetchBowlsData, CACHE_KEY)); }
     catch { /* keep showing cached version */ }
   }, REFRESH_MS);
 }

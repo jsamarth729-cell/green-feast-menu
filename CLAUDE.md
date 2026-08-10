@@ -6,8 +6,9 @@ restaurant) in Jaipur. The menus run on **4 physical 40" screens** (1920×1080, 
 mounted in the store. The screens are **display-only** — no touch, no interaction. They just
 show the menu and auto-update when the data changes.
 
-**Screen 1 (Healthy Bowls) is built.** Screens 2–4 (Wraps & Paninis, Beverages,
-Salads & Toasts) are planned and will reuse the same structure.
+**Screen 1 (Healthy Bowls) and Screen 2 (Wraps, Paninis & Open Toasts) are built.**
+Screens 3–4 (Beverages, Salads & Toasts) are planned and will reuse the same
+shared core.
 
 ## Tech stack (deliberately simple)
 - Plain **HTML + CSS + vanilla JavaScript**. No frameworks, no build step, no npm at runtime.
@@ -22,27 +23,37 @@ non-developer (the owner edits a spreadsheet, not code).
 ## How it works (data flow)
 
 ```
-Google Sheet (owner edits bowls)
+Google Sheet (owner edits menu)
       │  published as CSV
       ▼
-script.js  ──fetch──►  parses CSV  ──►  builds HTML  ──►  bowls.html renders on screen
+<screen>.js  ──fetch──►  parses CSV  ──►  builds HTML  ──►  <screen>.html renders on screen
       │
       └─ caches to localStorage (so the screen survives a wifi/Google outage)
 ```
 
-- `bowls.html` is the screen. It's a fixed **1920×1080 canvas** that CSS scales to fit
-  whatever display it's shown on (`transform: scale()` calculated in JS).
-- On load, `script.js` fetches the Google Sheet CSV + a local `config.json`, builds all the
-  HTML (hero slideshow + bowl grid + upsell rail), and injects it.
-- It **re-fetches every 5 minutes**, so edits in the Sheet appear on screen automatically.
-- Every successful fetch is saved to `localStorage`. If Google is unreachable, the last good
-  copy is shown instead of a blank screen.
+- Each board (`bowls.html`, `wraps.html`, …) is a fixed **1920×1080 canvas** that CSS
+  scales to fit whatever display it's shown on (`transform: scale()`, calculated in
+  `core.js`).
+- Every board loads **`core.js`** first, then its own script (`bowls.js`, `wraps.js`).
+  `core.js` holds the parts that must behave identically everywhere: viewport
+  scaling, CSV parsing, the fetch+localStorage cache pattern, fullscreen-on-gesture,
+  and the tag-abbreviation map. The screen's own script owns its data shape and how
+  it builds that screen's HTML.
+- Same split on the CSS side: **`core.css`** (tokens, canvas, shared tag/macro/badge
+  pills, the upsell rail, the footer strip) loads before the screen's own file
+  (`bowls.css`, `wraps.css`, …), which holds only that screen's layout.
+- Each board **re-fetches every 5 minutes**, so Sheet edits appear on screen
+  automatically. Every successful fetch is saved to `localStorage`; if Google is
+  unreachable, the last good copy is shown instead of a blank screen.
 
-### Two data sources, on purpose
-1. **Google Sheet (CSV)** → the 9 bowls. Things the owner changes often (name, price, macros,
-   tags, badges, image framing). URL is in `script.js` as `BOWLS_SOURCE`.
-2. **`data/config.json`** (local file) → the "Build Your Own Bowl" tile + the upsell rail.
-   These rarely change, so they're kept in the repo, not the Sheet.
+### Two data sources, on purpose (per screen)
+1. **Google Sheet (CSV)** → the menu items themselves. Things the owner changes often
+   (name, price, macros, tags, badges, image framing). Screen 1's URL is
+   `BOWLS_SOURCE` in `bowls.js`; Screen 2 currently points at the local
+   `data/wraps-sheet.csv` snapshot until its own Sheet tab is published (see below).
+2. **A local config JSON** (`data/config.json` for Screen 1, `data/screen2-config.json`
+   for Screen 2) → static content that rarely changes: Screen 1's Build-Your-Own tile,
+   Screen 2's panel title/stat chips/wrap photo, and each screen's upsell rail.
 
 ---
 
@@ -50,18 +61,23 @@ script.js  ──fetch──►  parses CSV  ──►  builds HTML  ──►  
 
 | File | What it does |
 |------|--------------|
-| `DESIGN-PRINCIPLES.md` | **Read before designing any new screen.** The design rules distilled from building Screen 1 — legibility, tags, photography, colour, Chrome 69 limits. |
-| `bowls.html` | The Screen 1 markup (the actual menu board). |
-| `style.css` | All styling. 1920×1080 layout, colors, fonts, tile/hero design. |
-| `script.js` | The brain: fetches data, parses CSV, builds & renders HTML, auto-refresh. |
+| `DESIGN-PRINCIPLES.md` | **Read before designing any new screen.** The design rules distilled from building Screens 1–2 — legibility, tags, photography, colour, Chrome 69 limits. |
+| `core.css` | **Shared by every board.** Reset, colour tokens, fonts, the 1920×1080 canvas, tag/macro/badge pill styling, the upsell rail, the footer strip. If a rule should look identical on all four screens, it lives here — not in a screen's own CSS file. |
+| `core.js` | **Shared by every board.** Viewport scaling, CSV parsing, the fetch+localStorage cache pattern (`loadData()`), fullscreen-on-gesture, and the tag-abbreviation map (`TAG_ABBREV`). Screen-specific data shapes and render logic do not belong here. |
+| `bowls.html` / `bowls.css` / `bowls.js` | Screen 1 — Power Bowls: hero slideshow + 2×5 tile grid. Loads `core.css`/`core.js` first. |
+| `wraps.html` / `wraps.css` / `wraps.js` | Screen 2 — Wraps, Paninis & Open Toasts: static feature panel (no slideshow) + stacked category blocks. Loads `core.css`/`core.js` first. |
 | `tvtest.html` | **On-TV diagnostic.** ES5-only page reporting browser engine + feature support in large text. Open this first when a board renders wrong. |
-| `adjust.html` | **Image adjuster tool** — local page with live sliders to frame each bowl photo, then export a finished CSV. (See "Image framing" below.) |
-| `data/config.json` | Static content: Build-Your-Own tile + upsell rail items. |
-| `data/bowls-sheet.csv` | Local snapshot/template of the Sheet. **Not what the live boards read** — see the caching note below. |
-| `images/nobg/` | The transparent cut-outs actually served: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
-| `images/` | The square JPG crops these were built from. Kept as the `HERO_CUTOUT_UNAVAILABLE` fallback source. |
-| `build-bowl-cutouts.mjs` | **The image pipeline.** Original photo → background removal → alpha repair → isolate subject → trim → normalize. Run from the repo root. |
+| `adjust.html` | **Image adjuster tool** — local page with live sliders to frame each bowl photo, then export a finished CSV. (See "Image framing" below.) Screen 1 only, for now. |
+| `data/config.json` | Screen 1 static content: Build-Your-Own tile + upsell rail items. |
+| `data/bowls-sheet.csv` | Local snapshot/template of the Screen 1 Sheet tab. **Not what the live board reads** — see the caching note below. |
+| `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the three summary stat chips, the panini and wrap image slugs, the wrap note, and the upsell rail. |
+| `data/wraps-sheet.csv` | Screen 2 items (paninis, toasts, wraps), grouped by a `section` column. **Currently what the live board reads directly** — no Sheet tab published for Screen 2 yet; swap `WRAPS_SOURCE` in `wraps.js` for the published CSV URL once one exists, same pattern as `BOWLS_SOURCE`. |
+| `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
+| `images/screen2/` | Screen 2's transparent cut-outs: the panini and mex-chipotle feature photos (trimmed only), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
+| `images/` | The square JPG crops Screen 1's cut-outs were built from. Kept as the `HERO_CUTOUT_UNAVAILABLE` fallback source. |
+| `build-bowl-cutouts.mjs` | **Screen 1's image pipeline.** Original photo → background removal → alpha repair → isolate subject → trim → normalize. Run from the repo root. |
 | `ingest-manual-cutout.mjs` | Normalizes a hand-cut transparent PNG through the same path, for when the remover fails on a photo (see DESIGN-PRINCIPLES §6). |
+| `build-screen2-cutouts.mjs` | Screen 2's image pipeline. Trims hand-cut PNGs to their alpha bounding box; the three Open Toasts photos additionally get placed on a shared canvas at uniform width. Source art lives in the local, gitignored `Screen 2/` folder — this script reads from there. |
 
 ### Not committed / local-only
 - `node_modules/`, `drive-download-…/` (raw photo dump), `images_compressed/`, `*.bat`,
@@ -71,17 +87,18 @@ script.js  ──fetch──►  parses CSV  ──►  builds HTML  ──►  
 ---
 
 ## The Google Sheet columns
-Header row (exact order):
+
+**Screen 1 (Power Bowls)** — header row (exact order):
 
 ```
 id, name, description, price, kcal, protein, fibre, tags, badge, image, featured, img_x, img_y, img_scale
 ```
 
 - **tags** — write the **full readable name** (`Gluten Free`, `Less Spicy`, `Vegan`,
-  `Low Calorie`). `TAG_ABBREV` in `script.js` shortens them to `GF`/`LS`/`V`/`LC` for the
+  `Low Calorie`). `TAG_ABBREV` in `core.js` shortens them to `GF`/`LS`/`V`/`LC` for the
   tile pills, and the footer glossary spells them back out. Comma-separate for multiple
   (`Vegan,Low Calorie`). An unmapped tag renders as written — add it to `TAG_ABBREV` and
-  the footer legend in `bowls.html` together.
+  the footer legend together (each board repeats the same legend markup in its own HTML).
 - **badge** — flexible. `Chef's Spotlight` → green, `Most Loved` → brown, anything else →
   default sage green. Blank = no badge. Badges show on the grid tile only, not the hero.
 - **featured** — `TRUE` puts the bowl in the rotating hero slideshow (left panel). Not every
@@ -92,9 +109,27 @@ id, name, description, price, kcal, protein, fibre, tags, badge, image, featured
   Blank = 50/50/1. Rarely needed now that `build-bowl-cutouts.mjs` normalizes size
   and position automatically.
 
+**Screen 2 (Wraps, Paninis & Open Toasts)** — header row, currently read from
+`data/wraps-sheet.csv` (no Sheet tab published yet):
+
+```
+id, section, name, description, price, kcal, protein, fibre, tags, badge, image
+```
+
+- **section** — `panini`, `toast`, or `wrap`. Drives which block on the board the row
+  renders into. There is no `featured` column — Screen 2 has no slideshow.
+- Paninis leave **kcal/protein/fibre blank** — they show three shared summary stat
+  chips (from `data/screen2-config.json`) instead of per-item macros, to save space
+  in the narrower feature panel. Toasts and wraps fill in all three, same as bowls.
+- **image** — only toasts use this (one of `avo-feta-toast`, `earthy-hummus-toast`,
+  `mango-salsa-toast`). The panini feature photo and the single wrap photo are set in
+  `data/screen2-config.json`, not per-row, since only one of each appears on the board.
+
 ⚠️ **Important caching note:** Google's published-CSV link is cached on **Google's servers
 for ~5 minutes**. After editing the Sheet, the live screen updates within ~5 min on its own.
 A browser hard-refresh does NOT bypass this — the delay is on Google's end, not ours.
+This applies once a screen's data source is a Sheet URL; Screen 2 reads a local file
+today, so its edits are instant until `WRAPS_SOURCE` is swapped over.
 
 ---
 
@@ -103,31 +138,39 @@ Photos are pre-cropped to **squares**, so they fill the circular cutouts perfect
 default. To re-frame a bowl (zoom/pan), **do not guess numbers in the Sheet** — the 5-minute
 Google delay makes that painful. Instead:
 
-1. Open **`adjust.html`** on the local server (`http://localhost:3000/adjust.html`).
+1. Open **`adjust.html`** on the local server (e.g. `http://localhost:3100/adjust.html`
+   — pick a port that isn't already in use by something else on the machine).
 2. Drag the **Zoom / Horizontal / Vertical** sliders — preview updates instantly.
    (Zoom in first, then pan — a square photo at zoom 1 has no spare image to pan into.)
 3. Click **Download updated CSV**.
 4. In Google Sheets: **File → Import → Upload → Replace current sheet**.
 
 Under the hood, framing is applied as `transform: translate(img_x−50%, img_y−50%)
-scale(img_scale)` on the `<img>`. **`script.js` and `adjust.html` must keep this formula
-identical** so the preview matches the real screen.
+scale(img_scale)` on the `<img>`. **`bowls.js` and `adjust.html` must keep this formula
+identical** so the preview matches the real screen. (Screen 1 only — Screen 2's cut-outs
+are pre-normalized by `build-screen2-cutouts.mjs` and have no per-item framing controls.)
 
 ---
 
 ## Running & deploying
 
-**Local preview** (for development): serve the folder and open `bowls.html`, e.g.
-`npx serve . --listen 3000` then `http://localhost:3000/bowls.html`.
+**Local preview** (for development): serve the folder and open the board you're working
+on, e.g. `npx serve . --listen 3100 --no-port-switching` then
+`http://localhost:3100/bowls.html` or `http://localhost:3100/wraps.html`. Pin the port
+explicitly (`--no-port-switching`) and check the page `<title>` after navigating —
+`serve` silently falls back to a different port if the one you asked for is taken by
+another project, and a stale tab pointed at the wrong port will show the wrong site
+without any error.
 
 **Live site** (GitHub Pages):
 - Repo: `https://github.com/jsamarth729-cell/green-feast-menu`
-- Live URL: `https://jsamarth729-cell.github.io/green-feast-menu/bowls.html`
+- Live URLs: `.../bowls.html` (Screen 1), `.../wraps.html` (Screen 2)
 - Deploy = commit + push to `main`. Pages rebuilds automatically in ~1 min.
 
-**On the physical screens** (kiosk mode):
+**On the physical screens** (kiosk mode), point each TV at its own board:
 ```
 chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/bowls.html
+chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/wraps.html
 ```
 
 ---
@@ -138,14 +181,24 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/bowls.htm
 - **Phase 3 ✅** — GitHub Pages + kiosk setup on the physical screens.
 - **Phase 3.5 ✅** — Screen 1 redesigned for wall-distance legibility (dark hero, cut-out
   photography, abbreviated tags + glossary). Rules captured in `DESIGN-PRINCIPLES.md`.
-- **Phase 4 ⏳** — Build Screens 2 (Wraps & Paninis), 3 (Beverages), 4 (Salads & Toasts),
-  reusing this same structure **and `DESIGN-PRINCIPLES.md`**.
+- **Phase 4a ✅** — Extracted the shared `core.css`/`core.js` from Screen 1's original
+  `style.css`/`script.js`, then built Screen 2 (Wraps, Paninis & Open Toasts) on top of
+  it. Screen 2 intentionally departs from Screen 1's layout (static feature panel
+  instead of a slideshow, stacked category blocks instead of a 2×5 grid) — see
+  DESIGN-PRINCIPLES §2 for which parts of a new screen's layout are fixed vs free.
+- **Phase 4b ⏳** — Build Screens 3 (Beverages) and 4 (Salads & Toasts), reusing
+  `core.css`/`core.js` **and `DESIGN-PRINCIPLES.md`**.
+- **Phase 4c ⏳** — Publish a Google Sheet tab for Screen 2 and point `WRAPS_SOURCE` in
+  `wraps.js` at it, same as `BOWLS_SOURCE`. Today Screen 2 reads `data/wraps-sheet.csv`
+  directly, so the owner cannot yet edit it from a spreadsheet.
 
 ## Known TODO
 - `tropical-fruit-salad` has only one photo (a 3/4 angle), so its grid tile shows that
   angle rather than a true overhead like the other eight. Needs a new photograph.
 - Cut-out PNGs are 900×900 regardless of use; tiles display them at 123px. Downscaling the
   `-top.png` files would cut first-paint time on store wifi if the boards ever feel slow.
+- Screen 2's item descriptions/macros are real content taken from the approved mockup, not
+  placeholders — but they still live in a local CSV, not a Sheet (see Phase 4c above).
 
 ---
 
@@ -156,7 +209,12 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/bowls.htm
   is from 2018. A JS syntax error there is fatal *and silent*: the page renders static HTML
   with no console anyone can see. See DESIGN-PRINCIPLES §9 for the banned list.
 - Keep it **dependency-free** on the live site. Node scripts are offline tooling only.
-- When changing how images are framed, **update `script.js` and `adjust.html` together**.
+- When changing how Screen 1's images are framed, **update `bowls.js` and `adjust.html`
+  together**.
+- **A rule that should look identical on every board belongs in `core.css`/`core.js`, not
+  in a screen's own file.** Before copying something from `bowls.css`/`bowls.js` into a
+  new screen, check whether it's already shared — and if a fix needs to happen on every
+  board, it almost certainly belongs in `core.*` rather than being patched per screen.
 - The owner is **non-technical** — prefer solutions they can drive from the Sheet or a simple
   local tool over anything requiring code edits.
 - **Verify at real display size**, and with Playwright rather than the Browser pane (its

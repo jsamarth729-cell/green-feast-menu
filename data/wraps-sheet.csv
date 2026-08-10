@@ -1,0 +1,11 @@
+id,section,name,description,price,kcal,protein,fibre,tags,badge,image
+1,panini,Plant Protein Soya Panini,"Soya protein, grilled veggies, greens, sauce",329,,,,Gluten Free,,
+2,panini,Peri Peri Paneer Panini,"Peri peri paneer, peppers, onions, greens",329,,,,Vegan,,
+3,panini,Green Goddess Panini,"Herbed greens, avocado, grilled veggies",329,,,,Vegan,,
+4,toast,Avo Feta Toast,"Avocado, feta, seeds, greens on multigrain",299,320,10,7,Vegan,,avo-feta-toast
+5,toast,Earthy Hummus Toast,"Hummus, mushrooms, herbs, seeds",299,300,10,8,Vegan,,earthy-hummus-toast
+6,toast,Mango Salsa Open Toast,"Mango salsa, avocado, greens, seeds",299,310,9,6,Vegan,,mango-salsa-toast
+7,wrap,Smoky Chipotle Wrap,"Smoky chipotle, crunchy greens, roasted veggies",349,420,20,8,Vegan,,
+8,wrap,BBQ Protein Wrap,"BBQ glazed protein, fresh greens, crunchy veggies",349,440,24,7,Vegan,,
+9,wrap,Cajun Fusion Wrap,"Cajun-spiced protein, peppers, greens, creamy dressing",349,410,21,8,Vegan,,
+10,wrap,Plant Protein Soya Wrap,"Spiced soya protein, fresh vegetables, house dressing",349,430,25,9,Gluten Free,,

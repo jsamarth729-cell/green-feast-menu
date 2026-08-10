@@ -14,3 +14,7 @@ images_compressed/
 /*.png
 /*.jpg
 /*.jpeg
+
+# Screen 2 mockups + hand-cut source art (same reasoning as above —
+# the committed cut-outs live in images/screen2/).
+Screen 2/

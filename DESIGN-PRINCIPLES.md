@@ -74,6 +74,33 @@ supports it.
   breathe rather than switching to a different column count. Consistency across
   the four screens matters more than perfectly packing each one.
 
+**What's fixed vs what's free, per screen.** Screen 2 (Wraps, Paninis & Open
+Toasts) departs from this skeleton on purpose: no slideshow (the left panel is
+a static feature block), and the right side stacks category blocks (Open
+Toasts, then Wraps) instead of the 2×5 grid — because the menu itself isn't
+nine interchangeable items, it's three different categories with different
+shapes. That's a legitimate reason to deviate; "it looked nicer" is not.
+
+What must **not** move, regardless of a screen's internal layout:
+- The **left panel is always 525px**, dark (`--hero-bg`), so the dark/cream
+  seam lands in the same place on every board hanging on the wall.
+- The **upsell rail and footer strip** are pixel-identical everywhere — same
+  height, same colours, same content structure. They now live in `core.css`
+  precisely so this can't drift screen to screen.
+- **Colour tokens, fonts, and the tag/macro/badge pill styling** (`core.css`)
+  are shared. A screen may need a variant (e.g. Screen 2's panini-panel tags
+  recolour `.tile-tag` gold instead of forest-on-cream, because the base pill
+  was designed for cream tiles and is nearly invisible on the dark panel) —
+  that's an intentional override in the screen's own CSS, not a fork of the
+  shared rule.
+
+What's free to change per screen: the grid vs. category-block choice, whether
+there's a slideshow, how many photos appear and where. Match the *intent* of
+whatever mockup you're given (hierarchy, what's given a big photo vs. a small
+one, where prices sit) — see §10 on mockup drift, which applies doubly here
+since a new screen's mockup is rarely built at the true 1920×1080 canvas
+proportions.
+
 ---
 
 ## 3. Hero panel
@@ -118,9 +145,9 @@ Hard-won, after going back and forth twice:
 - **The footer carries the glossary**, spelled out once:
   `V Vegan · GF Gluten Free · LC Low Calorie · LS Less Spicy`.
 - **The abbreviation map lives in code, not in the Sheet.** The owner keeps
-  writing readable full names ("Gluten Free"); `TAG_ABBREV` in `script.js`
-  shortens them for display. This keeps the Sheet human-readable and means
-  adding a tag never requires the owner to learn a code.
+  writing readable full names ("Gluten Free"); `TAG_ABBREV` in `core.js`
+  shortens them for display on every board. This keeps the Sheet human-readable
+  and means adding a tag never requires the owner to learn a code.
 - New tags on other screens follow the same shape: a short 1–2 letter code plus
   a glossary entry. Keep the total number of distinct tags small — a glossary
   longer than ~5 entries stops being scannable.
@@ -161,6 +188,16 @@ Rules that took several attempts to get right:
 **Shot list for new screens:** ask the photographer for both angles per item, each
 item photographed alone with nothing else in frame, on a background that
 contrasts with the product. That last point prevents rule 5 entirely.
+
+**Screen 2's pipeline is simpler, on purpose.** Its source photos arrived
+already background-removed (by the user, through an external tool), so
+`build-screen2-cutouts.mjs` skips background removal and blob isolation
+entirely — it only does rule 1 (trim to bbox) and, for the three Open Toasts
+photos, rule 2 (shared canvas, uniform width, common centre — `toast` mode).
+The panini and wrap feature photos are trimmed only (`feature` mode): each is
+alone in its own layout slot with nothing to normalize against. If a future
+screen's source photos still have a background baked in, use
+`build-bowl-cutouts.mjs`'s full pipeline instead.
 
 ---
 
@@ -258,3 +295,12 @@ Notes:
 - Cut-out PNGs are 900×900 regardless of use. Tiles display at 123px, so those
   files are ~7× oversized. Downscaling tile PNGs would cut load time on store
   wifi — worth doing if the boards ever feel slow to first paint.
+- Screen 2's cut-outs came from a free background-removal tool and are capped at
+  612×408 source resolution — fine at the sizes they're displayed (Open Toasts
+  cards, the panini feature photo scales up from a much larger clean source so
+  it's unaffected), but the wrap photo is the one upscaling from the smaller
+  source and may read slightly soft up close. Re-cut from the full-resolution
+  original if it's ever noticeable on the wall.
+- Screen 2 has no Sheet tab yet — `wraps.js` reads `data/wraps-sheet.csv`
+  directly, so the owner cannot edit it from a spreadsheet until one is
+  published and `WRAPS_SOURCE` is pointed at it (see CLAUDE.md Phase 4c).

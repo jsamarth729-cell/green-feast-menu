@@ -1,0 +1,25 @@
+{
+  "panel": {
+    "eyebrow": "Signature",
+    "title": "Panini Range",
+    "image": "panini-hero",
+    "stats": [
+      { "value": "15g+", "label": "protein" },
+      { "value": "390–450", "label": "kcal" },
+      { "value": "8–10g", "label": "fibre" }
+    ]
+  },
+  "sections": {
+    "toast": { "heading": "Open Toasts" },
+    "wrap": {
+      "heading": "Wraps",
+      "image": "bbq-plate",
+      "note": "Freshly rolled.\nPacked with plant power."
+    }
+  },
+  "upsell": [
+    "Panini + any smoothie | ₹449 | save ₹49",
+    "Add extra protein | +₹99",
+    "Add a cold press | +₹99"
+  ]
+}
