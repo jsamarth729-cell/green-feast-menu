@@ -128,7 +128,8 @@ function renderUpsell(upsell) {
      <div class="upsell-gold">
        <span class="gold-text">${upsell.gold.text}</span>
        <span class="gold-price">${upsell.gold.price}</span>
-     </div>`;
+     </div>
+     ${upsell.note ? `<span class="upsell-note">${upsell.note}</span>` : ''}`;
 }
 
 /* ── Full render ─────────────────────────────────────────────── */
