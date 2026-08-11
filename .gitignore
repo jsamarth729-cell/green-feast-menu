@@ -18,3 +18,9 @@ images_compressed/
 # Screen 2 mockups + hand-cut source art (same reasoning as above —
 # the committed cut-outs live in images/screen2/).
 Screen 2/
+
+# Screen 3 mockups + source art (same reasoning as above —
+# the committed cut-outs live in images/screen3/). Anchored to the repo root
+# (leading slash) — an unanchored "Screen3/" also matched images/screen3/ on
+# Windows' case-insensitive filesystem, since the names differ only by a space.
+/Screen3/

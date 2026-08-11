@@ -6,9 +6,9 @@ restaurant) in Jaipur. The menus run on **4 physical 40" screens** (1920×1080, 
 mounted in the store. The screens are **display-only** — no touch, no interaction. They just
 show the menu and auto-update when the data changes.
 
-**Screen 1 (Healthy Bowls) and Screen 2 (Wraps, Paninis & Open Toasts) are built.**
-Screens 3–4 (Beverages, Salads & Toasts) are planned and will reuse the same
-shared core.
+**Screen 1 (Healthy Bowls), Screen 2 (Wraps, Paninis & Open Toasts), and Screen 3
+(Beverages) are built.** Screen 4 (Salads & Toasts) is planned and will reuse the
+same shared core.
 
 ## Tech stack (deliberately simple)
 - Plain **HTML + CSS + vanilla JavaScript**. No frameworks, no build step, no npm at runtime.
@@ -34,7 +34,8 @@ Google Sheet (owner edits menu)
 - Each board (`bowls.html`, `wraps.html`, …) is a fixed **1920×1080 canvas** that CSS
   scales to fit whatever display it's shown on (`transform: scale()`, calculated in
   `core.js`).
-- Every board loads **`core.js`** first, then its own script (`bowls.js`, `wraps.js`).
+- Every board loads **`core.js`** first, then its own script (`bowls.js`, `wraps.js`,
+  `beverages.js`).
   `core.js` holds the parts that must behave identically everywhere: viewport
   scaling, CSV parsing, the fetch+localStorage cache pattern, fullscreen-on-gesture,
   and the tag-abbreviation map. The screen's own script owns its data shape and how
@@ -49,11 +50,14 @@ Google Sheet (owner edits menu)
 ### Two data sources, on purpose (per screen)
 1. **Google Sheet (CSV)** → the menu items themselves. Things the owner changes often
    (name, price, macros, tags, badges, image framing). Screen 1's URL is
-   `BOWLS_SOURCE` in `bowls.js`; Screen 2's is `WRAPS_SOURCE` in `wraps.js`, its own
-   tab in the same Sheet document (see below).
+   `BOWLS_SOURCE` in `bowls.js`; Screen 2's is `WRAPS_SOURCE` in `wraps.js`; Screen 3's
+   is `BEVERAGES_SOURCE` in `beverages.js` — each its own tab in the same Sheet
+   document (see below).
 2. **A local config JSON** (`data/config.json` for Screen 1, `data/screen2-config.json`
-   for Screen 2) → static content that rarely changes: Screen 1's Build-Your-Own tile,
-   Screen 2's panel title/stat chips/wrap photo, and each screen's upsell rail.
+   for Screen 2, `data/screen3-config.json` for Screen 3) → static content that rarely
+   changes: Screen 1's Build-Your-Own tile, Screen 2's panel title/stat chips/wrap
+   photo, Screen 3's board title/section eyebrows/taglines, and each screen's upsell
+   rail.
 
 ---
 
@@ -66,23 +70,29 @@ Google Sheet (owner edits menu)
 | `core.js` | **Shared by every board.** Viewport scaling, CSV parsing, the fetch+localStorage cache pattern (`loadData()`), fullscreen-on-gesture, and the tag-abbreviation map (`TAG_ABBREV`). Screen-specific data shapes and render logic do not belong here. |
 | `bowls.html` / `bowls.css` / `bowls.js` | Screen 1 — Power Bowls: hero slideshow + 2×5 tile grid. Loads `core.css`/`core.js` first. |
 | `wraps.html` / `wraps.css` / `wraps.js` | Screen 2 — Wraps, Paninis & Open Toasts: static feature panel (no slideshow) + stacked category blocks. Loads `core.css`/`core.js` first. |
+| `beverages.html` / `beverages.css` / `beverages.js` | Screen 3 — Beverages: no hero/slideshow and no 525px dark left panel — a full-width dark header band instead, then a 5-up Functional Smoothies row and a 4-up Coffee Menu row stacked in `.main-content`. Loads `core.css`/`core.js` first. See DESIGN-PRINCIPLES §2 for why the dark anchor moved. |
 | `tvtest.html` | **On-TV diagnostic.** ES5-only page reporting browser engine + feature support in large text. Open this first when a board renders wrong. |
 | `adjust.html` | **Image adjuster tool** — local page with live sliders to frame each bowl photo, then export a finished CSV. (See "Image framing" below.) Screen 1 only, for now. |
 | `data/config.json` | Screen 1 static content: Build-Your-Own tile + upsell rail items. |
 | `data/bowls-sheet.csv` | Local snapshot/template of the Screen 1 Sheet tab. **Not what the live board reads** — see the caching note below. |
 | `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the three summary stat chips, the panini and wrap image slugs, the wrap note, and the upsell rail. |
 | `data/wraps-sheet.csv` | Local snapshot/template of the Screen 2 Sheet tab, grouped by a `section` column (`panini`/`toast`/`wrap`). **Not what the live board reads** — same caching note as `data/bowls-sheet.csv` below. |
+| `data/screen3-config.json` | Screen 3 static content: board title, the two section headings ("Functional Smoothies", "Coffee"), the footer macro note, and the gold protein upsell. **`upsell` here is a single `{heading, gold:{text,price}}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one item, not a variable combo list. |
+| `data/screen3-sheet.csv` | Local snapshot/template of the Screen 3 Sheet tab, grouped by a `section` column (`smoothie`/`coffee`). **Not what the live board reads once the Sheet tab is published** — same caching note as `data/bowls-sheet.csv` below. |
 | `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
 | `images/screen2/` | Screen 2's transparent cut-outs: the panini and wrap (`bbq-plate`) feature photos (trimmed only), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
+| `images/screen3/` | Screen 3's transparent cut-outs, one per smoothie/coffee (`<slug>.png`). Trimmed to alpha bounding box only — **no shared canvas** (a deliberate departure from the Screen 2 pattern; see DESIGN-PRINCIPLES §6). The board normalizes them by CSS height instead. |
 | `images/` | The square JPG crops Screen 1's cut-outs were built from. Kept as the `HERO_CUTOUT_UNAVAILABLE` fallback source. |
 | `build-bowl-cutouts.mjs` | **Screen 1's image pipeline.** Original photo → background removal → alpha repair → isolate subject → trim → normalize. Run from the repo root. |
 | `ingest-manual-cutout.mjs` | Normalizes a hand-cut transparent PNG through the same path, for when the remover fails on a photo (see DESIGN-PRINCIPLES §6). |
 | `build-screen2-cutouts.mjs` | Screen 2's image pipeline. Trims hand-cut PNGs to their alpha bounding box; the three Open Toasts photos additionally get placed on a shared canvas at uniform width. Source art lives in the local, gitignored `Screen 2/` folder — this script reads from there. |
+| `build-screen3-cutouts.mjs` | Screen 3's image pipeline. Trims pre-background-removed PNGs to their alpha bounding box only — no shared canvas, since all nine sources are already the same cup, angle and lighting. Source art lives in the local, gitignored `Screen3/` folder — this script reads from there. |
 
 ### Not committed / local-only
 - `node_modules/`, `drive-download-…/` (raw photo dump), `images_compressed/`, `*.bat`,
-  `.claude/`, `.playwright-mcp/`, and loose reference screenshots/mockups in the root —
-  all in `.gitignore`.
+  `.claude/`, `.playwright-mcp/`, `Screen 2/` and `Screen3/` (source art the cutout
+  scripts read from), and loose reference screenshots/mockups in the root — all in
+  `.gitignore`.
 
 ---
 
@@ -125,10 +135,34 @@ id, section, name, description, price, kcal, protein, fibre, tags, badge, image
   `mango-salsa-toast`). The panini feature photo and the single wrap photo are set in
   `data/screen2-config.json`, not per-row, since only one of each appears on the board.
 
+**Screen 3 (Beverages)** — header row, own tab in the same Sheet document (its own `gid`
+in `BEVERAGES_SOURCE`, once published — see "Go live" below):
+
+```
+id, section, name, description, benefit, price, kcal, protein, sugar, badge, image
+```
+
+- **section** — `smoothie` or `coffee`. Drives which row on the board the item renders into.
+  There is no `featured` column — Screen 3 has no slideshow.
+- **benefit** — Screen 3's functional-smoothie differentiator (`Focus`, `Clarity`, `Energy`,
+  `Strength`, `Recovery`). Renders as its own accent chip beside the name, one colour per
+  benefit (see `beverages.css`, and DESIGN-PRINCIPLES §7 for the palette). **Replaces dietary
+  tags on this board** — Screen 3 cards don't use `V`/`GF`/`LC`/`LS`, and unlike Screens 1–2 the
+  footer doesn't carry that glossary either (§2: the bar itself stays pixel-identical, but its
+  content is per-board — Screen 3's footer shows a macro disclaimer instead). Blank for coffee
+  rows.
+- **description** — any occurrence of `brahmi`, `shatavari`, `ashwagandha`, or `blue spirulina`
+  (case-insensitive) is automatically highlighted on the board (`POWER_INGREDIENTS` in
+  `beverages.js`). No Sheet markup needed; just write the ingredient name normally.
+- Screen 3 uses **kcal/protein/sugar** (not fibre) — sugar reads as the more relevant macro
+  for smoothies and coffee than fibre does.
+- **image** — the slug (e.g. `blue-mind`); the code appends `images/screen3/<slug>.png`.
+  Every row uses this column — unlike Screen 2, there's no shared feature photo.
+
 ⚠️ **Important caching note:** Google's published-CSV link is cached on **Google's servers
 for ~5 minutes**. After editing the Sheet, the live screen updates within ~5 min on its own.
 A browser hard-refresh does NOT bypass this — the delay is on Google's end, not ours.
-Applies to both screens now that both read from published Sheet tabs.
+Applies to all boards reading from published Sheet tabs.
 
 ---
 
@@ -155,7 +189,8 @@ are pre-normalized by `build-screen2-cutouts.mjs` and have no per-item framing c
 
 **Local preview** (for development): serve the folder and open the board you're working
 on, e.g. `npx serve . --listen 3100 --no-port-switching` then
-`http://localhost:3100/bowls.html` or `http://localhost:3100/wraps.html`. Pin the port
+`http://localhost:3100/bowls.html`, `http://localhost:3100/wraps.html`, or
+`http://localhost:3100/beverages.html`. Pin the port
 explicitly (`--no-port-switching`) and check the page `<title>` after navigating —
 `serve` silently falls back to a different port if the one you asked for is taken by
 another project, and a stale tab pointed at the wrong port will show the wrong site
@@ -163,13 +198,15 @@ without any error.
 
 **Live site** (GitHub Pages):
 - Repo: `https://github.com/jsamarth729-cell/green-feast-menu`
-- Live URLs: `.../bowls.html` (Screen 1), `.../wraps.html` (Screen 2)
+- Live URLs: `.../bowls.html` (Screen 1), `.../wraps.html` (Screen 2), `.../beverages.html`
+  (Screen 3)
 - Deploy = commit + push to `main`. Pages rebuilds automatically in ~1 min.
 
 **On the physical screens** (kiosk mode), point each TV at its own board:
 ```
 chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/bowls.html
 chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/wraps.html
+chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/beverages.html
 ```
 
 ---
@@ -189,7 +226,12 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/wraps.htm
   `wraps.js` at it, same as `BOWLS_SOURCE`. Both boards now read live Sheet tabs — the owner
   can edit either from a spreadsheet, no code changes needed for routine menu edits.
 - **Phase 4b ⏳** — Build Screens 3 (Beverages) and 4 (Salads & Toasts), reusing
-  `core.css`/`core.js` **and `DESIGN-PRINCIPLES.md`**.
+  `core.css`/`core.js` **and `DESIGN-PRINCIPLES.md`**. Screen 3 is built and verified
+  locally (`data/screen3-sheet.csv`); it still needs its Sheet tab published and
+  `BEVERAGES_SOURCE` in `beverages.js` pointed at the live URL (same "Go live" steps
+  Screen 2 followed in Phase 4c) before it's on GitHub Pages. Screen 4 not started.
+  Screen 3 intentionally departs from Screens 1–2's 525px dark left panel — see
+  DESIGN-PRINCIPLES §2.
 
 ## Known TODO
 - `tropical-fruit-salad` has only one photo (a 3/4 angle), so its grid tile shows that

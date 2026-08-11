@@ -82,11 +82,19 @@ nine interchangeable items, it's three different categories with different
 shapes. That's a legitimate reason to deviate; "it looked nicer" is not.
 
 What must **not** move, regardless of a screen's internal layout:
-- The **left panel is always 525px**, dark (`--hero-bg`), so the dark/cream
-  seam lands in the same place on every board hanging on the wall.
+- **Every board carries a dark anchor.** Screens 1–2 do this with a 525px dark
+  (`--hero-bg`) left panel, so the dark/cream seam lands in the same place on every
+  board hanging on the wall. Screen 3 (Beverages) is the first to depart from that
+  shape — see below for why, and for the approved alternative.
 - The **upsell rail and footer strip** are pixel-identical everywhere — same
-  height, same colours, same content structure. They now live in `core.css`
-  precisely so this can't drift screen to screen.
+  height, same colours, same shared classes. They now live in `core.css`
+  precisely so this can't drift screen to screen. **What each board puts inside
+  them may differ.** Screen 3's footer carries `.footer-note` ("Macros shown are
+  average per serving") instead of the V/GF/LC/LS glossary, because no card on
+  that board uses those tags — the 42px dark bar and the wordmark stay fixed,
+  only the content in between changes. Likewise Screen 3's upsell rail holds one
+  centred gold item instead of Screens 1–2's pipe-delimited combo list, because a
+  single item left-aligned in the full-width rail left most of it visibly empty.
 - **Colour tokens, fonts, and the tag/macro/badge pill styling** (`core.css`)
   are shared. A screen may need a variant (e.g. Screen 2's panini-panel tags
   recolour `.tile-tag` gold instead of forest-on-cream, because the base pill
@@ -100,6 +108,18 @@ whatever mockup you're given (hierarchy, what's given a big photo vs. a small
 one, where prices sit) — see §10 on mockup drift, which applies doubly here
 since a new screen's mockup is rarely built at the true 1920×1080 canvas
 proportions.
+
+**Screen 3's dark anchor is a horizontal band, not a vertical panel.** Screens 1–2
+each hero one item (or a small signature range) worth a dedicated dark panel and a
+big photo. A beverage board doesn't have that — nine roughly-equal items across two
+categories, no single item worth the space, and the owner's mockup and brief both
+call for no slideshow and no left panel. Screen 3 instead opens with a **96px
+full-width dark header band** (`.board-header`, `--hero-bg`) carrying just the
+board title, with the smoothie and coffee rows stacked in a cream `.main-content`
+below it. The dark/cream contrast the panel exists to provide is still there — it's
+just a horizontal seam near the top of the board instead of a vertical one on the
+left. Read "every board carries a dark anchor" as the rule that survives; the
+525px-left-panel shape is Screens 1–2's implementation of it, not the rule itself.
 
 ---
 
@@ -151,6 +171,15 @@ Hard-won, after going back and forth twice:
 - New tags on other screens follow the same shape: a short 1–2 letter code plus
   a glossary entry. Keep the total number of distinct tags small — a glossary
   longer than ~5 entries stops being scannable.
+
+**Screen 3 doesn't use this system at all.** Its smoothies are sold on a
+functional benefit (Focus, Clarity, Energy, Strength, Recovery), not a dietary
+attribute, so the benefit gets its own `.benefit-chip` — full word, not an
+abbreviation, and one colour per benefit rather than the shared pill styling —
+instead of a `V`/`GF`/`LC`/`LS` tag. Because no card on Screen 3 uses those four
+tags, its footer carries `.footer-note` (a macro disclaimer) instead of the
+glossary; see §2 for why that's a legitimate per-board footer content swap, not
+a fork of the footer's shared shape.
 
 ---
 
@@ -210,6 +239,24 @@ aspect ratio instead of reusing bowl's. When adding a new shot type, size its
 canvas from its own subjects' aspect ratios — don't assume last screen's
 numbers still apply.
 
+**Screen 3 skips rule 2 (shared canvas) entirely — and this is not a general
+licence to skip it.** `build-screen3-cutouts.mjs` does rule 1 (trim to alpha
+bbox) and nothing else: no shared canvas, no padding, just a downscale if a
+trimmed subject is taller than 600px. This only holds because all nine Screen 3
+source photos are the *same physical cup*, same camera angle, same lighting —
+verified by compositing all nine on `--cream` at real display height and
+confirming by eye that they already read as a matched set before writing any
+normalization code. Their aspect-ratio spread (0.80–0.89) is garnish height,
+not a framing mismatch to correct. Padding every file out to a canvas sized for
+the tallest would waste ~18% of a typical file on transparent padding, and
+because the card's photo box is height-limited, that padding would shrink
+every cup on screen — the exact failure this section already records for the
+900×900 toast canvas. `beverages.css` normalizes by CSS height instead
+(`height: 100%; width: auto` on the `<img>`). If a future screen's source
+photos are *not* this uniform, go back to rule 2's shared-canvas approach —
+verify uniformity on a rendered contact sheet before choosing to skip it, the
+same way Screen 3 did.
+
 ---
 
 ## 7. Colour
@@ -223,9 +270,29 @@ numbers still apply.
 | `--forest` | `#283F28` | body text on cream, BYOB tile background |
 | `--bar` / `--bar-dark` | `#223322` / `#1A2A1A` | upsell rail / footer |
 
+**Screen 3-scoped benefit-chip palette** (`beverages.css`, not `core.css` — see §2 on
+what stays shared vs. what a board owns):
+
+| class | value | benefit |
+|---|---|---|
+| `.b-focus` | `#2F5C8A` | Focus |
+| `.b-clarity` | `#3D7A4A` | Clarity |
+| `.b-energy` | `#6B3A78` | Energy |
+| `.b-strength` | `#6B4226` | Strength |
+| `.b-recovery` | `#B0752A` | Recovery |
+
 - Gold is the accent for **anything the customer should act on** — the hero's
   appetite copy and the Build-Your-Own tile. Do not use it decoratively, or it
   stops signalling.
+- **Screen 3 extends gold to one new, deliberate use: highlighting adaptogens
+  (`brahmi`, `shatavari`, `ashwagandha`, `blue spirulina`) inline in a smoothie's
+  description via `.power`.** This is not a literal call-to-action like the
+  upsell pill — it's informational. The justification: the adaptogen *is* the
+  reason to buy the drink, so marking it is signalling the board's core sell,
+  not decorating it. Treat this as the boundary, not a precedent to extend
+  further — if a later screen starts using gold for a third purpose, gold stops
+  meaning "act on this" and the rule in the first bullet above has quietly
+  failed. Don't add a fourth gold use without updating this section to say why.
 - Keep the dark-hero / cream-grid split. The contrast between the two halves is
   doing real legibility work, not just looking nice.
 
@@ -322,3 +389,10 @@ Notes:
   source. (The panini and wrap feature photos are both sourced from
   full-resolution originals — 1343×947 and 1346×852 respectively — so neither
   is affected by this.)
+- Five of Screen 3's nine source photos (`avo-clarity`, `purple-pulse`,
+  `gingerale-cold-brew`, `vietnamese-cold-brew`, `iced-latte`) are removebg
+  free-tier previews with trimmed subjects only 305–333px wide. Fine at the
+  ~214px they render at on the board today; **re-cut from higher-resolution
+  originals before ever enlarging these past ~340px display height.** The
+  other four (`blue-mind`, `cocoa-core`, `going-nuts`, `cold-brew`) are
+  already high-resolution and unaffected.
