@@ -199,6 +199,17 @@ alone in its own layout slot with nothing to normalize against. If a future
 screen's source photos still have a background baked in, use
 `build-bowl-cutouts.mjs`'s full pipeline instead.
 
+**Copying a canvas size from another shot type breaks rule 1.** The `toast`
+canvas first shipped as 900×900 — copied straight from the bowl pipeline
+without re-checking the assumption. A bowl *is* roughly square; a flat open
+toast is not (~1.5:1). ~40% of every toast file was transparent padding above
+and below the food, so at display size the photo read as noticeably smaller
+than intended — the "image = subject" rule violated by the pipeline itself,
+not by a bad photo. Fixed by sizing the canvas (900×630) to the actual subject
+aspect ratio instead of reusing bowl's. When adding a new shot type, size its
+canvas from its own subjects' aspect ratios — don't assume last screen's
+numbers still apply.
+
 ---
 
 ## 7. Colour
@@ -261,6 +272,16 @@ Notes:
 - `-webkit-line-clamp` works, but ship its `-webkit-box` + `-webkit-box-orient`
   companions.
 - Fullscreen needs the `webkit`-prefixed call (unprefixed landed in Chrome 71).
+- **Grid items don't shrink to a stretched row without `min-height: 0` — this is
+  not a Chrome 69 quirk, it happens in every browser.** A grid item's implicit
+  `min-height: auto` means it won't shrink below its own content size, even
+  though `align-items: stretch` (the default) is telling it to fill the row.
+  Screen 2's Open Toasts cards hit this: giving `.toast-grid` `flex: 1` so it
+  would absorb leftover vertical space should have stretched each `.toast-card`
+  down to match, but the cards kept their full content height instead and
+  overflowed 104px past the grid into the section below — invisible until
+  measured (bounding-box heights, not a screenshot glance), fixed by adding
+  `min-height: 0` to the grid item itself, not just the flexed child inside it.
 - A JS syntax error is fatal and silent — the page renders static HTML only, with
   no visible error. If a screen shows headings but no content, suspect this first
   and open `tvtest.html`, which reports engine version and feature support in
@@ -295,12 +316,9 @@ Notes:
 - Cut-out PNGs are 900×900 regardless of use. Tiles display at 123px, so those
   files are ~7× oversized. Downscaling tile PNGs would cut load time on store
   wifi — worth doing if the boards ever feel slow to first paint.
-- Screen 2's cut-outs came from a free background-removal tool and are capped at
-  612×408 source resolution — fine at the sizes they're displayed (Open Toasts
-  cards, the panini feature photo scales up from a much larger clean source so
-  it's unaffected), but the wrap photo is the one upscaling from the smaller
-  source and may read slightly soft up close. Re-cut from the full-resolution
-  original if it's ever noticeable on the wall.
-- Screen 2 has no Sheet tab yet — `wraps.js` reads `data/wraps-sheet.csv`
-  directly, so the owner cannot edit it from a spreadsheet until one is
-  published and `WRAPS_SOURCE` is pointed at it (see CLAUDE.md Phase 4c).
+- The three Open Toasts cut-outs came from a free background-removal tool and
+  are capped at 612×408 source resolution — fine at the sizes they're
+  displayed. If they're ever enlarged further, re-cut from a higher-resolution
+  source. (The panini and wrap feature photos are both sourced from
+  full-resolution originals — 1343×947 and 1346×852 respectively — so neither
+  is affected by this.)

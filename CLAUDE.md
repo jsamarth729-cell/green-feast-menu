@@ -49,8 +49,8 @@ Google Sheet (owner edits menu)
 ### Two data sources, on purpose (per screen)
 1. **Google Sheet (CSV)** → the menu items themselves. Things the owner changes often
    (name, price, macros, tags, badges, image framing). Screen 1's URL is
-   `BOWLS_SOURCE` in `bowls.js`; Screen 2 currently points at the local
-   `data/wraps-sheet.csv` snapshot until its own Sheet tab is published (see below).
+   `BOWLS_SOURCE` in `bowls.js`; Screen 2's is `WRAPS_SOURCE` in `wraps.js`, its own
+   tab in the same Sheet document (see below).
 2. **A local config JSON** (`data/config.json` for Screen 1, `data/screen2-config.json`
    for Screen 2) → static content that rarely changes: Screen 1's Build-Your-Own tile,
    Screen 2's panel title/stat chips/wrap photo, and each screen's upsell rail.
@@ -71,9 +71,9 @@ Google Sheet (owner edits menu)
 | `data/config.json` | Screen 1 static content: Build-Your-Own tile + upsell rail items. |
 | `data/bowls-sheet.csv` | Local snapshot/template of the Screen 1 Sheet tab. **Not what the live board reads** — see the caching note below. |
 | `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the three summary stat chips, the panini and wrap image slugs, the wrap note, and the upsell rail. |
-| `data/wraps-sheet.csv` | Screen 2 items (paninis, toasts, wraps), grouped by a `section` column. **Currently what the live board reads directly** — no Sheet tab published for Screen 2 yet; swap `WRAPS_SOURCE` in `wraps.js` for the published CSV URL once one exists, same pattern as `BOWLS_SOURCE`. |
+| `data/wraps-sheet.csv` | Local snapshot/template of the Screen 2 Sheet tab, grouped by a `section` column (`panini`/`toast`/`wrap`). **Not what the live board reads** — same caching note as `data/bowls-sheet.csv` below. |
 | `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
-| `images/screen2/` | Screen 2's transparent cut-outs: the panini and mex-chipotle feature photos (trimmed only), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
+| `images/screen2/` | Screen 2's transparent cut-outs: the panini and wrap (`bbq-plate`) feature photos (trimmed only), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
 | `images/` | The square JPG crops Screen 1's cut-outs were built from. Kept as the `HERO_CUTOUT_UNAVAILABLE` fallback source. |
 | `build-bowl-cutouts.mjs` | **Screen 1's image pipeline.** Original photo → background removal → alpha repair → isolate subject → trim → normalize. Run from the repo root. |
 | `ingest-manual-cutout.mjs` | Normalizes a hand-cut transparent PNG through the same path, for when the remover fails on a photo (see DESIGN-PRINCIPLES §6). |
@@ -109,8 +109,8 @@ id, name, description, price, kcal, protein, fibre, tags, badge, image, featured
   Blank = 50/50/1. Rarely needed now that `build-bowl-cutouts.mjs` normalizes size
   and position automatically.
 
-**Screen 2 (Wraps, Paninis & Open Toasts)** — header row, currently read from
-`data/wraps-sheet.csv` (no Sheet tab published yet):
+**Screen 2 (Wraps, Paninis & Open Toasts)** — header row, own tab in the same
+Sheet document as Screen 1 (its own `gid` in `WRAPS_SOURCE`):
 
 ```
 id, section, name, description, price, kcal, protein, fibre, tags, badge, image
@@ -128,8 +128,7 @@ id, section, name, description, price, kcal, protein, fibre, tags, badge, image
 ⚠️ **Important caching note:** Google's published-CSV link is cached on **Google's servers
 for ~5 minutes**. After editing the Sheet, the live screen updates within ~5 min on its own.
 A browser hard-refresh does NOT bypass this — the delay is on Google's end, not ours.
-This applies once a screen's data source is a Sheet URL; Screen 2 reads a local file
-today, so its edits are instant until `WRAPS_SOURCE` is swapped over.
+Applies to both screens now that both read from published Sheet tabs.
 
 ---
 
@@ -186,19 +185,17 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/wraps.htm
   it. Screen 2 intentionally departs from Screen 1's layout (static feature panel
   instead of a slideshow, stacked category blocks instead of a 2×5 grid) — see
   DESIGN-PRINCIPLES §2 for which parts of a new screen's layout are fixed vs free.
+- **Phase 4c ✅** — Published a Google Sheet tab for Screen 2 and pointed `WRAPS_SOURCE` in
+  `wraps.js` at it, same as `BOWLS_SOURCE`. Both boards now read live Sheet tabs — the owner
+  can edit either from a spreadsheet, no code changes needed for routine menu edits.
 - **Phase 4b ⏳** — Build Screens 3 (Beverages) and 4 (Salads & Toasts), reusing
   `core.css`/`core.js` **and `DESIGN-PRINCIPLES.md`**.
-- **Phase 4c ⏳** — Publish a Google Sheet tab for Screen 2 and point `WRAPS_SOURCE` in
-  `wraps.js` at it, same as `BOWLS_SOURCE`. Today Screen 2 reads `data/wraps-sheet.csv`
-  directly, so the owner cannot yet edit it from a spreadsheet.
 
 ## Known TODO
 - `tropical-fruit-salad` has only one photo (a 3/4 angle), so its grid tile shows that
   angle rather than a true overhead like the other eight. Needs a new photograph.
 - Cut-out PNGs are 900×900 regardless of use; tiles display them at 123px. Downscaling the
   `-top.png` files would cut first-paint time on store wifi if the boards ever feel slow.
-- Screen 2's item descriptions/macros are real content taken from the approved mockup, not
-  placeholders — but they still live in a local CSV, not a Sheet (see Phase 4c above).
 
 ---
 
