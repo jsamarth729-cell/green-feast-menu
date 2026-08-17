@@ -29,6 +29,26 @@
   --badge-warm:  #7A5230;
   --hero-bg:     #163019;
   --gold:        #FEFA67;
+
+  /* ─── Item typography ─────────────────────────────────────────
+     The same three elements appear on every board under six
+     different class names each (.tile-name / .panini-item-name /
+     .toast-name / .wrap-name / .smoothie-name / .coffee-name, and
+     likewise for desc and price). Sizing them from tokens makes
+     "make item names bigger" one edit instead of eighteen.
+
+     Boards ARE allowed to differ — but a deliberate difference gets
+     a *named* variant below, so intent is readable. An unnamed size
+     is an accident: that is how .panini-item-desc sat at 17px
+     against 16px everywhere else. See DESIGN-PRINCIPLES.md §12. */
+
+  --fs-item-name:     22px;  /* grid tiles, toasts, wraps, smoothies */
+  --fs-item-name-lg:  24px;  /* feature panels — panini, coffee: bigger
+                                card, fewer items, more room */
+  --fs-item-desc:     16px;  /* every board */
+  --fs-item-price:    26px;  /* grid tiles, toasts, wraps, coffee */
+  --fs-item-price-sm: 24px;  /* panini, smoothie — captured as-is from
+                                the existing CSS; intent unconfirmed */
 }
 
 body {

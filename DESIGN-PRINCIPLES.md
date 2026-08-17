@@ -396,3 +396,95 @@ Notes:
   originals before ever enlarging these past ~340px display height.** The
   other four (`blue-mind`, `cocoa-core`, `going-nuts`, `cold-brew`) are
   already high-resolution and unaffected.
+
+---
+
+## 12. Shared vocabulary — name things the same way on every board
+
+Read this before making any change that touches more than one screen.
+
+### Why this section exists
+
+The same conceptual element is implemented under a different class name on each
+board. "Item name" exists six times, as `.tile-name`, `.panini-item-name`,
+`.toast-name`, `.wrap-name`, `.smoothie-name`, `.coffee-name`. So "make the item
+names bigger" is not one edit — it is six edits across three files, and missing
+one is the default outcome, not the unlucky one.
+
+It already happened. Item names drifted to 22/24px, prices to 26/24px, and
+descriptions to 16px everywhere except `.panini-item-desc`, which sat at 17px
+with no design reason — an accident from a separate session that nobody could
+spot, because a naked `17px` in a file looks exactly like a deliberate one.
+
+Meanwhile every element that lives in `core.css` — tag pills, macro chips,
+badges, the upsell rail, the footer — has **zero drift across three screens
+built in three separate sessions.** The architecture works where it was applied.
+
+### The goal is not sameness
+
+Boards are allowed to differ. A feature panel on dark ground genuinely wants a
+larger name than a grid tile. The goal is that **a deliberate difference is
+distinguishable from an accidental one by reading the code.** That means every
+intentional variant gets a *name*; an unnamed variation is a bug.
+
+### Canonical names
+
+Use these words in conversation, in commits, and in class names on any new screen.
+
+| Canonical name | What it is | Implemented today as |
+|---|---|---|
+| **Category** | Food vs beverage. Conversational only — no code presence. | — |
+| **Section** | A menu grouping: Power Bowls, Panini, Open Toast, Wraps, Functional Smoothies, Coffee. Slug form. | `section` column in the Sheet |
+| **Section Title** | The on-screen heading for a Section | `.section-title`, `.bev-section-title`, `.grid-title` |
+| **Item Name** | The dish/drink name | `.tile-name`, `.panini-item-name`, `.toast-name`, `.wrap-name`, `.smoothie-name`, `.coffee-name` |
+| **Item Desc** | The one- or two-line description under the name | `.tile-desc`, `.panini-item-desc`, `.toast-desc`, `.wrap-desc`, `.smoothie-desc`, `.coffee-desc` |
+| **Item Price** | The price | `.tile-price`, `.panini-item-price`, `.toast-price`, `.wrap-price`, `.smoothie-price`, `.coffee-price` |
+| **Macro Chip** | kcal / protein / fibre / sugar readouts | `.tile-macro` (small), `.macro-chip` (large, hero) |
+| **Diet Tag** | V / GF / LC / LS — the abbreviated dietary pills | `tags` column, `.tile-tag`, `TAG_ABBREV` in `core.js` |
+| **Item Badge** | Chef's Spotlight, Most Loved | `badge` column, `.tile-badge`, `.badge-spotlight`, `.badge-loved` |
+| **Benefit Chip** | Focus / Clarity / Energy / Strength / Recovery. Screen 3 only; replaces Diet Tags there. | `benefit` column, `.benefit-chip`, `.b-focus` … |
+
+⚠️ **Diet Tag vs Item Badge is the easy one to get backwards.** In this codebase
+the *dietary* markers (V/GF/LS) are **tags** and *Chef's Spotlight* is a
+**badge** — which is the opposite of how most people say it out loud. Always use
+the two-word form ("diet tag", "item badge"); never the bare word "badge".
+
+Likewise, the kcal/protein readouts are **chips**, not badges — the code has
+said `chip` since Screen 1.
+
+### Typography tokens
+
+Canonical elements take their size from a token in `core.css`, never a literal:
+
+```css
+:root {
+  --fs-item-name:    22px;   /* grid tiles, toasts, wraps, smoothies */
+  --fs-item-name-lg: 24px;   /* feature panels: panini, coffee */
+  --fs-item-desc:    16px;
+  --fs-item-price:   26px;
+}
+```
+
+**A literal `px` on an Item Name, Item Desc, or Item Price is a bug unless it
+carries a comment explaining why.** If a screen needs a different size, add a
+named variant token (`-lg`, `-sm`) rather than a bare number. The name is the
+documentation: `var(--fs-item-name-lg)` says "this is deliberately the large
+variant"; `24px` says nothing at all.
+
+Run `node check-consistency.mjs` before pushing — it fails on any canonical
+element using a literal size.
+
+### Fixed heights must derive from their token
+
+`.smoothie-desc` and `.coffee-desc` carry fixed `height` values (42px and 21px)
+that were hand-computed from `16px × 1.3 line-height`. They are silently welded
+to the old font size: raise the description token and the text clips mid-glyph
+rather than reflowing.
+
+Derive them instead, so they follow the token automatically:
+
+```css
+height: calc(var(--fs-item-desc) * 1.3 * 2);   /* 2 clamped lines */
+```
+
+`calc()` and custom properties are both fine on Chrome 69 (see §9).
