@@ -128,8 +128,7 @@ function renderUpsell(upsell) {
      <div class="upsell-gold">
        <span class="gold-text">${upsell.gold.text}</span>
        <span class="gold-price">${upsell.gold.price}</span>
-     </div>
-     ${upsell.note ? `<span class="upsell-note">${upsell.note}</span>` : ''}`;
+     </div>`;
 }
 
 /* ── Full render ─────────────────────────────────────────────── */
@@ -143,6 +142,13 @@ function render(data) {
   document.getElementById('boardTitle').textContent = config.board.title;
 
   document.getElementById('smoothieHeading').textContent = config.sections.smoothie.heading;
+  const smoothieNoteEl = document.getElementById('smoothieNote');
+  if (config.sections.smoothie.note) {
+    smoothieNoteEl.textContent = config.sections.smoothie.note;
+    smoothieNoteEl.style.display = '';
+  } else {
+    smoothieNoteEl.style.display = 'none';
+  }
   document.getElementById('smoothieRow').innerHTML = smoothies.map(smoothieCardHTML).join('');
 
   document.getElementById('coffeeHeading').textContent = config.sections.coffee.heading;

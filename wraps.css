@@ -67,7 +67,7 @@
 }
 .panini-item-name {
   font-family: 'Playfair Display', serif;
-  font-size: 24px;
+  font-size: var(--fs-item-name);
   font-weight: 600;
   color: #FFFFFF;
   line-height: 1.25;
@@ -83,13 +83,13 @@
 .panini-item-price {
   margin-left: auto;
   font-family: 'Inter', sans-serif;
-  font-size: 24px;
+  font-size: var(--fs-item-price-sm);
   font-weight: 600;
   color: #FFFFFF;
   flex-shrink: 0;
 }
 .panini-item-desc {
-  font-size: 17px;
+  font-size: var(--fs-item-desc);
   color: var(--gold);
   opacity: 0.82;
   line-height: 1.3;
@@ -174,21 +174,11 @@
   padding: 0 44px 20px;
 }
 
+/* Shared .section-header/.section-title live in core.css. This screen's
+   blocks need a little more top padding than the shared default since
+   they follow directly under the content panel edge / a preceding grid. */
 .section-header {
-  display: flex;
-  align-items: baseline;
   padding-top: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(88,120,88,0.14);
-  margin-bottom: 12px;
-  flex-shrink: 0;
-}
-.section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 38px;
-  font-weight: 600;
-  color: var(--forest);
-  line-height: 1;
 }
 
 /* ─── Open Toasts — 3-up card grid ──────────────────────────── */
@@ -255,14 +245,14 @@
 }
 .toast-name {
   font-family: 'Playfair Display', serif;
-  font-size: 22px;
+  font-size: var(--fs-item-name);
   font-weight: 600;
   color: var(--forest);
   line-height: 1.2;
 }
 .toast-desc {
-  font-size: 16px;
-  color: var(--sage);
+  font-size: var(--fs-item-desc);
+  color: var(--c-item-desc);
   line-height: 1.32;
   margin-bottom: 10px;
   display: -webkit-box;
@@ -280,7 +270,7 @@
   border-top: 1px solid rgba(88,120,88,0.12);
 }
 .toast-price {
-  font-size: 26px;
+  font-size: var(--fs-item-price);
   font-weight: 600;
   color: var(--forest);
   font-family: 'Inter', sans-serif;
@@ -327,22 +317,22 @@
 }
 .wrap-name {
   font-family: 'Playfair Display', serif;
-  font-size: 22px;
+  font-size: var(--fs-item-name);
   font-weight: 600;
   color: var(--forest);
   line-height: 1.2;
 }
 .wrap-price {
   margin-left: auto;
-  font-size: 26px;
+  font-size: var(--fs-item-price);
   font-weight: 600;
   color: var(--forest);
   font-family: 'Inter', sans-serif;
   flex-shrink: 0;
 }
 .wrap-desc {
-  font-size: 16px;
-  color: var(--sage);
+  font-size: var(--fs-item-desc);
+  color: var(--c-item-desc);
   line-height: 1.3;
   margin: 4px 0 8px;
   display: -webkit-box;

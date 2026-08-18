@@ -65,7 +65,8 @@ Google Sheet (owner edits menu)
 
 | File | What it does |
 |------|--------------|
-| `DESIGN-PRINCIPLES.md` | **Read before designing any new screen.** The design rules distilled from building Screens 1–2 — legibility, tags, photography, colour, Chrome 69 limits. |
+| `DESIGN-PRINCIPLES.md` | **Read before designing any new screen, and §12 before any cross-screen change.** The design rules distilled from building Screens 1–2 — legibility, tags, photography, colour, Chrome 69 limits — plus §12's shared element vocabulary and typography tokens. |
+| `check-consistency.mjs` | **Run manually before pushing** (`node check-consistency.mjs`). Reports canonical elements (Item Name / Desc / Price) using literal font sizes instead of tokens, and font-size drift between screens. Offline tooling — not part of the live site. |
 | `core.css` | **Shared by every board.** Reset, colour tokens, fonts, the 1920×1080 canvas, tag/macro/badge pill styling, the upsell rail, the footer strip. If a rule should look identical on all four screens, it lives here — not in a screen's own CSS file. |
 | `core.js` | **Shared by every board.** Viewport scaling, CSV parsing, the fetch+localStorage cache pattern (`loadData()`), fullscreen-on-gesture, and the tag-abbreviation map (`TAG_ABBREV`). Screen-specific data shapes and render logic do not belong here. |
 | `bowls.html` / `bowls.css` / `bowls.js` | Screen 1 — Power Bowls: hero slideshow + 2×5 tile grid. Loads `core.css`/`core.js` first. |
@@ -77,7 +78,7 @@ Google Sheet (owner edits menu)
 | `data/bowls-sheet.csv` | Local snapshot/template of the Screen 1 Sheet tab. **Not what the live board reads** — see the caching note below. |
 | `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the three summary stat chips, the panini and wrap image slugs, the wrap note, and the upsell rail. |
 | `data/wraps-sheet.csv` | Local snapshot/template of the Screen 2 Sheet tab, grouped by a `section` column (`panini`/`toast`/`wrap`). **Not what the live board reads** — same caching note as `data/bowls-sheet.csv` below. |
-| `data/screen3-config.json` | Screen 3 static content: board title, the two section headings ("Functional Smoothies", "Coffee"), the footer macro note, and the gold protein upsell. **`upsell` here is a single `{heading, gold:{text,price}, note}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one gold item plus an optional plain-white trailing note, not a variable combo list. |
+| `data/screen3-config.json` | Screen 3 static content: board title, the two section headings ("Functional Smoothies", "Coffee"), the footer macro note, and the gold protein upsell. **`upsell` here is a single `{heading, gold:{text,price}}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one gold item, not a variable combo list. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. |
 | `data/screen3-sheet.csv` | Local snapshot/template of the Screen 3 Sheet tab, grouped by a `section` column (`smoothie`/`coffee`). **Not what the live board reads once the Sheet tab is published** — same caching note as `data/bowls-sheet.csv` below. |
 | `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
 | `images/screen2/` | Screen 2's transparent cut-outs: the panini and wrap (`bbq-plate`) feature photos (trimmed only), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
@@ -242,8 +243,23 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/beverages
 ---
 
 ## Conventions for working in this repo
+- **No code changes without explicit approval.** Investigate, read, measure, and propose
+  freely — but do not edit, create, or delete a file until the owner has said yes to that
+  specific change. Show the proposed diff or describe the change precisely, then wait.
+  This applies to "obvious" fixes and one-line tweaks too: the boards hang side by side in
+  a live store, and an unreviewed change on one screen is how they drift apart.
 - **Read `DESIGN-PRINCIPLES.md` before designing a new screen.** It records not just the
   rules but which of them came from mistakes worth not repeating.
+- **Read `DESIGN-PRINCIPLES.md` §12 before *any* change that touches more than one
+  screen.** It defines the shared vocabulary — Item Name, Item Desc, Item Price, Macro
+  Chip, Diet Tag, Item Badge, Benefit Chip — and the typography tokens they take their
+  sizes from. Note that **Diet Tag** (V/GF/LS) and **Item Badge** (Chef's Spotlight) are
+  named the opposite of how most people say them out loud; always use the two-word form.
+- **Canonical elements take sizes from tokens, not literals.** A bare `px` on an Item
+  Name, Item Desc, or Item Price is a bug unless commented. Deliberate per-screen
+  variation is fine — but it gets a *named* variant token, so intent is readable.
+- **Run `node check-consistency.mjs` before pushing.** Manual, not automatic. It reports
+  canonical elements using literal sizes and any token that has drifted.
 - **Check every web feature against Chrome 69** — the store TVs are new but their WebView
   is from 2018. A JS syntax error there is fatal *and silent*: the page renders static HTML
   with no console anyone can see. See DESIGN-PRINCIPLES §9 for the banned list.
