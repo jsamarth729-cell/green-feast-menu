@@ -435,7 +435,8 @@ Use these words in conversation, in commits, and in class names on any new scree
 |---|---|---|
 | **Category** | Food vs beverage. Conversational only — no code presence. | — |
 | **Section** | A menu grouping: Power Bowls, Panini, Open Toast, Wraps, Functional Smoothies, Coffee. Slug form. | `section` column in the Sheet |
-| **Section Title** | The on-screen heading for a Section | `.section-title`, `.bev-section-title`, `.grid-title` |
+| **Section Header** | The row holding a Section Title (and, on Screen 3's smoothie row, an inline note) | `.section-header` in `core.css`. `--<slug>` modifier classes exist on the markup (`--bowls`, `--toasts`, `--wraps`, `--smoothies`, `--coffee`) for section-specific spacing — `--coffee` adds top margin — but carry no colour; the underline is uniform, see below |
+| **Section Title** | The on-screen heading for a Section | `.section-title` in `core.css`. `.section-title--lg` is Power Bowls' variant, since it's the one section that fills Screen 1's entire grid panel rather than stacking with others |
 | **Item Name** | The dish/drink name | `.tile-name`, `.panini-item-name`, `.toast-name`, `.wrap-name`, `.smoothie-name`, `.coffee-name` |
 | **Item Desc** | The one- or two-line description under the name | `.tile-desc`, `.panini-item-desc`, `.toast-desc`, `.wrap-desc`, `.smoothie-desc`, `.coffee-desc` |
 | **Item Price** | The price | `.tile-price`, `.panini-item-price`, `.toast-price`, `.wrap-price`, `.smoothie-price`, `.coffee-price` |
@@ -452,39 +453,60 @@ the two-word form ("diet tag", "item badge"); never the bare word "badge".
 Likewise, the kcal/protein readouts are **chips**, not badges — the code has
 said `chip` since Screen 1.
 
+Section Header/Title are handled differently from the Item elements above.
+Item Name/Desc/Price stayed as six separate per-screen selectors, each pointed
+at a shared token — a screen genuinely needs its own selector to hang
+screen-specific rules off (e.g. `.panini-item-desc`'s gold colour on a dark
+panel). Section Header/Title had no such need, so they were collapsed into one
+selector in `core.css`, with per-section differences expressed as modifier
+classes (`.section-header--coffee`, `.section-title--lg`) rather than
+duplicate rules. Since there's only one selector, there's nothing for
+`check-consistency.mjs` to compare across screens — the drift this section
+warns about is structurally impossible here, not just avoided by convention.
+
 ### Typography tokens
 
 Canonical elements take their size from a token in `core.css`, never a literal:
 
 ```css
 :root {
-  --fs-item-name:    22px;   /* grid tiles, toasts, wraps, smoothies */
-  --fs-item-name-lg: 24px;   /* feature panels: panini, coffee */
-  --fs-item-desc:    16px;
-  --fs-item-price:   26px;
+  --fs-item-name:      24px;   /* every board — flattened, no large variant */
+  --fs-item-desc:      18px;   /* every board */
+  --fs-item-price:     26px;   /* grid tiles, toasts, wraps, coffee */
+  --fs-item-price-sm:  24px;   /* panini, smoothie */
+  --c-item-desc:       #000000;  /* every board except the dark panini panel */
 }
 ```
 
 **A literal `px` on an Item Name, Item Desc, or Item Price is a bug unless it
 carries a comment explaining why.** If a screen needs a different size, add a
 named variant token (`-lg`, `-sm`) rather than a bare number. The name is the
-documentation: `var(--fs-item-name-lg)` says "this is deliberately the large
-variant"; `24px` says nothing at all.
+documentation: `var(--fs-item-price-sm)` says "this is deliberately the small
+variant"; `24px` says nothing at all. (Item Name had a `-lg` variant for the
+panini/coffee feature panels; it was retired when those were flattened to match
+the base size — a reminder that variants get removed, not just added, when a
+design decision changes.)
+
+The dark panini panel is the one place these tokens don't apply — its
+description and diet tags stay gold-on-dark for contrast rather than switching
+to `--c-item-desc` / dark-green outlines. That's a deliberate, permanent
+exception, not an oversight — don't "fix" it into consistency.
 
 Run `node check-consistency.mjs` before pushing — it fails on any canonical
 element using a literal size.
 
 ### Fixed heights must derive from their token
 
-`.smoothie-desc` and `.coffee-desc` carry fixed `height` values (42px and 21px)
-that were hand-computed from `16px × 1.3 line-height`. They are silently welded
-to the old font size: raise the description token and the text clips mid-glyph
-rather than reflowing.
-
-Derive them instead, so they follow the token automatically:
+`.smoothie-desc` and `.coffee-desc` carry fixed `height` values, derived from
+`var(--fs-item-desc)` rather than a hardcoded number:
 
 ```css
 height: calc(var(--fs-item-desc) * 1.3 * 2);   /* 2 clamped lines */
 ```
+
+This is why: they used to be hand-computed literals (`42px`, `21px`) baked from
+`16px × 1.3`. Raising the description token later would have clipped the text
+mid-glyph instead of reflowing it, because a literal height doesn't know the
+font size changed. Keep them derived — never replace with a literal again.
 
 `calc()` and custom properties are both fine on Chrome 69 (see §9).

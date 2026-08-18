@@ -42,13 +42,19 @@
      is an accident: that is how .panini-item-desc sat at 17px
      against 16px everywhere else. See DESIGN-PRINCIPLES.md §12. */
 
-  --fs-item-name:     22px;  /* grid tiles, toasts, wraps, smoothies */
-  --fs-item-name-lg:  24px;  /* feature panels — panini, coffee: bigger
-                                card, fewer items, more room */
-  --fs-item-desc:     16px;  /* every board */
+  --fs-item-name:     24px;  /* every board — flattened; feature panels
+                                no longer size up */
+  --fs-item-desc:     18px;  /* every board */
   --fs-item-price:    26px;  /* grid tiles, toasts, wraps, coffee */
   --fs-item-price-sm: 24px;  /* panini, smoothie — captured as-is from
                                 the existing CSS; intent unconfirmed */
+  --c-item-desc:      #000000;  /* every board except the dark panini
+                                    panel, which stays gold for contrast */
+
+  --fs-section-title:    38px;  /* Open Toasts, Wraps, Functional
+                                    Smoothies, Coffee */
+  --fs-section-title-lg: 46px;  /* Power Bowls — the sole section
+                                    filling Screen 1's grid panel */
 }
 
 body {
@@ -81,6 +87,48 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   SECTION HEADER — was three separate implementations
+   (.grid-header/.grid-title on Screen 1, .section-header/.section-title
+   on Screen 2, .bev-section-header/.bev-section-title on Screen 3),
+   the same drift pattern §12 exists to prevent. Unified here so every
+   board's "Power Bowls" / "Open Toasts" / "Coffee" heading shares one
+   box model, and a per-section accent colour is applied with a single
+   modifier class instead of three copies of the same rule.
+
+   Each board still writes its own <div class="section-header
+   section-header--<slug>"> — the modifier just selects which accent. */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(88,120,88,0.14);
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: var(--fs-section-title);
+  font-weight: 600;
+  color: var(--forest);
+  line-height: 1;
+  padding-bottom: 8px;
+  border-bottom: 4px solid var(--forest);
+}
+/* Screen 1's "Power Bowls" is the only section filling that board's
+   entire grid panel (not one of several stacked blocks like Screens
+   2-3), so it keeps a larger size — a named variant, not a literal. */
+.section-title--lg {
+  font-size: var(--fs-section-title-lg);
+}
+
+/* Per-section modifier classes — the underline itself is a uniform
+   var(--forest) across every section (see DESIGN-PRINCIPLES §12), so
+   these only carry the one section that needs different spacing.
+   Kept on the markup (rather than deleted) so a future per-section
+   difference has somewhere to go without re-touching the HTML. */
+.section-header--coffee { margin-top: 14px; }
+
+/* ═══════════════════════════════════════════════════════════════
    SHARED PILLS — tags, macros, badges
 ══════════════════════════════════════════════════════════════════ */
 
@@ -94,11 +142,11 @@ body {
   margin-left: 4px;
 }
 .tile-tag {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--forest);
   background: rgba(40,63,40,0.10);
-  border: 1.5px solid rgba(40,63,40,0.50);
+  border: 1.5px solid var(--forest);
   padding: 2px 7px;
   border-radius: 7px;
   letter-spacing: 0.04em;
@@ -155,7 +203,7 @@ body {
   position: absolute;
   top: 10px;
   right: 14px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;

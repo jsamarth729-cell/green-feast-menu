@@ -38,21 +38,20 @@
   padding: 0 44px 32px;
 }
 
-.bev-section-header {
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(88,120,88,0.14);
-  margin-bottom: 10px;
-  flex-shrink: 0;
-}
-.bev-section-header--coffee {
-  margin-top: 14px;
-}
-.bev-section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 38px;
+/* Shared .section-header/.section-title, plus the --coffee accent
+   modifier's margin-top, live in core.css. */
+/* Same highlight recipe as .power (the brahmi/shatavari ingredient
+   highlight below) — this note is calling out a similar "read this"
+   fact, so it borrows the same visual language. */
+.bev-section-note {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
   font-weight: 600;
   color: var(--forest);
-  line-height: 1;
+  background: rgba(254,250,103,0.55);
+  padding: 0 3px;
+  border-radius: 3px;
+  margin-left: 14px;
 }
 
 .smoothie-row {
@@ -107,6 +106,11 @@
   border-radius: 8px;
   white-space: nowrap;
   flex-shrink: 0;
+  /* .smoothie-name-row aligns its children to the text baseline, which
+     leaves this chip's padded box hanging low against the name.
+     align-self overrides that for this one child without disturbing
+     .smoothie-price's baseline alignment in the same row. */
+  align-self: center;
 }
 .benefit-chip.b-focus    { background: #2F5C8A; }
 .benefit-chip.b-clarity  { background: #3D7A4A; }
@@ -175,9 +179,9 @@
 
 .smoothie-desc {
   font-size: var(--fs-item-desc);
-  color: var(--sage);
+  color: var(--c-item-desc);
   line-height: 1.3;
-  height: 42px;
+  height: calc(var(--fs-item-desc) * 1.3 * 2);
   margin-bottom: 8px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -198,7 +202,7 @@
 }
 .coffee-name {
   font-family: 'Playfair Display', serif;
-  font-size: var(--fs-item-name-lg);
+  font-size: var(--fs-item-name);
   font-weight: 600;
   color: var(--forest);
   line-height: 1.2;
@@ -214,9 +218,9 @@
 
 .coffee-desc {
   font-size: var(--fs-item-desc);
-  color: var(--sage);
+  color: var(--c-item-desc);
   line-height: 1.3;
-  height: 21px;
+  height: calc(var(--fs-item-desc) * 1.3 * 1);
   margin-bottom: 8px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -277,12 +281,4 @@
   font-size: 26px;
   font-weight: 700;
   color: var(--gold);
-}
-.upsell-note {
-  margin-left: auto;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
 }

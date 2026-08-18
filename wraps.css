@@ -67,7 +67,7 @@
 }
 .panini-item-name {
   font-family: 'Playfair Display', serif;
-  font-size: var(--fs-item-name-lg);
+  font-size: var(--fs-item-name);
   font-weight: 600;
   color: #FFFFFF;
   line-height: 1.25;
@@ -174,21 +174,11 @@
   padding: 0 44px 20px;
 }
 
+/* Shared .section-header/.section-title live in core.css. This screen's
+   blocks need a little more top padding than the shared default since
+   they follow directly under the content panel edge / a preceding grid. */
 .section-header {
-  display: flex;
-  align-items: baseline;
   padding-top: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(88,120,88,0.14);
-  margin-bottom: 12px;
-  flex-shrink: 0;
-}
-.section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 38px;
-  font-weight: 600;
-  color: var(--forest);
-  line-height: 1;
 }
 
 /* ─── Open Toasts — 3-up card grid ──────────────────────────── */
@@ -262,7 +252,7 @@
 }
 .toast-desc {
   font-size: var(--fs-item-desc);
-  color: var(--sage);
+  color: var(--c-item-desc);
   line-height: 1.32;
   margin-bottom: 10px;
   display: -webkit-box;
@@ -342,7 +332,7 @@
 }
 .wrap-desc {
   font-size: var(--fs-item-desc);
-  color: var(--sage);
+  color: var(--c-item-desc);
   line-height: 1.3;
   margin: 4px 0 8px;
   display: -webkit-box;
