@@ -1,10 +1,10 @@
 id,name,description,price,kcal,protein,fibre,tags,badge,image,featured,img_x,img_y,img_scale
-1,Avo Protein Bowl,"Tofu, quinoa, sweet potato, avocado, walnuts, honey mustard",349,380,24,12,Less Spicy,,avo-protein,TRUE,50,50,1
-2,Umami Soba Bowl,"Soba noodles, tofu, crunchy veg, creamy peanut dressing",349,400,24,12,,Most Loved,umami-soba,TRUE,50,50,1
-3,Thai Zen Bowl,"Chilli tofu, crunchy veggies, peanut crunch on brown rice",349,380,24,12,"Vegan,Low Calorie",,thai-zen,TRUE,50,50,1
-4,Italian Harvest Bowl,"Herbed pasta, grilled veggies, parmesan, creamy pesto yogurt",349,380,24,12,Low Calorie,,italian-harvest,TRUE,50,50,1
-5,Quinoa Buddha Bowl,"Quinoa, chickpeas, paneer, roasted veg, sweet mango dressing",349,380,24,12,Gluten Free,,quinoa-buddha,TRUE,50,50,1
-6,Mexican Fiesta Bowl,"Smoky beans, rice, corn, salsa, nachos, avocado, chipotle",349,380,24,12,Gluten Free,,mexican-fiesta,TRUE,50,50,1
-7,Mediterranean Bliss Bowl,"Chickpeas, couscous, roasted veggies, feta, hummus, tahini",349,380,24,12,Less Spicy,Chef's Spotlight,mediterranean-bliss,TRUE,50,50,1
-8,Healthy Burrito Bowl,"Rajma, rice, corn, salsa, paneer or tofu, guacamole, nachos",349,380,24,12,Gluten Free,,burrito-bowl,FALSE,50,50,1
-9,Tropical Fruit Salad,"Pineapple, kiwi, pomegranate, grapes, berries, citrus mint dressing",349,180,3,6,Low Calorie,,tropical-fruit-salad,FALSE,50,50,1
+1,Mexican Fiesta Bowl,"Brown rice, beans, pineapple salsa, guacamole, charred corn, nachos, veggies, hydroponic greens, chipotle dressing",349,490,19,12,"Gluten Free,High Fibre",,mexican-fiesta,TRUE,50,50,1
+2,Mediterranean Bliss Bowl,"Couscous, paneer, chickpeas, beetroot hummus, roasted beetroot, pickled cabbage, veggies, hydroponic greens, tahini dressing",349,510,23,14,High Protein,Most Loved,mediterranean-bliss,TRUE,50,50,1
+3,Umami Soba Bowl,"Soba noodles, paneer, broccoli, pickled cabbage, veggies, hydroponic greens, peanut dressing",349,500,20,12,Contains Nuts,Chef's Special,umami-soba,TRUE,50,50,1
+4,Italian Harvest Bowl,"Creamy spinach pasta, herbed feta, olives, mushroom, broccoli, veggies, green goddess dressing",349,530,18,12,,,italian-harvest,TRUE,50,50,1
+5,Quinoa Buddha Bowl,"Quinoa, paneer, herbed chickpeas, roasted beetroot, veggies, hydroponic greens, mango dressing",349,500,21,11,"Gluten Free,High Protein",,quinoa-buddha,TRUE,50,50,1
+6,Thai Zen Bowl,"Brown rice, chilli tofu, veggies, hydroponic greens, peanut dressing",349,480,18,13,"Gluten Free,Contains Nuts",,thai-zen,TRUE,50,50,1
+7,Burrito Bowl,"Brown rice, paneer, mixed beans, charred corn, guacamole, pineapple salsa, sour cream, nachos, veggies, chipotle dressing",349,550,24,13,"Gluten Free,High Protein",,burrito-bowl,FALSE,50,50,1
+8,Avo Protein Bowl,"Quinoa, chilli tofu, guacamole, broccoli, pickled cabbage, veggies, hydroponic greens, honey mustard dressing",349,510,21,11,,,avo-protein,TRUE,50,50,1
+9,Tropical Fruit Bowl,"Pineapple, sunmelon, Valencia orange, kiwi, blueberry, red grapes, seeds, lemon honey dressing (seasonal fruits)",299,190,3.5,6,,,tropical-fruit-salad,FALSE,50,50,1

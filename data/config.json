@@ -2,11 +2,12 @@
   "buildYourOwn": {
     "name": "Build Your Own Bowl",
     "description": "Choose base, protein, toppings and dressing.",
-    "price": 329
+    "price": 349
   },
   "upsell": [
-    "Bowl + any smoothie | ₹549 | save ₹79",
-    "Add extra protein | +₹99",
-    "Add a cold press | +₹99"
+    "High protein meal | +₹150 | +20–22g protein",
+    "Add any functional smoothie | +₹250",
+    "Add any coffee | +₹200",
+    "Extra protein | +₹50"
   ]
 }
