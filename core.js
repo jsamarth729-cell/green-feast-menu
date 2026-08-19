@@ -12,10 +12,11 @@
    show an abbreviation and the footer carries the glossary. Mapping lives here
    rather than in the Sheet so the owner keeps writing readable names. */
 const TAG_ABBREV = {
-  'Gluten Free': 'GF',
-  'Less Spicy':  'LS',
-  'Vegan':       'V',
-  'Low Calorie': 'LC',
+  'Gluten Free':   'GF',
+  'High Protein':  'PRO',
+  'High Fibre':    'FIB',
+  'Contains Nuts': 'N',
+  'Less Spicy':    'LS',
 };
 function tagAbbrev(tag) {
   return TAG_ABBREV[tag] || tag;

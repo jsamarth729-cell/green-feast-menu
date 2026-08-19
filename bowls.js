@@ -122,8 +122,11 @@ function heroSlideHTML(bowl) {
 function tileHTML(bowl) {
   const hasBadge = bowl.badge && bowl.badge.trim();
   let badgeClass = '';
-  if (bowl.badge === "Chef's Spotlight") badgeClass = 'badge-spotlight';
-  if (bowl.badge === 'Most Loved')       badgeClass = 'badge-loved';
+  /* CSS class name kept as "badge-spotlight" even though the menu's badge
+     text is now "Chef's Special" — only the data string changed, not the
+     colour it maps to. Don't "fix" this mismatch. */
+  if (bowl.badge === "Chef's Special") badgeClass = 'badge-spotlight';
+  if (bowl.badge === 'Most Loved')     badgeClass = 'badge-loved';
 
   const tags = tagsHTML(bowl.tags);
 

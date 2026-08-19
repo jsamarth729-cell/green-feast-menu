@@ -66,8 +66,10 @@ function highlightPower(text) {
 }
 
 function badgeClassFor(badge) {
-  if (badge === "Chef's Spotlight") return 'badge-spotlight';
-  if (badge === 'Most Loved')       return 'badge-loved';
+  /* CSS class kept as "badge-spotlight" — only the menu's badge text
+     changed to "Chef's Special", not the colour it maps to. */
+  if (badge === "Chef's Special") return 'badge-spotlight';
+  if (badge === 'Most Loved')     return 'badge-loved';
   return '';
 }
 
