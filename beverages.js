@@ -1,8 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
    SCREEN 3 — Beverages (Functional Smoothies + Coffee Menu).
    Loads after core.js (scaling, CSV parsing, fetch+cache, fullscreen,
-   tag abbreviations all live there — though this board doesn't use
-   dietary tags; see csvRowToItem below).
+   tag abbreviations all live there). Smoothies can carry Diet Tags
+   (currently just Contains Nuts) rendered spelled-out rather than
+   abbreviated, since this board has no footer glossary to explain an
+   abbreviation — see smoothieCardHTML below.
 ══════════════════════════════════════════════════════════════════ */
 
 // ═══════════════════════════════════════════════════════════════
@@ -27,7 +29,8 @@ function csvRowToItem(row) {
     price:       Number(row.price),
     kcal:        row.kcal ? Number(row.kcal) : null,
     protein:     row.protein ? Number(row.protein) : null,
-    sugar:       row.sugar ? Number(row.sugar) : null,
+    fibre:       row.fibre ? Number(row.fibre) : null,
+    tags:        row.tags ? row.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
     badge:       row.badge || '',
     image:       row.image || ''
   };
@@ -73,9 +76,17 @@ function badgeClassFor(badge) {
   return '';
 }
 
+/* Benefit names are now multi-word ("Low Cortisol", "Women Wellness"),
+   so the class slug must replace spaces or it produces two junk
+   classes and no colour match — e.g. "b-low cortisol". */
+function benefitClass(benefit) {
+  return 'b-' + benefit.toLowerCase().replace(/\s+/g, '-');
+}
+
 /* ── Smoothie card ───────────────────────────────────────────── */
 function smoothieCardHTML(item) {
   const hasBadge = item.badge && item.badge.trim();
+  const hasMeta  = item.benefit || item.tags.length;
 
   return `
     <div class="smoothie-card">
@@ -86,14 +97,18 @@ function smoothieCardHTML(item) {
       </div>
       <div class="smoothie-name-row">
         <span class="smoothie-name">${item.name}</span>
-        ${item.benefit ? `<span class="benefit-chip b-${item.benefit.toLowerCase()}">${item.benefit}</span>` : ''}
         <span class="smoothie-price"><span class="tile-rupee">₹</span>${item.price}</span>
       </div>
+      ${hasMeta ? `
+      <div class="smoothie-meta-row">
+        ${item.benefit ? `<span class="benefit-chip ${benefitClass(item.benefit)}">${item.benefit}</span>` : ''}
+        ${item.tags.map(t => `<span class="tile-tag tile-tag--full">${t}</span>`).join('')}
+      </div>` : ''}
       <div class="smoothie-desc">${highlightPower(item.description)}</div>
       <div class="tile-macros">
         <span class="tile-macro">${item.kcal} kcal</span>
         <span class="tile-macro">${item.protein}g protein</span>
-        <span class="tile-macro">${item.sugar}g sugar</span>
+        <span class="tile-macro">${item.fibre}g fibre</span>
       </div>
     </div>`;
 }
@@ -116,8 +131,8 @@ function coffeeCardHTML(item) {
       </div>
       <div class="tile-macros">
         <span class="tile-macro">${item.kcal} kcal</span>
-        <span class="tile-macro">${item.protein}g protein</span>
-        <span class="tile-macro">${item.sugar}g sugar</span>
+        ${item.protein != null ? `<span class="tile-macro">${item.protein}g protein</span>` : ''}
+        ${item.fibre   != null ? `<span class="tile-macro">${item.fibre}g fibre</span>` : ''}
       </div>
     </div>`;
 }
