@@ -2,9 +2,9 @@
    SCREEN 3 — Beverages (Functional Smoothies + Coffee Menu).
    Loads after core.js (scaling, CSV parsing, fetch+cache, fullscreen,
    tag abbreviations all live there). Smoothies can carry Diet Tags
-   (currently just Contains Nuts) rendered spelled-out rather than
-   abbreviated, since this board has no footer glossary to explain an
-   abbreviation — see smoothieCardHTML below.
+   (currently just Contains Nuts) — rendered via the same tagsHTML()
+   helper Screens 1-2 use, since this board now shares their footer
+   glossary. See smoothieCardHTML below.
 ══════════════════════════════════════════════════════════════════ */
 
 // ═══════════════════════════════════════════════════════════════
@@ -102,7 +102,7 @@ function smoothieCardHTML(item) {
       ${hasMeta ? `
       <div class="smoothie-meta-row">
         ${item.benefit ? `<span class="benefit-chip ${benefitClass(item.benefit)}">${item.benefit}</span>` : ''}
-        ${item.tags.map(t => `<span class="tile-tag tile-tag--full">${t}</span>`).join('')}
+        ${tagsHTML(item.tags)}
       </div>` : ''}
       <div class="smoothie-desc">${highlightPower(item.description)}</div>
       <div class="tile-macros">
@@ -170,8 +170,6 @@ function render(data) {
 
   document.getElementById('coffeeHeading').textContent = config.sections.coffee.heading;
   document.getElementById('coffeeRow').innerHTML = coffees.map(coffeeCardHTML).join('');
-
-  document.getElementById('footerNote').textContent = config.footerNote;
 
   renderUpsell(config.upsell);
 }

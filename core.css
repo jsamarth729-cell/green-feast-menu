@@ -151,15 +151,6 @@ body {
   border-radius: 7px;
   letter-spacing: 0.04em;
 }
-/* Screen 3 has no footer glossary (its footer carries the macro
-   disclaimer instead), so an abbreviated tag there would be
-   unexplained. This modifier renders the full word — the letter-
-   spacing above is tuned for 1-3 character abbreviations and reads
-   too loose on a whole word like "Contains Nuts". */
-.tile-tag--full {
-  letter-spacing: 0;
-}
-
 /* Macro pill row, on cream backgrounds */
 .tile-macros {
   display: flex;

@@ -78,7 +78,7 @@ Google Sheet (owner edits menu)
 | `data/bowls-sheet.csv` | Local snapshot/template of the Screen 1 Sheet tab. **Not what the live board reads** — see the caching note below. |
 | `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the panini and wrap summary stat chips (both sections share a macro range now, no per-item macros), the panini and wrap image slugs, the column-3 combo block (`combos`), and the bottom-rail upsell (`upsell`, quick add-ons only — meal upgrades moved to `combos`). |
 | `data/wraps-sheet.csv` | Local snapshot/template of the Screen 2 Sheet tab, grouped by a `section` column (`panini`/`toast`/`wrap`). **Not what the live board reads** — same caching note as `data/bowls-sheet.csv` below. |
-| `data/screen3-config.json` | Screen 3 static content: board title, the two section headings ("Functional Smoothies", "Coffee"), the footer macro note, and the gold protein upsell. **`upsell` here is a single `{heading, gold:{text,price}}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one gold item, not a variable combo list. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. |
+| `data/screen3-config.json` | Screen 3 static content: board title, the two section headings ("Functional Smoothies", "Coffee"), and the gold protein upsell. **`upsell` here is a single `{heading, gold:{text,price}}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one gold item, not a variable combo list. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. Screen 3's footer is now the same glossary block as Screens 1–2 (no board-specific footer content remains). |
 | `data/screen3-sheet.csv` | Local snapshot/template of the Screen 3 Sheet tab, grouped by a `section` column (`smoothie`/`coffee`). **Not what the live board reads once the Sheet tab is published** — same caching note as `data/bowls-sheet.csv` below. |
 | `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
 | `images/screen2/` | Screen 2's transparent cut-outs: the panini and wrap (`bbq-plate`) feature photos (trimmed only), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
@@ -105,13 +105,17 @@ Google Sheet (owner edits menu)
 id, name, description, price, kcal, protein, fibre, tags, badge, image, featured, img_x, img_y, img_scale
 ```
 
-- **tags** — write the **full readable name** (`Gluten Free`, `Less Spicy`, `Vegan`,
-  `Low Calorie`). `TAG_ABBREV` in `core.js` shortens them to `GF`/`LS`/`V`/`LC` for the
-  tile pills, and the footer glossary spells them back out. Comma-separate for multiple
-  (`Vegan,Low Calorie`). An unmapped tag renders as written — add it to `TAG_ABBREV` and
-  the footer legend together (each board repeats the same legend markup in its own HTML).
-- **badge** — flexible. `Chef's Spotlight` → green, `Most Loved` → brown, anything else →
+- **tags** — write the **full readable name** (`Gluten Free`, `High Protein`, `High Fibre`,
+  `Contains Nuts`, `Less Spicy`). `TAG_ABBREV` in `core.js` shortens them to
+  `GF`/`PRO`/`FIB`/`N`/`LS` for the tile pills, and the footer glossary spells them back
+  out. Comma-separate for multiple (`Gluten Free,High Protein`). An unmapped tag renders
+  as written — add it to `TAG_ABBREV` and the footer legend together (each board repeats
+  the same legend markup in its own HTML). `Vegan`/`V` and `Low Calorie`/`LC` were retired
+  when the menu moved away from an all-vegan lineup.
+- **badge** — flexible. `Chef's Special` → green, `Most Loved` → brown, anything else →
   default sage green. Blank = no badge. Badges show on the grid tile only, not the hero.
+  (The CSS class is still named `badge-spotlight` — only the menu's wording changed from
+  the earlier `Chef's Spotlight`, not the class or the colour it maps to.)
 - **featured** — `TRUE` puts the bowl in the rotating hero slideshow (left panel). Not every
   bowl needs to be featured; weak photos can stay in the grid and be left out of rotation.
 - **image** — the **slug**, with no extension (e.g. `thai-zen`). The code appends
@@ -147,13 +151,13 @@ id, section, name, description, benefit, price, kcal, protein, sugar, badge, ima
 
 - **section** — `smoothie` or `coffee`. Drives which row on the board the item renders into.
   There is no `featured` column — Screen 3 has no slideshow.
-- **benefit** — Screen 3's functional-smoothie differentiator (`Focus`, `Clarity`, `Energy`,
-  `Strength`, `Recovery`). Renders as its own accent chip beside the name, one colour per
-  benefit (see `beverages.css`, and DESIGN-PRINCIPLES §7 for the palette). **Replaces dietary
-  tags on this board** — Screen 3 cards don't use `V`/`GF`/`LC`/`LS`, and unlike Screens 1–2 the
-  footer doesn't carry that glossary either (§2: the bar itself stays pixel-identical, but its
-  content is per-board — Screen 3's footer shows a macro disclaimer instead). Blank for coffee
-  rows.
+- **benefit** — Screen 3's functional-smoothie differentiator (`Focus`, `Antioxidant`,
+  `Low Cortisol`, `Women Wellness`, `Balance`). Renders as its own chip on its own row below
+  the name (`.smoothie-meta-row`), one colour per benefit (see `beverages.css`, and
+  DESIGN-PRINCIPLES §7 for the palette). Blank for coffee rows.
+- **tags** — smoothies can carry Diet Tags too (currently just `Contains Nuts`), rendered in
+  the same `.smoothie-meta-row` next to the benefit chip via the shared `tagsHTML()` helper —
+  same abbreviation (`N`) and footer glossary as Screens 1–2. Coffee rows have none.
 - **description** — any occurrence of `brahmi`, `shatavari`, `ashwagandha`, or `blue spirulina`
   (case-insensitive) is automatically highlighted on the board (`POWER_INGREDIENTS` in
   `beverages.js`). No Sheet markup needed; just write the ingredient name normally.
@@ -255,8 +259,8 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/beverages
 - **Read `DESIGN-PRINCIPLES.md` §12 before *any* change that touches more than one
   screen.** It defines the shared vocabulary — Item Name, Item Desc, Item Price, Macro
   Chip, Diet Tag, Item Badge, Benefit Chip — and the typography tokens they take their
-  sizes from. Note that **Diet Tag** (V/GF/LS) and **Item Badge** (Chef's Spotlight) are
-  named the opposite of how most people say them out loud; always use the two-word form.
+  sizes from. Note that **Diet Tag** (GF/PRO/FIB/N/LS) and **Item Badge** (Chef's Special)
+  are named the opposite of how most people say them out loud; always use the two-word form.
 - **Canonical elements take sizes from tokens, not literals.** A bare `px` on an Item
   Name, Item Desc, or Item Price is a bug unless commented. Deliberate per-screen
   variation is fine — but it gets a *named* variant token, so intent is readable.

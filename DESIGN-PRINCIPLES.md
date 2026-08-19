@@ -89,12 +89,14 @@ What must **not** move, regardless of a screen's internal layout:
 - The **upsell rail and footer strip** are pixel-identical everywhere — same
   height, same colours, same shared classes. They now live in `core.css`
   precisely so this can't drift screen to screen. **What each board puts inside
-  them may differ.** Screen 3's footer carries `.footer-note` ("Macros shown are
-  average per serving") instead of the V/GF/LC/LS glossary, because no card on
-  that board uses those tags — the 42px dark bar and the wordmark stay fixed,
-  only the content in between changes. Likewise Screen 3's upsell rail holds one
-  centred gold item instead of Screens 1–2's pipe-delimited combo list, because a
-  single item left-aligned in the full-width rail left most of it visibly empty.
+  them may differ** — the 42px dark bar and the wordmark stay fixed, only the
+  content in between changes. Right now all three boards' footers show the same
+  Diet Tag glossary (`.footer-legend` — `core.css` also defines `.footer-note`
+  as an alternative shape, unused today but available if a future board needs
+  board-specific footer content instead). Screen 3's upsell rail *does* differ
+  today: it holds one centred gold item instead of Screens 1–2's pipe-delimited
+  combo list, because a single item left-aligned in the full-width rail left
+  most of it visibly empty.
 - **Colour tokens, fonts, and the tag/macro/badge pill styling** (`core.css`)
   are shared. A screen may need a variant (e.g. Screen 2's panini-panel tags
   recolour `.tile-tag` gold instead of forest-on-cream, because the base pill
@@ -159,27 +161,34 @@ The hero sells one item at a time. It is **not** a summary of the grid.
 
 Hard-won, after going back and forth twice:
 
-- **Tiles show abbreviations** — `V`, `GF`, `LC`, `LS`. Full words were tried
-  and failed: at tile scale they were too small to read, and they crowded the
-  name.
+- **Tiles show abbreviations** — `GF`, `PRO`, `FIB`, `N`, `LS`. Full words were
+  tried and failed: at tile scale they were too small to read, and they
+  crowded the name. (Earlier menu had `V`/`LC` instead of `PRO`/`FIB`/`N` —
+  retired when the menu moved away from an all-vegan lineup; the abbreviation
+  *pattern* below is what survived that change, not any specific tag.)
 - **The footer carries the glossary**, spelled out once:
-  `V Vegan · GF Gluten Free · LC Low Calorie · LS Less Spicy`.
+  `GF Gluten Free · PRO High Protein · FIB High Fibre · N Contains Nuts · LS Less Spicy`.
 - **The abbreviation map lives in code, not in the Sheet.** The owner keeps
   writing readable full names ("Gluten Free"); `TAG_ABBREV` in `core.js`
   shortens them for display on every board. This keeps the Sheet human-readable
   and means adding a tag never requires the owner to learn a code.
-- New tags on other screens follow the same shape: a short 1–2 letter code plus
-  a glossary entry. Keep the total number of distinct tags small — a glossary
-  longer than ~5 entries stops being scannable.
+- New tags on other screens follow the same shape: a short code plus a glossary
+  entry. Prefer 1–2 letters, but go to 3 rather than ship two codes that are
+  easy to confuse at wall distance — `High Protein` and `High Fibre` were first
+  tried as `HP`/`HF`, which differ by one letter, and became `PRO`/`FIB`
+  instead. Keep the total number of distinct tags small — a glossary longer
+  than ~5 entries stops being scannable.
 
-**Screen 3 doesn't use this system at all.** Its smoothies are sold on a
-functional benefit (Focus, Clarity, Energy, Strength, Recovery), not a dietary
-attribute, so the benefit gets its own `.benefit-chip` — full word, not an
-abbreviation, and one colour per benefit rather than the shared pill styling —
-instead of a `V`/`GF`/`LC`/`LS` tag. Because no card on Screen 3 uses those four
-tags, its footer carries `.footer-note` (a macro disclaimer) instead of the
-glossary; see §2 for why that's a legitimate per-board footer content swap, not
-a fork of the footer's shared shape.
+**Screen 3 adds a second system on top of this one, rather than replacing it.**
+Its smoothies are sold on a functional benefit (Focus, Antioxidant, Low
+Cortisol, Women Wellness, Balance), which is not a dietary attribute, so it
+gets its own `.benefit-chip` — full word, not an abbreviation, one colour per
+benefit rather than the shared pill styling. That chip sits *alongside* the
+same Diet Tag system this section describes: a smoothie can also carry
+`Contains Nuts` (currently the only tag that applies there), abbreviated `N`
+and explained in the same footer glossary as Screens 1–2. Benefit chip and
+diet tag render together in `.smoothie-meta-row`, on their own row beneath the
+item name. Coffee cards use neither.
 
 ---
 
@@ -438,15 +447,15 @@ Use these words in conversation, in commits, and in class names on any new scree
 | **Section Header** | The row holding a Section Title (and, on Screen 3's smoothie row, an inline note) | `.section-header` in `core.css`. `--<slug>` modifier classes exist on the markup (`--bowls`, `--toasts`, `--wraps`, `--smoothies`, `--coffee`) for section-specific spacing — `--coffee` adds top margin — but carry no colour; the underline is uniform, see below |
 | **Section Title** | The on-screen heading for a Section | `.section-title` in `core.css`. `.section-title--lg` is Power Bowls' variant, since it's the one section that fills Screen 1's entire grid panel rather than stacking with others |
 | **Item Name** | The dish/drink name | `.tile-name`, `.panini-item-name`, `.toast-name`, `.wrap-name`, `.smoothie-name`, `.coffee-name` |
-| **Item Desc** | The one- or two-line description under the name | `.tile-desc`, `.panini-item-desc`, `.toast-desc`, `.wrap-desc`, `.smoothie-desc`, `.coffee-desc` |
+| **Item Desc** | The description under the name — clamped to 2 lines on most boards, 3 on Screen 1 (its descriptions run longer; see the bowl tile's `-webkit-line-clamp`) | `.tile-desc`, `.panini-item-desc`, `.toast-desc`, `.wrap-desc`, `.smoothie-desc`, `.coffee-desc` |
 | **Item Price** | The price | `.tile-price`, `.panini-item-price`, `.toast-price`, `.wrap-price`, `.smoothie-price`, `.coffee-price` |
-| **Macro Chip** | kcal / protein / fibre / sugar readouts | `.tile-macro` (small), `.macro-chip` (large, hero) |
-| **Diet Tag** | V / GF / LC / LS — the abbreviated dietary pills | `tags` column, `.tile-tag`, `TAG_ABBREV` in `core.js` |
-| **Item Badge** | Chef's Spotlight, Most Loved | `badge` column, `.tile-badge`, `.badge-spotlight`, `.badge-loved` |
-| **Benefit Chip** | Focus / Clarity / Energy / Strength / Recovery. Screen 3 only; replaces Diet Tags there. | `benefit` column, `.benefit-chip`, `.b-focus` … |
+| **Macro Chip** | kcal / protein / fibre readouts (Screen 3 dropped its earlier sugar column in favour of fibre, matching the others) | `.tile-macro` (small), `.macro-chip` (large, hero) |
+| **Diet Tag** | GF / PRO / FIB / N / LS — the abbreviated dietary pills. `V` (Vegan) and `LC` (Low Calorie) were retired when the menu moved away from an all-vegan lineup | `tags` column, `.tile-tag`, `TAG_ABBREV` in `core.js` |
+| **Item Badge** | Chef's Special, Most Loved (the CSS class stays `badge-spotlight` for the first — only the menu's wording changed, not the colour it maps to) | `badge` column, `.tile-badge`, `.badge-spotlight`, `.badge-loved` |
+| **Benefit Chip** | Focus / Antioxidant / Low Cortisol / Women Wellness / Balance. Screen 3 only. Coexists with Diet Tag, not a replacement for it — a smoothie can show both, stacked in `.smoothie-meta-row` below the name | `benefit` column, `.benefit-chip`, `.b-focus` … |
 
 ⚠️ **Diet Tag vs Item Badge is the easy one to get backwards.** In this codebase
-the *dietary* markers (V/GF/LS) are **tags** and *Chef's Spotlight* is a
+the *dietary* markers (GF/PRO/FIB/N/LS) are **tags** and *Chef's Special* is a
 **badge** — which is the opposite of how most people say it out loud. Always use
 the two-word form ("diet tag", "item badge"); never the bare word "badge".
 
