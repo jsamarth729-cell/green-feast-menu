@@ -76,7 +76,7 @@ Google Sheet (owner edits menu)
 | `adjust.html` | **Image adjuster tool** — local page with live sliders to frame each bowl photo, then export a finished CSV. (See "Image framing" below.) Screen 1 only, for now. |
 | `data/config.json` | Screen 1 static content: Build-Your-Own tile + upsell rail items. |
 | `data/bowls-sheet.csv` | Local snapshot/template of the Screen 1 Sheet tab. **Not what the live board reads** — see the caching note below. |
-| `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the three summary stat chips, the panini and wrap image slugs, the wrap note, and the upsell rail. |
+| `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the panini and wrap summary stat chips (both sections share a macro range now, no per-item macros), the panini and wrap image slugs, the wrap note, the column-3 combo block (`combos`), and the bottom-rail upsell (`upsell`, quick add-ons only — meal upgrades moved to `combos`). |
 | `data/wraps-sheet.csv` | Local snapshot/template of the Screen 2 Sheet tab, grouped by a `section` column (`panini`/`toast`/`wrap`). **Not what the live board reads** — same caching note as `data/bowls-sheet.csv` below. |
 | `data/screen3-config.json` | Screen 3 static content: board title, the two section headings ("Functional Smoothies", "Coffee"), the footer macro note, and the gold protein upsell. **`upsell` here is a single `{heading, gold:{text,price}}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one gold item, not a variable combo list. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. |
 | `data/screen3-sheet.csv` | Local snapshot/template of the Screen 3 Sheet tab, grouped by a `section` column (`smoothie`/`coffee`). **Not what the live board reads once the Sheet tab is published** — same caching note as `data/bowls-sheet.csv` below. |
@@ -127,13 +127,15 @@ Sheet document as Screen 1 (its own `gid` in `WRAPS_SOURCE`):
 id, section, name, description, price, kcal, protein, fibre, tags, badge, image
 ```
 
-- **section** — `panini`, `toast`, or `wrap`. Drives which block on the board the row
+- **section** — `panini`, `toast`, or `wrap`. Drives which column on the board the row
   renders into. There is no `featured` column — Screen 2 has no slideshow.
-- Paninis leave **kcal/protein/fibre blank** — they show three shared summary stat
-  chips (from `data/screen2-config.json`) instead of per-item macros, to save space
-  in the narrower feature panel. Toasts and wraps fill in all three, same as bowls.
+- **Both paninis and wraps leave kcal/protein/fibre blank** — each shows its own three
+  shared summary stat chips (from `data/screen2-config.json`'s `panel.stats` and
+  `sections.wrap.stats`) instead of per-item macros. Toasts fill in all three, same as
+  bowls.
 - **image** — only toasts use this (one of `avo-feta-toast`, `earthy-hummus-toast`,
-  `mango-salsa-toast`). The panini feature photo and the single wrap photo are set in
+  `mango-salsa-toast` — the last is currently unused, no toast row points at it, but the
+  file stays). The panini feature photo and the single wrap photo are set in
   `data/screen2-config.json`, not per-row, since only one of each appears on the board.
 
 **Screen 3 (Beverages)** — header row, own tab in the same Sheet document (its own `gid`

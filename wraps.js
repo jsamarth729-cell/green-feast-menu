@@ -57,12 +57,22 @@ function paniniHeaderHTML(panel) {
     <div class="panini-title">${panel.title}</div>`;
 }
 
+function badgeClassFor(badge) {
+  /* CSS class kept as "badge-spotlight" — only the menu's badge text
+     changed to "Chef's Special", not the colour it maps to. */
+  if (badge === "Chef's Special") return 'badge-spotlight';
+  if (badge === 'Most Loved')     return 'badge-loved';
+  return '';
+}
+
 function paniniItemHTML(item) {
   const tags = tagsHTML(item.tags);
+  const hasBadge = item.badge && item.badge.trim();
   return `
     <div class="panini-item">
       <div class="panini-item-row">
         <span class="panini-item-name">${item.name}</span>
+        ${hasBadge ? `<span class="panini-item-badge ${badgeClassFor(item.badge)}">${item.badge}</span>` : ''}
         ${tags ? `<div class="tile-tags">${tags}</div>` : ''}
         <span class="panini-item-price"><span class="tile-rupee">₹</span>${item.price}</span>
       </div>
@@ -106,7 +116,11 @@ function toastCardHTML(item) {
     </div>`;
 }
 
-/* ── Wraps (right, bottom block) ─────────────────────────────── */
+/* ── Wraps ────────────────────────────────────────────────────── */
+/* No per-item macros — wraps now share a summary range, same pattern
+   as panini (config.sections.wrap.stats, rendered via paniniStatHTML
+   into #wrapStats). The CSV's kcal/protein/fibre columns for wrap rows
+   are blank as a result. */
 function wrapRowHTML(item) {
   const tags = tagsHTML(item.tags);
   return `
@@ -117,18 +131,28 @@ function wrapRowHTML(item) {
         <span class="wrap-price"><span class="tile-rupee">₹</span>${item.price}</span>
       </div>
       <div class="wrap-desc">${item.description}</div>
-      <div class="tile-macros">
-        <span class="tile-macro">${item.kcal} kcal</span>
-        <span class="tile-macro">${item.protein}g protein</span>
-        <span class="tile-macro">${item.fibre}g fibre</span>
-      </div>
     </div>`;
 }
 
+/* ── Combo block (column 3, below the toasts) ────────────────── */
+function comboBlockHTML(cfg) {
+  const rows = cfg.items.map(function (i) {
+    return `
+      <div class="combo-row">
+        <span class="combo-row-text">${i.text}</span>
+        <span class="combo-row-price">${i.price}</span>
+      </div>`;
+  }).join('');
+  return `<div class="combo-heading">${cfg.heading}</div>${rows}`;
+}
+
 /* ── Upsell rail — same shape as Screen 1's, own copy since the
-   parsing logic here isn't screen-agnostic layout (core.js is). ── */
+   parsing logic here isn't screen-agnostic layout (core.js is).
+   Heading reads "Extras" (not "Make it a meal") because this board
+   now has a second upsell surface — the combo block in column 3 —
+   which carries the meal upgrades. This rail is quick add-ons only. ── */
 function renderUpsell(items) {
-  let html = `<div class="upsell-heading">Make it a meal</div>`;
+  let html = `<div class="upsell-heading">Extras</div>`;
 
   items.forEach(item => {
     const parts = item.split('|').map(p => p.trim());
@@ -169,8 +193,10 @@ function render(data) {
           onerror="this.closest('.panini-photo-wrap').classList.add('photo-error');this.remove()">`;
 
   document.getElementById('toastGrid').innerHTML = toasts.map(toastCardHTML).join('');
+  document.getElementById('comboBlock').innerHTML = comboBlockHTML(config.combos);
 
   document.getElementById('wrapList').innerHTML = wraps.map(wrapRowHTML).join('');
+  document.getElementById('wrapStats').innerHTML = config.sections.wrap.stats.map(paniniStatHTML).join('');
   const wrapCfg = config.sections.wrap;
   const noteLines = (wrapCfg.note || '').split('\n').map(l => `<div>${l}</div>`).join('');
   document.getElementById('wrapPhoto').innerHTML = `

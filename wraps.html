@@ -31,24 +31,32 @@
         </div>
       </div>
 
-      <!-- ── Right: category blocks ── -->
+      <!-- ── Right: two columns — wraps, then toasts + combos ── -->
       <div class="content-panel">
 
-        <div class="section-header section-header--toasts">
-          <h1 class="section-title">Open Toasts</h1>
-        </div>
-        <div class="toast-grid" id="toastGrid">
-          <!-- injected by JS -->
-        </div>
-
-        <div class="section-header section-header--wraps">
-          <h1 class="section-title">Wraps</h1>
-        </div>
-        <div class="wrap-block">
+        <div class="wrap-column">
+          <div class="section-header section-header--wraps">
+            <h1 class="section-title">Wraps</h1>
+          </div>
           <div class="wrap-list" id="wrapList">
             <!-- injected by JS -->
           </div>
+          <div class="wrap-stats" id="wrapStats">
+            <!-- injected by JS -->
+          </div>
           <div class="wrap-photo-wrap" id="wrapPhoto">
+            <!-- injected by JS -->
+          </div>
+        </div>
+
+        <div class="toast-column">
+          <div class="section-header section-header--toasts">
+            <h1 class="section-title">Open Toasts</h1>
+          </div>
+          <div class="toast-grid" id="toastGrid">
+            <!-- injected by JS -->
+          </div>
+          <div class="combo-block" id="comboBlock">
             <!-- injected by JS -->
           </div>
         </div>
