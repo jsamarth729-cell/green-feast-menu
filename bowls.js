@@ -187,32 +187,6 @@ function startSlideshow() {
   }, SLIDE_MS);
 }
 
-/* ── Upsell rail ─────────────────────────────────────────────── */
-function renderUpsell(items) {
-  let html = `<div class="upsell-heading">Make it a meal</div>`;
-
-  items.forEach(item => {
-    const parts = item.split('|').map(p => p.trim());
-    if (parts.length >= 3) {
-      html += `
-        <div class="upsell-combo">
-          <span class="combo-text">${parts[0]}</span>
-          <span class="combo-price">${parts[1]}</span>
-          <span class="combo-save">${parts[2]}</span>
-        </div>`;
-    } else {
-      html += `
-        <div class="upsell-vdiv"></div>
-        <div class="upsell-addon">
-          <span class="addon-text">${parts[0]}</span>
-          <span class="addon-price">${parts[1] || ''}</span>
-        </div>`;
-    }
-  });
-
-  document.getElementById('upsellRail').innerHTML = html;
-}
-
 /* ── Full render ─────────────────────────────────────────────── */
 function render(data) {
   const featured = data.bowls.filter(b => b.featured);
@@ -232,7 +206,7 @@ function render(data) {
   document.getElementById('bowlGrid').innerHTML =
     data.bowls.map(tileHTML).join('') + byobTileHTML(data.buildYourOwn);
 
-  renderUpsell(data.upsell);
+  renderPipeUpsell(data.upsell, 'Extras');
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

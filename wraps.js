@@ -146,36 +146,6 @@ function comboBlockHTML(cfg) {
   return `<div class="combo-heading">${cfg.heading}</div>${rows}`;
 }
 
-/* ── Upsell rail — same shape as Screen 1's, own copy since the
-   parsing logic here isn't screen-agnostic layout (core.js is).
-   Heading reads "Extras" (not "Make it a meal") because this board
-   now has a second upsell surface — the combo block in column 3 —
-   which carries the meal upgrades. This rail is quick add-ons only. ── */
-function renderUpsell(items) {
-  let html = `<div class="upsell-heading">Extras</div>`;
-
-  items.forEach(item => {
-    const parts = item.split('|').map(p => p.trim());
-    if (parts.length >= 3) {
-      html += `
-        <div class="upsell-combo">
-          <span class="combo-text">${parts[0]}</span>
-          <span class="combo-price">${parts[1]}</span>
-          <span class="combo-save">${parts[2]}</span>
-        </div>`;
-    } else {
-      html += `
-        <div class="upsell-vdiv"></div>
-        <div class="upsell-addon">
-          <span class="addon-text">${parts[0]}</span>
-          <span class="addon-price">${parts[1] || ''}</span>
-        </div>`;
-    }
-  });
-
-  document.getElementById('upsellRail').innerHTML = html;
-}
-
 /* ── Full render ─────────────────────────────────────────────── */
 function render(data) {
   const items  = data.items;
@@ -202,7 +172,7 @@ function render(data) {
     <img src="${screen2ImageSrc(wrapCfg.image)}" alt="Wraps"
          onerror="this.closest('.wrap-photo-wrap').classList.add('photo-error');this.remove()">`;
 
-  renderUpsell(config.upsell);
+  renderPipeUpsell(config.upsell, 'Extras');
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

@@ -27,6 +27,37 @@ function tagsHTML(tags) {
     .join('');
 }
 
+/* Bottom-rail upsell for Screens 1-2, which share an identical strip.
+   Pipe-delimited: "text | price" renders a plain add-on, "text | price | note"
+   renders the larger combo card with a trailing note chip. Screen 3 has its own
+   shape (a single gold pill) and deliberately does NOT use this. */
+function renderPipeUpsell(items, heading) {
+  let html = `<div class="upsell-heading">${heading}</div>`;
+
+  items.forEach((item, i) => {
+    const parts = item.split('|').map(p => p.trim());
+    if (parts.length >= 3) {
+      html += `
+        <div class="upsell-combo">
+          <span class="combo-text">${parts[0]}</span>
+          <span class="combo-price">${parts[1]}</span>
+          <span class="combo-save">${parts[2]}</span>
+        </div>`;
+    } else {
+      /* Divider separates items from each other, not the first item from the
+         heading — a leading divider reads as a stray mark. */
+      html += `
+        ${i > 0 ? '<div class="upsell-vdiv"></div>' : ''}
+        <div class="upsell-addon">
+          <span class="addon-text">${parts[0]}</span>
+          <span class="addon-price">${parts[1] || ''}</span>
+        </div>`;
+    }
+  });
+
+  document.getElementById('upsellRail').innerHTML = html;
+}
+
 /* ── Scale 1920×1080 canvas to fill viewport ─────────────────── */
 let lastW = 0, lastH = 0;
 
