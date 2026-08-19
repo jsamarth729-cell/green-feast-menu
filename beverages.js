@@ -120,15 +120,15 @@ function coffeeCardHTML(item) {
   return `
     <div class="coffee-card">
       ${hasBadge ? `<div class="tile-badge ${badgeClassFor(item.badge)}">${item.badge}</div>` : ''}
+      <div class="coffee-photo">
+        <img src="${screen3ImageSrc(item.image)}" alt="${item.name}"
+             onerror="this.closest('.coffee-photo').classList.add('photo-error');this.remove()">
+      </div>
       <div class="coffee-name-row">
         <span class="coffee-name">${item.name}</span>
         <span class="coffee-price"><span class="tile-rupee">₹</span>${item.price}</span>
       </div>
       <div class="coffee-desc">${item.description}</div>
-      <div class="coffee-photo">
-        <img src="${screen3ImageSrc(item.image)}" alt="${item.name}"
-             onerror="this.closest('.coffee-photo').classList.add('photo-error');this.remove()">
-      </div>
       <div class="tile-macros">
         <span class="tile-macro">${item.kcal} kcal</span>
         ${item.protein != null ? `<span class="tile-macro">${item.protein}g protein</span>` : ''}

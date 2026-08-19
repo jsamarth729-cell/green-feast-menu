@@ -69,22 +69,28 @@ for (const file of new Set(Object.values(CANONICAL).flat().map(([f]) => f))) {
 }
 
 /* Pull one declaration out of a top-level rule block. Good enough for
-   this codebase: every canonical selector is a single flat class rule
-   at column 0, no nesting, no media queries. */
+   this codebase: every canonical selector sits at column 0, no
+   nesting, no media queries — but it MAY be grouped with another
+   selector via a comma (e.g. ".smoothie-desc,\n.coffee-desc {" when
+   two card types share identical rules — see beverages.css). Find the
+   selector's own line, then the next "{" and its matching "}", rather
+   than assuming the selector is immediately followed by "{". */
 function decl(css, selector, property) {
-  const rule = css.match(
-    new RegExp('^\\.' + selector + '\\s*\\{([^}]*)\\}', 'm')
-  );
-  if (!rule) return { missing: true };
+  const selMatch = css.match(new RegExp('^\\.' + selector + '\\s*[,{]', 'm'));
+  if (!selMatch) return { missing: true };
 
-  const line = css.slice(0, rule.index).split('\n').length;
-  const found = rule[1].match(
+  const braceIdx = css.indexOf('{', selMatch.index);
+  const closeIdx = css.indexOf('}', braceIdx);
+  const body = css.slice(braceIdx + 1, closeIdx);
+
+  const line = css.slice(0, selMatch.index).split('\n').length;
+  const found = body.match(
     new RegExp('(^|\\n)\\s*' + property + '\\s*:\\s*([^;]+);')
   );
   if (!found) return { missing: true, line };
 
   const value = found[2].trim();
-  const commented = /\/\*/.test(rule[1].split(found[0])[1] || '');
+  const commented = /\/\*/.test(body.split(found[0])[1] || '');
   return { value, line, isToken: value.startsWith('var('), commented };
 }
 
