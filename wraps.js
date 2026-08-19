@@ -198,11 +198,9 @@ function render(data) {
   document.getElementById('wrapList').innerHTML = wraps.map(wrapRowHTML).join('');
   document.getElementById('wrapStats').innerHTML = config.sections.wrap.stats.map(paniniStatHTML).join('');
   const wrapCfg = config.sections.wrap;
-  const noteLines = (wrapCfg.note || '').split('\n').map(l => `<div>${l}</div>`).join('');
   document.getElementById('wrapPhoto').innerHTML = `
     <img src="${screen2ImageSrc(wrapCfg.image)}" alt="Wraps"
-         onerror="this.closest('.wrap-photo-wrap').classList.add('photo-error');this.remove()">
-    <div class="wrap-note">${noteLines}</div>`;
+         onerror="this.closest('.wrap-photo-wrap').classList.add('photo-error');this.remove()">`;
 
   renderUpsell(config.upsell);
 }

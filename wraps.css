@@ -126,6 +126,11 @@
   display: flex;
   padding: 18px 44px 0 61px;
   flex-shrink: 0;
+  /* The feature photo below is absolutely positioned and can extend
+     above its own wrap (max-height:118%) when the wrap is short —
+     without this, it paints over these chips instead of behind them. */
+  position: relative;
+  z-index: 1;
 }
 .panini-stats > * + * {
   margin-left: 10px;
@@ -171,7 +176,7 @@
   left: -28px;
   bottom: -18px;
   width: calc(100% + 56px);
-  max-height: 118%;
+  max-height: 100%;
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 20px 40px rgba(0,0,0,0.35));
@@ -323,31 +328,31 @@
   flex-shrink: 0;
   background: var(--bar);
   border-radius: 14px;
-  padding: 16px 20px;
+  padding: 22px 24px;
   margin-top: 16px;
 }
 .combo-heading {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--sage-light);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .combo-row {
   display: flex;
   align-items: baseline;
 }
 .combo-row + .combo-row {
-  margin-top: 10px;
+  margin-top: 14px;
 }
 .combo-row-text {
-  font-size: 17px;
+  font-size: 19px;
   color: rgba(255,255,255,0.86);
 }
 .combo-row-price {
   margin-left: auto;
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 600;
   color: var(--gold);
 }
@@ -443,13 +448,4 @@
 .wrap-photo-wrap.photo-error {
   align-items: center;
   justify-content: center;
-}
-.wrap-note {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 16px;
-  color: var(--sage);
-  text-align: center;
-  line-height: 1.4;
-  margin-top: 14px;
 }
