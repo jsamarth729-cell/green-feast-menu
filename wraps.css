@@ -63,6 +63,13 @@
 }
 .panini-item-row {
   display: flex;
+  /* A long name + badge (e.g. "P4 - Peri Peri Paneer Panini" + "MOST
+     LOVED") doesn't fit the 420px column alongside the price — name,
+     badge and price together need ~474px. flex-wrap lets the price
+     drop to its own right-aligned line rather than forcing the badge
+     away from the name it belongs to. Only affects rows this long;
+     shorter panini keep everything on one line. */
+  flex-wrap: wrap;
   align-items: baseline;
 }
 .panini-item-row > * + * {
@@ -88,8 +95,16 @@
    isn't a positioned ancestor. A corner badge in a dense 3-item list
    also reads as clutter; inline next to the name fits the row that's
    already there. */
+/* Lives inside .panini-item-name (not as a sibling flex item in
+   .panini-item-row) so it wraps with the name text and always sits
+   after the last word — a long name like "P4 - Peri Peri Paneer
+   Panini" wraps to two lines, and a sibling badge would stay pinned
+   to the first line's baseline while the name continued underneath. */
 .panini-item-badge {
-  font-size: 9px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -97,7 +112,6 @@
   background: var(--gold);
   padding: 2px 7px;
   border-radius: 6px;
-  flex-shrink: 0;
 }
 .panini-item-price {
   margin-left: auto;
@@ -324,20 +338,26 @@
    leftover height, not this block; if it flexed instead, the toast
    photos would grow past their upscaling ceiling (~373px tall — the
    point where the 828x507 cut-outs stop being downscaled). ────────── */
+/* Gold outline + --hero-bg (not --bar) so this block bookends the
+   gold-accented dark panini panel on the far left, and reads as the
+   one thing on this board asking the customer to spend more — the
+   same role gold plays everywhere else (DESIGN-PRINCIPLES §7). */
 .combo-block {
   flex-shrink: 0;
-  background: var(--bar);
+  background: var(--hero-bg);
+  border: 2px solid var(--gold);
   border-radius: 14px;
-  padding: 22px 24px;
+  padding: 24px 26px;
   margin-top: 16px;
+  box-shadow: 0 4px 18px rgba(40,63,40,0.18);
 }
 .combo-heading {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--sage-light);
-  margin-bottom: 12px;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--gold);
+  margin-bottom: 10px;
 }
 .combo-row {
   display: flex;
@@ -347,12 +367,12 @@
   margin-top: 14px;
 }
 .combo-row-text {
-  font-size: 19px;
+  font-size: 22px;
   color: rgba(255,255,255,0.86);
 }
 .combo-row-price {
   margin-left: auto;
-  font-size: 23px;
+  font-size: 26px;
   font-weight: 600;
   color: var(--gold);
 }
@@ -420,6 +440,7 @@
 }
 .wrap-stats .stat-chip {
   border-color: rgba(88,120,88,0.45);
+  border-width: 2.5px;
 }
 .wrap-stats .stat-value {
   color: var(--forest);

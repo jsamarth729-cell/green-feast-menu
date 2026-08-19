@@ -71,8 +71,9 @@ function paniniItemHTML(item) {
   return `
     <div class="panini-item">
       <div class="panini-item-row">
-        <span class="panini-item-name">${item.name}</span>
-        ${hasBadge ? `<span class="panini-item-badge ${badgeClassFor(item.badge)}">${item.badge}</span>` : ''}
+        <span class="panini-item-name">${item.name}${hasBadge
+          ? `<span class="panini-item-badge ${badgeClassFor(item.badge)}">${item.badge}</span>`
+          : ''}</span>
         ${tags ? `<div class="tile-tags">${tags}</div>` : ''}
         <span class="panini-item-price"><span class="tile-rupee">₹</span>${item.price}</span>
       </div>
