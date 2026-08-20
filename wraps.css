@@ -4,8 +4,11 @@
    wraps.html loads core.css first, then this file.
 
    No slideshow here (unlike Screen 1's hero) — the left panel is a
-   static feature block. The right side stacks two category blocks
-   (Open Toasts, Wraps) instead of Screen 1's 2x5 tile grid.
+   static feature block. The right side holds two side-by-side columns
+   (Wraps, then Open Toasts + a combo block) instead of Screen 1's 2x5
+   tile grid. Was a single stacked column (Open Toasts above Wraps)
+   until the menu dropped to 2 toasts + 3 wraps and the layout moved to
+   three parallel columns total, panini panel included.
 ══════════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════════
@@ -60,6 +63,13 @@
 }
 .panini-item-row {
   display: flex;
+  /* A long name + badge (e.g. "P4 - Peri Peri Paneer Panini" + "MOST
+     LOVED") doesn't fit the 420px column alongside the price — name,
+     badge and price together need ~474px. flex-wrap lets the price
+     drop to its own right-aligned line rather than forcing the badge
+     away from the name it belongs to. Only affects rows this long;
+     shorter panini keep everything on one line. */
+  flex-wrap: wrap;
   align-items: baseline;
 }
 .panini-item-row > * + * {
@@ -79,6 +89,29 @@
   color: var(--gold);
   background: rgba(254,250,103,0.12);
   border-color: rgba(254,250,103,0.55);
+}
+/* Inline badge, not .tile-badge — that's position:absolute for a tile
+   corner, which would fly to the panel corner here since .panini-item
+   isn't a positioned ancestor. A corner badge in a dense 3-item list
+   also reads as clutter; inline next to the name fits the row that's
+   already there. */
+/* Lives inside .panini-item-name (not as a sibling flex item in
+   .panini-item-row) so it wraps with the name text and always sits
+   after the last word — a long name like "P4 - Peri Peri Paneer
+   Panini" wraps to two lines, and a sibling badge would stay pinned
+   to the first line's baseline while the name continued underneath. */
+.panini-item-badge {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hero-bg);
+  background: var(--gold);
+  padding: 2px 7px;
+  border-radius: 6px;
 }
 .panini-item-price {
   margin-left: auto;
@@ -107,6 +140,11 @@
   display: flex;
   padding: 18px 44px 0 61px;
   flex-shrink: 0;
+  /* The feature photo below is absolutely positioned and can extend
+     above its own wrap (max-height:118%) when the wrap is short —
+     without this, it paints over these chips instead of behind them. */
+  position: relative;
+  z-index: 1;
 }
 .panini-stats > * + * {
   margin-left: 10px;
@@ -152,7 +190,7 @@
   left: -28px;
   bottom: -18px;
   width: calc(100% + 56px);
-  max-height: 118%;
+  max-height: 100%;
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 20px 40px rgba(0,0,0,0.35));
@@ -164,24 +202,37 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CONTENT PANEL (right — fills remaining width, stacks two blocks)
+   CONTENT PANEL (right — fills remaining width, two side-by-side
+   columns: Wraps, then Open Toasts + the combo block)
 ══════════════════════════════════════════════════════════════════ */
 .content-panel {
   flex: 1;
   min-width: 0;
   display: flex;
-  flex-direction: column;
   padding: 0 44px 20px;
+}
+.content-panel > * + * {
+  margin-left: 24px;   /* flex gap banned on Chrome 69 — DESIGN-PRINCIPLES §9 */
+}
+.wrap-column,
+.toast-column {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Shared .section-header/.section-title live in core.css. This screen's
    blocks need a little more top padding than the shared default since
-   they follow directly under the content panel edge / a preceding grid. */
+   they follow directly under the content panel edge. */
 .section-header {
   padding-top: 20px;
 }
 
-/* ─── Open Toasts — 3-up card grid ──────────────────────────── */
+/* ─── Open Toasts — vertical, 1-up (was a 3-up row before the menu
+   dropped to 2 toasts and the layout moved to three parallel columns).
+   Card internals (photo top, centered text) are unchanged. ────────── */
 /* flex:1 lets this block absorb whatever vertical slack the column has
    left over, and .toast-photo-wrap below (flex:1 too) is what actually
    spends it — so the photo grows automatically instead of leaving dead
@@ -189,7 +240,8 @@
    the photo instead of overflowing the board. */
 .toast-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, 1fr);
   grid-gap: 16px;
   gap: 16px;
   flex: 1;
@@ -278,25 +330,66 @@
   margin-left: 8px;
 }
 
-/* ─── Wraps — text rows beside one shared photo ─────────────── */
-/* align-items: flex-start (not center) — centering a short list in a
-   tall box was the source of ~86px of dead space above/below the
-   rows. Natural height now; flex-shrink:0 keeps the toast grid above
-   as the one thing that absorbs leftover column slack. */
-.wrap-block {
-  display: flex;
-  align-items: flex-start;
-  margin-top: 4px;
+/* ─── Combo block (column 3, below the toasts) — meal upgrades.
+   Dark ground + gold prices matches the upsell rail's visual language
+   (gold marks "anything the customer should act on", DESIGN-PRINCIPLES
+   §7), so the two read as the same kind of thing — correct, since they
+   are. flex-shrink:0 so the toast grid above absorbs the column's
+   leftover height, not this block; if it flexed instead, the toast
+   photos would grow past their upscaling ceiling (~373px tall — the
+   point where the 828x507 cut-outs stop being downscaled). ────────── */
+/* Gold outline + --hero-bg (not --bar) so this block bookends the
+   gold-accented dark panini panel on the far left, and reads as the
+   one thing on this board asking the customer to spend more — the
+   same role gold plays everywhere else (DESIGN-PRINCIPLES §7). */
+.combo-block {
   flex-shrink: 0;
+  background: var(--hero-bg);
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  padding: 28px 28px;
+  margin-top: 16px;
+  box-shadow: 0 4px 18px rgba(40,63,40,0.18);
 }
-/* Fixed width, not flex-basis-as-percentage: the row's price sat up to
-   547px away from the name because the text column (808px) was far
-   wider than any description needs. 580px is a hard cap the widest
-   current description (~400px at 16px) fits inside with room to grow;
-   .wrap-photo-wrap takes whatever's left. */
+.combo-heading {
+  font-family: 'Inter', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.combo-star {
+  margin-right: 10px;
+}
+.combo-row {
+  display: flex;
+  align-items: baseline;
+}
+.combo-row + .combo-row {
+  margin-top: 22px;
+}
+.combo-row-text {
+  font-size: 25px;
+  color: rgba(255,255,255,0.86);
+}
+/* nowrap + no shrink: without these the price span gets squeezed by a
+   long text sibling and breaks between the "+" and the number, leaving
+   a stray "+" hanging at the end of the text's first line. */
+.combo-row-price {
+  margin-left: auto;
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--gold);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ─── Wraps — list, shared stat chips, then one photo below ─────
+   Was rows beside one shared photo when the block spanned the full
+   content-panel width; now confined to a single ~641px column, so the
+   photo moved from beside the list to below it. ────────────────── */
 .wrap-list {
-  flex: 0 0 580px;
-  min-width: 0;
+  flex-shrink: 0;
 }
 .wrap-row {
   padding: 13px 0;
@@ -341,10 +434,32 @@
   overflow: hidden;
 }
 
+/* Cream-ground variant of the gold-outlined .stat-chip on the dark
+   panini panel — the gold outline/text would be near-invisible here,
+   same reasoning as .panini-item-row .tile-tag above. */
+.wrap-stats {
+  display: flex;
+  flex-shrink: 0;
+  margin: 14px 0;
+}
+.wrap-stats > * + * {
+  margin-left: 10px;
+}
+.wrap-stats .stat-chip {
+  border-color: rgba(88,120,88,0.45);
+  border-width: 2.5px;
+}
+.wrap-stats .stat-value {
+  color: var(--forest);
+}
+.wrap-stats .stat-label {
+  color: var(--sage);
+}
+
 .wrap-photo-wrap {
   flex: 1;
   min-width: 0;
-  margin-left: 28px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -362,12 +477,4 @@
   align-items: center;
   justify-content: center;
 }
-.wrap-note {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 16px;
-  color: var(--sage);
-  text-align: center;
-  line-height: 1.4;
-  margin-top: 14px;
-}
+

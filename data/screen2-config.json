@@ -4,9 +4,9 @@
     "title": "Panini Range",
     "image": "panini-hero",
     "stats": [
-      { "value": "15g+", "label": "protein" },
-      { "value": "390–450", "label": "kcal" },
-      { "value": "8–10g", "label": "fibre" }
+      { "value": "15–19g", "label": "protein" },
+      { "value": "395–500", "label": "kcal" },
+      { "value": "5–7g",   "label": "fibre" }
     ]
   },
   "sections": {
@@ -14,12 +14,22 @@
     "wrap": {
       "heading": "Wraps",
       "image": "bbq-plate",
-      "note": "Freshly rolled.\nPacked with plant power."
+      "stats": [
+        { "value": "19–23g", "label": "protein" },
+        { "value": "515–540", "label": "kcal" },
+        { "value": "6–10g",  "label": "fibre" }
+      ]
     }
   },
+  "combos": {
+    "heading": "Make it a meal",
+    "items": [
+      { "text": "Add coffee to your meal",                "price": "+₹200" },
+      { "text": "Add a functional smoothie to your meal", "price": "+₹250" }
+    ]
+  },
   "upsell": [
-    "Panini + any smoothie | ₹449 | save ₹49",
-    "Add extra protein | +₹99",
-    "Add a cold press | +₹99"
+    "Extra protein (8–10g) | +₹50",
+    "Extra premiums — feta / guacamole / beetroot hummus | +₹50"
   ]
 }

@@ -5,8 +5,9 @@
 
    No slideshow, no 525px left panel (unlike Screens 1-2) — the dark
    anchor is a full-width header band instead. See DESIGN-PRINCIPLES
-   §2 for why. Two rows stack in .main-content: a 5-up smoothie row,
-   then a 4-up coffee row.
+   §2 for why. Two columns sit side by side in .main-content: a 3x2
+   smoothie grid (60% width) and a 2x2 coffee grid (40%), added when
+   the menu grew from 5 to 6 smoothies (was a 5-up + 4-up stacked pair).
 ══════════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════════
@@ -31,44 +32,69 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MAIN CONTENT — stacks the two category rows
+   MAIN CONTENT — two side-by-side columns
 ══════════════════════════════════════════════════════════════════ */
 .main-content {
-  flex-direction: column;
   padding: 0 44px 32px;
+}
+.bev-columns {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.bev-columns > * + * {
+  margin-left: 32px;   /* flex gap banned on Chrome 69 — DESIGN-PRINCIPLES §9 */
+}
+.bev-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.bev-col--smoothies { flex: 3; }   /* ~60% */
+.bev-col--coffee    { flex: 2; }   /* ~40% */
+
+/* Side by side now, not stacked — the top-margin that used to separate
+   the coffee section from the smoothie section above it would instead
+   misalign the two headings. core.css's --coffee modifier still sets
+   it (for any board that stacks sections again), so cancel it here. */
+.section-header--coffee {
+  margin-top: 0;
 }
 
 /* Shared .section-header/.section-title, plus the --coffee accent
    modifier's margin-top, live in core.css. */
-/* Same highlight recipe as .power (the brahmi/shatavari ingredient
-   highlight below) — this note is calling out a similar "read this"
-   fact, so it borrows the same visual language. */
+/* Pink highlight — distinct from .power's yellow, so this note reads
+   as its own kind of callout rather than another adaptogen highlight. */
+/* Parenthetical aside, not a highlighted callout — the pink background
+   read as shouty for what's really a footnote. The brackets themselves
+   live in the copy (screen3-config.json), not generated here. */
 .bev-section-note {
   font-family: 'Inter', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--forest);
-  background: rgba(254,250,103,0.55);
-  padding: 0 3px;
-  border-radius: 3px;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 700;
+  color: #000000;
   margin-left: 14px;
 }
 
-.smoothie-row {
+.smoothie-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   grid-gap: 16px;
   gap: 16px;
-  height: 376px;
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
 }
-.coffee-row {
+.coffee-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   grid-gap: 16px;
   gap: 16px;
-  height: 318px;
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -106,17 +132,19 @@
   border-radius: 8px;
   white-space: nowrap;
   flex-shrink: 0;
-  /* .smoothie-name-row aligns its children to the text baseline, which
-     leaves this chip's padded box hanging low against the name.
-     align-self overrides that for this one child without disturbing
-     .smoothie-price's baseline alignment in the same row. */
+  /* align-self: center is redundant now the chip lives in its own
+     .smoothie-meta-row rather than the baseline-aligned name row, but
+     harmless to keep — leave it in case a future layout puts the chip
+     back on a baseline row. */
   align-self: center;
 }
-.benefit-chip.b-focus    { background: #2F5C8A; }
-.benefit-chip.b-clarity  { background: #3D7A4A; }
-.benefit-chip.b-energy   { background: #6B3A78; }
-.benefit-chip.b-strength { background: #6B4226; }
-.benefit-chip.b-recovery { background: #B0752A; }
+/* Reassigned to the new benefit vocabulary — same five hues as before,
+   no new colours added to the palette (DESIGN-PRINCIPLES §7). */
+.benefit-chip.b-focus          { background: #2F5C8A; }  /* was b-focus, unchanged */
+.benefit-chip.b-antioxidant    { background: #6B3A78; }  /* was b-energy's purple */
+.benefit-chip.b-low-cortisol   { background: #3D7A4A; }  /* was b-clarity's green */
+.benefit-chip.b-women-wellness { background: #B0752A; }  /* was b-recovery's amber */
+.benefit-chip.b-balance        { background: #6B4226; }  /* was b-strength's brown */
 
 /* ─── Adaptogen highlight — inline gold "highlighter" behind
    functional ingredients (brahmi, shatavari, ashwagandha, blue
@@ -130,9 +158,16 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SMOOTHIE CARD (353x376)
+   CARD INTERNALS — shared between smoothie and coffee cards. Grouped
+   rather than duplicated per card type: both card types' photo, name
+   row, name, price and description are visually identical, so keeping
+   two copies would just be two places for the same rule to drift out
+   of sync (the exact failure §12 exists to prevent). Only the parts
+   that are genuinely different — the benefit/tag meta row (smoothie
+   only) and macro-chip centering (coffee only) — stay split.
 ══════════════════════════════════════════════════════════════════ */
-.smoothie-photo {
+.smoothie-photo,
+.coffee-photo {
   flex: 1;
   min-height: 0;
   margin-bottom: 10px;
@@ -140,35 +175,41 @@
   align-items: center;
   justify-content: center;
 }
-.smoothie-photo img {
+.smoothie-photo img,
+.coffee-photo img {
   height: 100%;
   width: auto;
   max-width: 100%;
   object-fit: contain;
   display: block;
 }
-.smoothie-photo.photo-error {
+.smoothie-photo.photo-error,
+.coffee-photo.photo-error {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.smoothie-name-row {
+.smoothie-name-row,
+.coffee-name-row {
   display: flex;
   align-items: baseline;
   margin-bottom: 6px;
 }
-.smoothie-name-row > * + * {
+.smoothie-name-row > * + *,
+.coffee-name-row > * + * {
   margin-left: 8px;
 }
-.smoothie-name {
+.smoothie-name,
+.coffee-name {
   font-family: 'Playfair Display', serif;
   font-size: var(--fs-item-name);
   font-weight: 600;
   color: var(--forest);
   line-height: 1.2;
 }
-.smoothie-price {
+.smoothie-price,
+.coffee-price {
   margin-left: auto;
   font-family: 'Inter', sans-serif;
   font-size: var(--fs-item-price-sm);
@@ -177,7 +218,22 @@
   flex-shrink: 0;
 }
 
-.smoothie-desc {
+/* Benefit chip + diet tag(s), on their own row below the name. Some
+   benefit names ("Women Wellness") are too wide to share the name row
+   with the price without overflowing, so this row absorbs any width —
+   no ceiling on future benefit-name length. Smoothie-only: coffee has
+   neither a benefit nor tags. */
+.smoothie-meta-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.smoothie-meta-row > * + * {
+  margin-left: 6px;   /* flex gap banned on Chrome 69 — DESIGN-PRINCIPLES §9 */
+}
+
+.smoothie-desc,
+.coffee-desc {
   font-size: var(--fs-item-desc);
   color: var(--c-item-desc);
   line-height: 1.3;
@@ -189,68 +245,14 @@
   overflow: hidden;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   COFFEE CARD (446x318)
-══════════════════════════════════════════════════════════════════ */
-.coffee-name-row {
-  display: flex;
-  align-items: baseline;
-  margin-bottom: 4px;
-}
-.coffee-name-row > * + * {
-  margin-left: 8px;
-}
-.coffee-name {
-  font-family: 'Playfair Display', serif;
-  font-size: var(--fs-item-name);
-  font-weight: 600;
-  color: var(--forest);
-  line-height: 1.2;
-}
-.coffee-price {
-  margin-left: auto;
-  font-family: 'Inter', sans-serif;
-  font-size: var(--fs-item-price);
-  font-weight: 600;
-  color: var(--forest);
-  flex-shrink: 0;
-}
-
-.coffee-desc {
-  font-size: var(--fs-item-desc);
-  color: var(--c-item-desc);
-  line-height: 1.3;
-  height: calc(var(--fs-item-desc) * 1.3 * 1);
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  overflow: hidden;
-}
-
+/* Coffee cards have no .smoothie-meta-row, so their flex:1 photo would
+   absorb that row's height (content + its 6px margin, ~30px total)
+   and render taller than a smoothie's photo. Reserving the same
+   amount here keeps all 10 photos the same size — verified by
+   measurement, not by eye. If .smoothie-meta-row's height ever
+   changes, this must change with it. */
 .coffee-photo {
-  flex: 1;
-  min-height: 0;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.coffee-photo img {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-  display: block;
-}
-.coffee-photo.photo-error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.coffee-card .tile-macros {
-  justify-content: center;
+  margin-bottom: 40px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -259,26 +261,24 @@
    Rail height/colours are unchanged from core.css (§2); the gold
    pill sits left-aligned, same as Screens 1-2's upsell content.
 ══════════════════════════════════════════════════════════════════ */
+/* Plain text, matching Screen 1/2's Extras rail (.addon-text/.addon-price
+   in core.css) rather than a boxed pill — same rail, same look on every
+   board now that the gold-pill trial (Screen 2) didn't win the comparison. */
 .upsell-gold {
   display: flex;
   align-items: center;
-  background: rgba(254,250,103,0.10);
-  border: 1.5px solid var(--gold);
-  border-radius: 12px;
-  padding: 10px 24px;
   flex-shrink: 0;
 }
 .upsell-gold > * + * {
   margin-left: 14px;
 }
 .gold-text {
-  font-size: 18px;
-  color: var(--gold);
-  letter-spacing: 0.01em;
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.95);
 }
 .gold-price {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--gold);
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.92);
 }

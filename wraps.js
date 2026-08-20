@@ -57,12 +57,23 @@ function paniniHeaderHTML(panel) {
     <div class="panini-title">${panel.title}</div>`;
 }
 
+function badgeClassFor(badge) {
+  /* CSS class kept as "badge-spotlight" — only the menu's badge text
+     changed to "Chef's Special", not the colour it maps to. */
+  if (badge === "Chef's Special") return 'badge-spotlight';
+  if (badge === 'Most Loved')     return 'badge-loved';
+  return '';
+}
+
 function paniniItemHTML(item) {
   const tags = tagsHTML(item.tags);
+  const hasBadge = item.badge && item.badge.trim();
   return `
     <div class="panini-item">
       <div class="panini-item-row">
-        <span class="panini-item-name">${item.name}</span>
+        <span class="panini-item-name">${item.name}${hasBadge
+          ? `<span class="panini-item-badge ${badgeClassFor(item.badge)}">${item.badge}</span>`
+          : ''}</span>
         ${tags ? `<div class="tile-tags">${tags}</div>` : ''}
         <span class="panini-item-price"><span class="tile-rupee">₹</span>${item.price}</span>
       </div>
@@ -106,7 +117,11 @@ function toastCardHTML(item) {
     </div>`;
 }
 
-/* ── Wraps (right, bottom block) ─────────────────────────────── */
+/* ── Wraps ────────────────────────────────────────────────────── */
+/* No per-item macros — wraps now share a summary range, same pattern
+   as panini (config.sections.wrap.stats, rendered via paniniStatHTML
+   into #wrapStats). The CSV's kcal/protein/fibre columns for wrap rows
+   are blank as a result. */
 function wrapRowHTML(item) {
   const tags = tagsHTML(item.tags);
   return `
@@ -117,39 +132,19 @@ function wrapRowHTML(item) {
         <span class="wrap-price"><span class="tile-rupee">₹</span>${item.price}</span>
       </div>
       <div class="wrap-desc">${item.description}</div>
-      <div class="tile-macros">
-        <span class="tile-macro">${item.kcal} kcal</span>
-        <span class="tile-macro">${item.protein}g protein</span>
-        <span class="tile-macro">${item.fibre}g fibre</span>
-      </div>
     </div>`;
 }
 
-/* ── Upsell rail — same shape as Screen 1's, own copy since the
-   parsing logic here isn't screen-agnostic layout (core.js is). ── */
-function renderUpsell(items) {
-  let html = `<div class="upsell-heading">Make it a meal</div>`;
-
-  items.forEach(item => {
-    const parts = item.split('|').map(p => p.trim());
-    if (parts.length >= 3) {
-      html += `
-        <div class="upsell-combo">
-          <span class="combo-text">${parts[0]}</span>
-          <span class="combo-price">${parts[1]}</span>
-          <span class="combo-save">${parts[2]}</span>
-        </div>`;
-    } else {
-      html += `
-        <div class="upsell-vdiv"></div>
-        <div class="upsell-addon">
-          <span class="addon-text">${parts[0]}</span>
-          <span class="addon-price">${parts[1] || ''}</span>
-        </div>`;
-    }
-  });
-
-  document.getElementById('upsellRail').innerHTML = html;
+/* ── Combo block (column 3, below the toasts) ────────────────── */
+function comboBlockHTML(cfg) {
+  const rows = cfg.items.map(function (i) {
+    return `
+      <div class="combo-row">
+        <span class="combo-row-text">${i.text}</span>
+        <span class="combo-row-price">${i.price}</span>
+      </div>`;
+  }).join('');
+  return `<div class="combo-heading"><span class="combo-star">★</span>${cfg.heading}</div>${rows}`;
 }
 
 /* ── Full render ─────────────────────────────────────────────── */
@@ -169,16 +164,16 @@ function render(data) {
           onerror="this.closest('.panini-photo-wrap').classList.add('photo-error');this.remove()">`;
 
   document.getElementById('toastGrid').innerHTML = toasts.map(toastCardHTML).join('');
+  document.getElementById('comboBlock').innerHTML = comboBlockHTML(config.combos);
 
   document.getElementById('wrapList').innerHTML = wraps.map(wrapRowHTML).join('');
+  document.getElementById('wrapStats').innerHTML = config.sections.wrap.stats.map(paniniStatHTML).join('');
   const wrapCfg = config.sections.wrap;
-  const noteLines = (wrapCfg.note || '').split('\n').map(l => `<div>${l}</div>`).join('');
   document.getElementById('wrapPhoto').innerHTML = `
     <img src="${screen2ImageSrc(wrapCfg.image)}" alt="Wraps"
-         onerror="this.closest('.wrap-photo-wrap').classList.add('photo-error');this.remove()">
-    <div class="wrap-note">${noteLines}</div>`;
+         onerror="this.closest('.wrap-photo-wrap').classList.add('photo-error');this.remove()">`;
 
-  renderUpsell(config.upsell);
+  renderPipeUpsell(config.upsell, 'Extras');
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

@@ -38,6 +38,7 @@ const MAP = {
   'gingerale-cold-brew':   'ChatGPT_Image_Aug_11__2026__03_08_47_AM-removebg-preview.png',
   'vietnamese-cold-brew':  'ChatGPT_Image_Aug_11__2026__03_20_35_AM-removebg-preview.png',
   'iced-latte':            'ChatGPT_Image_Aug_11__2026__03_02_49_AM-removebg-preview.png',
+  'berry-bloom':           'Berry Bloom.png',
 };
 
 await mkdir(OUT, { recursive: true });
