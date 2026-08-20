@@ -66,14 +66,15 @@
    modifier's margin-top, live in core.css. */
 /* Pink highlight — distinct from .power's yellow, so this note reads
    as its own kind of callout rather than another adaptogen highlight. */
+/* Parenthetical aside, not a highlighted callout — the pink background
+   read as shouty for what's really a footnote. The brackets themselves
+   live in the copy (screen3-config.json), not generated here. */
 .bev-section-note {
   font-family: 'Inter', sans-serif;
   font-size: 20px;
-  font-weight: 600;
-  color: var(--forest);
-  background: rgba(232,140,175,0.45);
-  padding: 0 3px;
-  border-radius: 3px;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--sage);
   margin-left: 14px;
 }
 
@@ -244,12 +245,14 @@
   overflow: hidden;
 }
 
-/* Coffee's macro row can hold 1-3 chips depending on the item (Iced
-   Cold Brew shows only kcal); centering keeps a single chip from
-   hanging awkwardly left. Smoothies always show all three, so the
-   shared .tile-macros default (left-aligned) is correct there. */
-.coffee-card .tile-macros {
-  justify-content: center;
+/* Coffee cards have no .smoothie-meta-row, so their flex:1 photo would
+   absorb that row's height (content + its 6px margin, ~30px total)
+   and render taller than a smoothie's photo. Reserving the same
+   amount here keeps all 10 photos the same size — verified by
+   measurement, not by eye. If .smoothie-meta-row's height ever
+   changes, this must change with it. */
+.coffee-photo {
+  margin-bottom: 40px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
