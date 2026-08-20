@@ -3,33 +3,15 @@
    Shared tokens, pills, upsell rail and footer live in core.css —
    beverages.html loads core.css first, then this file.
 
-   No slideshow, no 525px left panel (unlike Screens 1-2) — the dark
-   anchor is a full-width header band instead. See DESIGN-PRINCIPLES
-   §2 for why. Two columns sit side by side in .main-content: a 3x2
-   smoothie grid (60% width) and a 2x2 coffee grid (40%), added when
-   the menu grew from 5 to 6 smoothies (was a 5-up + 4-up stacked pair).
+   No slideshow, no 525px left panel (unlike Screens 1-2), and as of
+   this revision, no dark header band either — DESIGN-PRINCIPLES §2's
+   "every board carries a dark anchor" rule is deliberately not
+   satisfied here; see §2 for the tradeoff. The board's only dark mass
+   is now the shared upsell rail + footer at the bottom. Two columns
+   sit side by side in .main-content: a 3x2 smoothie grid (60% width)
+   and a 2x2 coffee grid (40%), added when the menu grew from 5 to 6
+   smoothies (was a 5-up + 4-up stacked pair).
 ══════════════════════════════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════════════════════════
-   BOARD HEADER — dark band, full width (replaces the 525px dark
-   left panel Screens 1-2 use; the dark/cream seam is horizontal
-   here instead of vertical)
-══════════════════════════════════════════════════════════════════ */
-.board-header {
-  height: 96px;
-  flex-shrink: 0;
-  background: var(--hero-bg);
-  display: flex;
-  align-items: center;
-  padding: 0 44px;
-}
-.board-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 46px;
-  font-weight: 600;
-  color: #FFFFFF;
-  line-height: 1;
-}
 
 /* ═══════════════════════════════════════════════════════════════
    MAIN CONTENT — two side-by-side columns
@@ -60,6 +42,15 @@
    it (for any board that stacks sections again), so cancel it here. */
 .section-header--coffee {
   margin-top: 0;
+}
+
+/* Matches Screen 2's .section-header override. Both boards' content now
+   starts at the very top of the screen (no header band on this board
+   any more — see the file's top comment), so the 20px is what keeps
+   the title off the screen edge — core.css's 10px default is too tight
+   against a screen boundary. */
+.section-header {
+  padding-top: 20px;
 }
 
 /* Shared .section-header/.section-title, plus the --coffee accent

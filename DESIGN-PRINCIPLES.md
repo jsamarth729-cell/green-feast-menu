@@ -82,10 +82,13 @@ nine interchangeable items, it's three different categories with different
 shapes. That's a legitimate reason to deviate; "it looked nicer" is not.
 
 What must **not** move, regardless of a screen's internal layout:
-- **Every board carries a dark anchor.** Screens 1–2 do this with a 525px dark
-  (`--hero-bg`) left panel, so the dark/cream seam lands in the same place on every
-  board hanging on the wall. Screen 3 (Beverages) is the first to depart from that
-  shape — see below for why, and for the approved alternative.
+- **Every board carries a dark anchor — except Screen 3, deliberately.** Screens
+  1–2 do this with a 525px dark (`--hero-bg`) left panel, so the dark/cream seam
+  lands in the same place on every board hanging on the wall. Screen 3
+  (Beverages) tried a horizontal-band alternative first, then dropped it
+  outright to buy vertical room for the smoothie/coffee cards — see below for
+  the history and the tradeoff. Read this bullet as "the rule every other
+  board follows", not as a universal guarantee.
 - The **upsell rail and footer strip** are pixel-identical everywhere — same
   height, same colours, same shared classes. They now live in `core.css`
   precisely so this can't drift screen to screen. **What each board puts inside
@@ -111,17 +114,33 @@ one, where prices sit) — see §10 on mockup drift, which applies doubly here
 since a new screen's mockup is rarely built at the true 1920×1080 canvas
 proportions.
 
-**Screen 3's dark anchor is a horizontal band, not a vertical panel.** Screens 1–2
-each hero one item (or a small signature range) worth a dedicated dark panel and a
-big photo. A beverage board doesn't have that — nine roughly-equal items across two
-categories, no single item worth the space, and the owner's mockup and brief both
-call for no slideshow and no left panel. Screen 3 instead opens with a **96px
-full-width dark header band** (`.board-header`, `--hero-bg`) carrying just the
-board title, with the smoothie and coffee rows stacked in a cream `.main-content`
-below it. The dark/cream contrast the panel exists to provide is still there — it's
-just a horizontal seam near the top of the board instead of a vertical one on the
-left. Read "every board carries a dark anchor" as the rule that survives; the
-525px-left-panel shape is Screens 1–2's implementation of it, not the rule itself.
+**Screen 3 tried a horizontal dark band, then dropped it.** Screens 1–2 each
+hero one item (or a small signature range) worth a dedicated dark panel and a
+big photo. A beverage board doesn't have that — nine-plus roughly-equal items
+across two categories, no single item worth the space, and the owner's mockup
+and brief both call for no slideshow and no left panel. Screen 3 first tried a
+**96px full-width dark header band** (`.board-header`, `--hero-bg`) carrying
+just the board title, with the smoothie and coffee rows in a cream
+`.main-content` below it — a horizontal seam near the top instead of a
+vertical one on the left, satisfying "every board carries a dark anchor" with
+a different shape.
+
+That band was later **removed outright**, on the owner's explicit request, to
+give the card grid the extra ~86px of height the band and its title were
+taking. Screen 3 now opens directly into `.main-content` — no board title, no
+top-of-screen dark mass at all. Its only dark elements are the shared upsell
+rail and footer strip at the bottom, identical to every other board.
+
+**This is a genuine, acknowledged departure from "every board carries a dark
+anchor",** not a reinterpretation of it. Hung beside Screens 1–2 — each of
+which keeps a 525px dark panel *in addition to* the same bottom strips — Screen
+3 will read lighter overall. That tradeoff was made knowingly, in exchange for
+noticeably larger cards and photos on a board with nine-plus similarly-weighted
+items and no natural hero. If a future board needs the "extra dark mass at the
+top" instrument back, `.board-header`'s CSS is recoverable from git history
+(the commit that deleted it is isolated and revertable on its own — see the
+repo's commit log around the point Screen 3's header band was removed) rather
+than being redesigned from scratch.
 
 ---
 
