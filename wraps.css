@@ -352,12 +352,14 @@
   box-shadow: 0 4px 18px rgba(40,63,40,0.18);
 }
 .combo-heading {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 24px;
-  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
   color: var(--gold);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+}
+.combo-star {
+  margin-right: 10px;
 }
 .combo-row {
   display: flex;
@@ -370,11 +372,16 @@
   font-size: 22px;
   color: rgba(255,255,255,0.86);
 }
+/* nowrap + no shrink: without these the price span gets squeezed by a
+   long text sibling and breaks between the "+" and the number, leaving
+   a stray "+" hanging at the end of the text's first line. */
 .combo-row-price {
   margin-left: auto;
   font-size: 26px;
   font-weight: 600;
   color: var(--gold);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* ─── Wraps — list, shared stat chips, then one photo below ─────

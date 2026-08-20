@@ -144,7 +144,7 @@ function comboBlockHTML(cfg) {
         <span class="combo-row-price">${i.price}</span>
       </div>`;
   }).join('');
-  return `<div class="combo-heading">${cfg.heading}</div>${rows}`;
+  return `<div class="combo-heading"><span class="combo-star">★</span>${cfg.heading}</div>${rows}`;
 }
 
 /* ── Full render ─────────────────────────────────────────────── */
