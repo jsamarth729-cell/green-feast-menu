@@ -261,26 +261,24 @@
    Rail height/colours are unchanged from core.css (§2); the gold
    pill sits left-aligned, same as Screens 1-2's upsell content.
 ══════════════════════════════════════════════════════════════════ */
+/* Plain text, matching Screen 1/2's Extras rail (.addon-text/.addon-price
+   in core.css) rather than a boxed pill — same rail, same look on every
+   board now that the gold-pill trial (Screen 2) didn't win the comparison. */
 .upsell-gold {
   display: flex;
   align-items: center;
-  background: rgba(254,250,103,0.10);
-  border: 1.5px solid var(--gold);
-  border-radius: 12px;
-  padding: 10px 24px;
   flex-shrink: 0;
 }
 .upsell-gold > * + * {
   margin-left: 14px;
 }
 .gold-text {
-  font-size: 18px;
-  color: var(--gold);
-  letter-spacing: 0.01em;
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.95);
 }
 .gold-price {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--gold);
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.92);
 }

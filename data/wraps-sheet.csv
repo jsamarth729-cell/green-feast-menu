@@ -1,5 +1,5 @@
 id,section,name,description,price,kcal,protein,fibre,tags,badge,image
-1,panini,P4 - Peri Peri Paneer Panini,"Peri peri paneer, cheese, assorted veggies, hydroponic lettuce, peri peri dip",349,,,,,Most Loved,
+1,panini,P4 - Peri Peri Paneer Panini,"Peri peri paneer, cheese, assorted veggies, hydroponic lettuce, peri peri dip",349,,,,,,
 2,panini,Green Goddess Panini,"Grilled paneer, guacamole, cheese, cucumber, hydroponic lettuce",349,,,,Less Spicy,,
 3,panini,Plant Protein Panini,"Soya kebab, cheese, assorted veggies, hydroponic lettuce, tandoori dip",349,,,,High Protein,,
 4,toast,Avo Feta Toast,"Sourdough, guacamole, feta cheese, cherry tomato, seed mix, pomegranate",329,325,8,7,,,avo-feta-toast

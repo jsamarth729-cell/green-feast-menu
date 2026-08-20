@@ -478,36 +478,3 @@
   justify-content: center;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   EXTRAS RAIL — gold-pill variant (Screen 2 only, for now)
-   Same markup as Screen 1's rail (core.js renderPipeUpsell); only
-   the presentation differs, via .upsell-rail--pills on the rail in
-   wraps.html. Mirrors Screen 3's "Add 12g protein" gold pill so the
-   two rail treatments can be compared side by side on the wall
-   before one is picked for both boards. If Screen 1 adopts this,
-   move these rules to core.css rather than copying them.
-══════════════════════════════════════════════════════════════════ */
-.upsell-rail--pills .upsell-vdiv {
-  display: none;   /* pills separate themselves; dividers read as clutter */
-}
-.upsell-rail--pills .upsell-addon {
-  background: rgba(254,250,103,0.10);
-  border: 1.5px solid var(--gold);
-  border-radius: 12px;
-  padding: 10px 24px;
-  flex-shrink: 0;
-}
-.upsell-rail--pills .upsell-addon > * + * {
-  margin-left: 14px;
-}
-.upsell-rail--pills .addon-text {
-  font-weight: 400;
-  color: var(--gold);
-  letter-spacing: 0.01em;
-}
-.upsell-rail--pills .addon-price {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--gold);
-}
