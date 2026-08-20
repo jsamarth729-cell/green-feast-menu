@@ -226,7 +226,7 @@
 .smoothie-meta-row {
   display: flex;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 .smoothie-meta-row > * + * {
   margin-left: 6px;   /* flex gap banned on Chrome 69 — DESIGN-PRINCIPLES §9 */
@@ -238,7 +238,7 @@
   color: var(--c-item-desc);
   line-height: 1.3;
   height: calc(var(--fs-item-desc) * 1.3 * 2);
-  margin-bottom: 8px;
+  margin-bottom: 14px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
