@@ -24,9 +24,8 @@
   "combos": {
     "heading": "Make it a meal",
     "items": [
-      { "text": "Add coffee to your meal",                 "price": "+₹200" },
-      { "text": "Add a functional smoothie to your meal",  "price": "+₹250" },
-      { "text": "Add extra protein to both your meal and smoothie (+20–22g)", "price": "+₹150" }
+      { "text": "Add coffee to your meal",                "price": "+₹200" },
+      { "text": "Add a functional smoothie to your meal", "price": "+₹250" }
     ]
   },
   "upsell": [
