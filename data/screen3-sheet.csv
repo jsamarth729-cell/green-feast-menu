@@ -4,7 +4,7 @@ id,section,name,description,benefit,price,kcal,protein,fibre,tags,badge,image
 3,smoothie,Avo Clarity,"Avocado, shatavari, banana, oat milk, granola, chia seeds",Women Wellness,299,280,5,9,Contains Nuts,,avo-clarity
 4,smoothie,Purple Pulse,"Blueberry, brahmi, banana, coconut milk, Greek yoghurt",Focus,299,220,8,5,,,purple-pulse
 5,smoothie,Cocoa Core,"Chocolate, cocoa, mulethi, banana, oat milk, Greek yoghurt, almond flakes",Balance,299,340,9,5,Contains Nuts,,cocoa-core
-6,smoothie,Berry Bloom,"Mixed berries, blue spirulina, banana, oat milk, Greek yoghurt, coconut milk",Antioxidant,299,195,6,6,,,blue-mind
+6,smoothie,Berry Bloom,"Mixed berries, blue spirulina, banana, oat milk, Greek yoghurt, coconut milk",Antioxidant,299,195,6,6,,,berry-bloom
 7,coffee,Iced Cold Brew,"Iced cold brew coffee, 300 ml serving",,250,5,,,,,cold-brew
 8,coffee,Vietnamese Cold Brew,"Vietnamese-style cold brew coffee, 300 ml serving",,250,145,,,,,vietnamese-cold-brew
 9,coffee,Ginger Ale Cold Brew,"Cold brew coffee with ginger ale, 300 ml serving",,250,60,,,,,gingerale-cold-brew
