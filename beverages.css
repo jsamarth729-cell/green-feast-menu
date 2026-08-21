@@ -60,12 +60,17 @@
 /* Parenthetical aside, not a highlighted callout — the pink background
    read as shouty for what's really a footnote. The brackets themselves
    live in the copy (screen3-config.json), not generated here. */
+/* Same yellow as .power's adaptogen highlight, so this note reads as
+   the same kind of "worth noticing" callout rather than a new colour. */
 .bev-section-note {
   font-family: 'Inter', sans-serif;
   font-size: 20px;
   font-style: italic;
   font-weight: 700;
   color: #000000;
+  background: rgba(254,250,103,0.55);
+  padding: 0 3px;
+  border-radius: 3px;
   margin-left: 14px;
 }
 
