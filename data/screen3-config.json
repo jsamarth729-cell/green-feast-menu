@@ -1,5 +1,4 @@
 {
-  "board": { "title": "Beverages" },
   "sections": {
     "smoothie": { "heading": "Functional Smoothies", "note": "(Sweetened with monk fruit and banana)" },
     "coffee": { "heading": "Coffee" }

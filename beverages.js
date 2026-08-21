@@ -156,8 +156,6 @@ function render(data) {
   const smoothies = items.filter(i => i.section === 'smoothie');
   const coffees   = items.filter(i => i.section === 'coffee');
 
-  document.getElementById('boardTitle').textContent = config.board.title;
-
   document.getElementById('smoothieHeading').textContent = config.sections.smoothie.heading;
   const smoothieNoteEl = document.getElementById('smoothieNote');
   if (config.sections.smoothie.note) {

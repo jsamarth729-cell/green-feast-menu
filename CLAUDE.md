@@ -56,8 +56,7 @@ Google Sheet (owner edits menu)
 2. **A local config JSON** (`data/config.json` for Screen 1, `data/screen2-config.json`
    for Screen 2, `data/screen3-config.json` for Screen 3) → static content that rarely
    changes: Screen 1's Build-Your-Own tile, Screen 2's panel title/stat chips/wrap
-   photo, Screen 3's board title/section eyebrows/taglines, and each screen's upsell
-   rail.
+   photo, Screen 3's section headings/sweetener note, and each screen's upsell rail.
 
 ---
 
@@ -71,14 +70,14 @@ Google Sheet (owner edits menu)
 | `core.js` | **Shared by every board.** Viewport scaling, CSV parsing, the fetch+localStorage cache pattern (`loadData()`), fullscreen-on-gesture, and the tag-abbreviation map (`TAG_ABBREV`). Screen-specific data shapes and render logic do not belong here. |
 | `bowls.html` / `bowls.css` / `bowls.js` | Screen 1 — Power Bowls: hero slideshow + 2×5 tile grid. Loads `core.css`/`core.js` first. |
 | `wraps.html` / `wraps.css` / `wraps.js` | Screen 2 — Wraps, Paninis & Open Toasts: static feature panel (no slideshow) + stacked category blocks. Loads `core.css`/`core.js` first. |
-| `beverages.html` / `beverages.css` / `beverages.js` | Screen 3 — Beverages: no hero/slideshow and no 525px dark left panel — a full-width dark header band instead, then a 5-up Functional Smoothies row and a 4-up Coffee Menu row stacked in `.main-content`. Loads `core.css`/`core.js` first. See DESIGN-PRINCIPLES §2 for why the dark anchor moved. |
+| `beverages.html` / `beverages.css` / `beverages.js` | Screen 3 — Beverages: no hero/slideshow, no 525px dark left panel, and (as of this revision) no dark header band either — `.main-content` starts at the screen's top edge. Two side-by-side columns: a 3x2 Functional Smoothies grid and a 2x2 Coffee grid. Loads `core.css`/`core.js` first. See DESIGN-PRINCIPLES §2 for the header-band history and the "no dark anchor" tradeoff this board now carries. |
 | `tvtest.html` | **On-TV diagnostic.** ES5-only page reporting browser engine + feature support in large text. Open this first when a board renders wrong. |
 | `adjust.html` | **Image adjuster tool** — local page with live sliders to frame each bowl photo, then export a finished CSV. (See "Image framing" below.) Screen 1 only, for now. |
 | `data/config.json` | Screen 1 static content: Build-Your-Own tile + upsell rail items. |
 | `data/bowls-sheet.csv` | Local snapshot/template of the Screen 1 Sheet tab. **Not what the live board reads** — see the caching note below. |
 | `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the panini and wrap summary stat chips (both sections share a macro range now, no per-item macros), the panini and wrap image slugs, the column-3 combo block (`combos`), and the bottom-rail upsell (`upsell`, quick add-ons only — meal upgrades moved to `combos`). |
 | `data/wraps-sheet.csv` | Local snapshot/template of the Screen 2 Sheet tab, grouped by a `section` column (`panini`/`toast`/`wrap`). **Not what the live board reads** — same caching note as `data/bowls-sheet.csv` below. |
-| `data/screen3-config.json` | Screen 3 static content: board title, the two section headings ("Functional Smoothies", "Coffee"), and the gold protein upsell. **`upsell` here is a single `{heading, gold:{text,price}}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one gold item, not a variable combo list. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. Screen 3's footer is now the same glossary block as Screens 1–2 (no board-specific footer content remains). |
+| `data/screen3-config.json` | Screen 3 static content: the two section headings ("Functional Smoothies", "Coffee") and the gold protein upsell. No board title — the board has no header band to put one in. **`upsell` here is a single `{heading, gold:{text,price}}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one gold item, not a variable combo list. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. Screen 3's footer is now the same glossary block as Screens 1–2 (no board-specific footer content remains). |
 | `data/screen3-sheet.csv` | Local snapshot/template of the Screen 3 Sheet tab, grouped by a `section` column (`smoothie`/`coffee`). **Not what the live board reads once the Sheet tab is published** — same caching note as `data/bowls-sheet.csv` below. |
 | `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
 | `images/screen2/` | Screen 2's transparent cut-outs: the panini and wrap (`bbq-plate`) feature photos (trimmed only), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
