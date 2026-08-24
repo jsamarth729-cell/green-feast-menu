@@ -76,7 +76,7 @@
   margin-left: 8px;
 }
 .panini-item-name {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-item-name);
   font-size: var(--fs-item-name);
   font-weight: 600;
   color: #FFFFFF;
@@ -296,7 +296,7 @@
   margin-left: 6px;
 }
 .toast-name {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-item-name);
   font-size: var(--fs-item-name);
   font-weight: 600;
   color: var(--forest);
@@ -409,7 +409,7 @@
   margin-left: 8px;
 }
 .wrap-name {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-item-name);
   font-size: var(--fs-item-name);
   font-weight: 600;
   color: var(--forest);

@@ -42,6 +42,12 @@
      is an accident: that is how .panini-item-desc sat at 17px
      against 16px everywhere else. See DESIGN-PRINCIPLES.md §12. */
 
+  --font-item-name:   'Montserrat', sans-serif;  /* every board — was
+                                'Playfair Display'. Section Title, hero-name,
+                                panini-title/eyebrow and footer-wordmark are
+                                NOT this token and stay Playfair — only the
+                                Item Name changed, so those headings now sit
+                                above a sans-serif name in a serif section. */
   --fs-item-name:     24px;  /* every board — flattened; feature panels
                                 no longer size up */
   --fs-item-desc:     18px;  /* every board */

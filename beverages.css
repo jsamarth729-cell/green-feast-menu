@@ -201,7 +201,7 @@
 }
 .smoothie-name,
 .coffee-name {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-item-name);
   font-size: var(--fs-item-name);
   font-weight: 600;
   color: var(--forest);

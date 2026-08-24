@@ -513,6 +513,10 @@ Canonical elements take their size from a token in `core.css`, never a literal:
 
 ```css
 :root {
+  --font-item-name:    'Montserrat', sans-serif;  /* every board — was
+                          Playfair Display. Nothing else that used to share
+                          that face (Section Title, hero-name, panini-title/
+                          eyebrow, footer-wordmark) moved with it — see below. */
   --fs-item-name:      24px;   /* every board — flattened, no large variant */
   --fs-item-desc:      18px;   /* every board */
   --fs-item-price:     26px;   /* grid tiles, toasts, wraps, coffee */
@@ -520,6 +524,17 @@ Canonical elements take their size from a token in `core.css`, never a literal:
   --c-item-desc:       #000000;  /* every board except the dark panini panel */
 }
 ```
+
+**Item Name is now the only canonical element in a different typeface from its
+own section.** Section Title, Screen 1's `.hero-name`, the panini panel's
+`.panini-title`/`.panini-eyebrow`, and the footer wordmark are all still
+Playfair Display — none of them read `--font-item-name`, on purpose (the
+request was specifically "item names", not a font swap for the boards).
+Practically: "Power Bowls" (serif) sits directly above "Mexican Fiesta Bowl"
+(now Montserrat, sans-serif) on the same tile. If a broader Montserrat rollout
+is ever wanted, do it by pointing more selectors at `--font-item-name` (or
+adding a sibling token) — not by redefining what `--font-item-name` means,
+which would silently change Item Name too.
 
 **A literal `px` on an Item Name, Item Desc, or Item Price is a bug unless it
 carries a comment explaining why.** If a screen needs a different size, add a
