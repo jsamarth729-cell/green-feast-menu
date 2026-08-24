@@ -113,10 +113,11 @@
   min-height: 0;
 }
 
-/* ─── Benefit chip — distinct from .tile-tag / .tile-macro. Each
-   benefit gets its own colour (Screen 3-scoped palette extension —
-   see DESIGN-PRINCIPLES §7). Unqualified rule is the fallback for
-   any benefit not in this list. ─────────────────────────────────── */
+/* ─── Benefit chip — distinct from .tile-tag / .tile-macro. Colour is
+   keyed to the DRINK (item.image slug), not the benefit category — see
+   benefitAccentClass() in beverages.js for why. Unqualified rule is the
+   fallback for any smoothie slug not in this list (a new item added to
+   the Sheet renders with this colour until given its own line here). */
 .benefit-chip {
   font-size: 13px;
   font-weight: 700;
@@ -134,13 +135,15 @@
      back on a baseline row. */
   align-self: center;
 }
-/* Reassigned to the new benefit vocabulary — same five hues as before,
-   no new colours added to the palette (DESIGN-PRINCIPLES §7). */
-.benefit-chip.b-focus          { background: #2F5C8A; }  /* was b-focus, unchanged */
-.benefit-chip.b-antioxidant    { background: #6B3A78; }  /* was b-energy's purple */
-.benefit-chip.b-low-cortisol   { background: #3D7A4A; }  /* was b-clarity's green */
-.benefit-chip.b-women-wellness { background: #B0752A; }  /* was b-recovery's amber */
-.benefit-chip.b-balance        { background: #6B4226; }  /* was b-strength's brown */
+/* One hue per drink, matching what's actually in the cup. Blue Mind and
+   Berry Bloom share the same magenta on purpose (both a berry/spirulina
+   swirl) — everything else is distinct. */
+.benefit-chip.acc-blue-mind    { background: #A62A6D; }  /* magenta — strawberry/blue spirulina swirl */
+.benefit-chip.acc-berry-bloom  { background: #A62A6D; }  /* magenta — mixed berry/spirulina swirl */
+.benefit-chip.acc-avo-clarity  { background: #4E7C3A; }  /* avocado green */
+.benefit-chip.acc-purple-pulse { background: #5B3A8C; }  /* blueberry purple */
+.benefit-chip.acc-going-nuts   { background: var(--badge-warm); }  /* peanut butter — reuses the existing warm-brown token */
+.benefit-chip.acc-cocoa-core   { background: #3D2418; }  /* dark chocolate */
 
 /* ─── Adaptogen highlight — inline gold "highlighter" behind
    functional ingredients (brahmi, shatavari, ashwagandha, blue
@@ -252,29 +255,8 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   UPSELL RAIL — Screen 3's single gold protein add-on (replaces the
-   panini-combo shape Screens 1-2 use; see beverages.js renderUpsell).
-   Rail height/colours are unchanged from core.css (§2); the gold
-   pill sits left-aligned, same as Screens 1-2's upsell content.
+   UPSELL RAIL — Screen 3 now renders through core.js's shared
+   renderPipeUpsell(), same as Screens 1-2 (see beverages.js). No
+   board-specific rail markup or styling remains; .upsell-addon /
+   .addon-text / .addon-price / .upsell-vdiv in core.css cover it.
 ══════════════════════════════════════════════════════════════════ */
-/* Plain text, matching Screen 1/2's Extras rail (.addon-text/.addon-price
-   in core.css) rather than a boxed pill — same rail, same look on every
-   board now that the gold-pill trial (Screen 2) didn't win the comparison. */
-.upsell-gold {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-.upsell-gold > * + * {
-  margin-left: 14px;
-}
-.gold-text {
-  font-size: 22px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.95);
-}
-.gold-price {
-  font-size: 22px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.92);
-}

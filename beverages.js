@@ -76,11 +76,14 @@ function badgeClassFor(badge) {
   return '';
 }
 
-/* Benefit names are now multi-word ("Low Cortisol", "Women Wellness"),
-   so the class slug must replace spaces or it produces two junk
-   classes and no colour match — e.g. "b-low cortisol". */
-function benefitClass(benefit) {
-  return 'b-' + benefit.toLowerCase().replace(/\s+/g, '-');
+/* Benefit Chip colour is keyed to the DRINK, not the benefit category —
+   so it matches what's actually in the cup (Purple Pulse is purple
+   because it's blueberry, not because "Focus" has a colour). This also
+   means renaming a benefit in the Sheet (e.g. Women Wellness -> Gut
+   Health) never needs a code change: the chip's colour and its text
+   come from two independent sources. See beverages.css for the map. */
+function benefitAccentClass(image) {
+  return 'acc-' + image;
 }
 
 /* ── Smoothie card ───────────────────────────────────────────── */
@@ -101,7 +104,7 @@ function smoothieCardHTML(item) {
       </div>
       ${hasMeta ? `
       <div class="smoothie-meta-row">
-        ${item.benefit ? `<span class="benefit-chip ${benefitClass(item.benefit)}">${item.benefit}</span>` : ''}
+        ${item.benefit ? `<span class="benefit-chip ${benefitAccentClass(item.image)}">${item.benefit}</span>` : ''}
         ${tagsHTML(item.tags)}
       </div>` : ''}
       <div class="smoothie-desc">${highlightPower(item.description)}</div>
@@ -137,17 +140,6 @@ function coffeeCardHTML(item) {
     </div>`;
 }
 
-/* ── Upsell rail — Screen 3's own shape: one gold protein add-on,
-   not the pipe-delimited combo list Screens 1-2 use. ─────────────── */
-function renderUpsell(upsell) {
-  document.getElementById('upsellRail').innerHTML =
-    `<div class="upsell-heading">${upsell.heading}</div>
-     <div class="upsell-gold">
-       <span class="gold-text">${upsell.gold.text}</span>
-       <span class="gold-price">${upsell.gold.price}</span>
-     </div>`;
-}
-
 /* ── Full render ─────────────────────────────────────────────── */
 function render(data) {
   const items  = data.items;
@@ -169,7 +161,7 @@ function render(data) {
   document.getElementById('coffeeHeading').textContent = config.sections.coffee.heading;
   document.getElementById('coffeeRow').innerHTML = coffees.map(coffeeCardHTML).join('');
 
-  renderUpsell(config.upsell);
+  renderPipeUpsell(config.upsell, config.upsellHeading);
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

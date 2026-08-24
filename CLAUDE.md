@@ -145,15 +145,17 @@ id, section, name, description, price, kcal, protein, fibre, tags, badge, image
 in `BEVERAGES_SOURCE`, once published — see "Go live" below):
 
 ```
-id, section, name, description, benefit, price, kcal, protein, sugar, badge, image
+id, section, name, description, benefit, price, kcal, protein, fibre, tags, badge, image
 ```
 
 - **section** — `smoothie` or `coffee`. Drives which row on the board the item renders into.
   There is no `featured` column — Screen 3 has no slideshow.
-- **benefit** — Screen 3's functional-smoothie differentiator (`Focus`, `Antioxidant`,
-  `Low Cortisol`, `Women Wellness`, `Balance`). Renders as its own chip on its own row below
-  the name (`.smoothie-meta-row`), one colour per benefit (see `beverages.css`, and
-  DESIGN-PRINCIPLES §7 for the palette). Blank for coffee rows.
+- **benefit** — Screen 3's functional-smoothie differentiator, free text (e.g. `Focus`,
+  `Antioxidant`) — the owner's to write, not a fixed list. Renders as its own chip on its own
+  row below the name (`.smoothie-meta-row`). **Chip colour comes from the `image` slug, not
+  this column** — `benefitAccentClass()` in `beverages.js` keys off the drink, so renaming a
+  benefit here never touches colour (see `beverages.css`, and DESIGN-PRINCIPLES §7 for the
+  palette). Blank for coffee rows.
 - **tags** — smoothies can carry Diet Tags too (currently just `Contains Nuts`), rendered in
   the same `.smoothie-meta-row` next to the benefit chip via the shared `tagsHTML()` helper —
   same abbreviation (`N`) and footer glossary as Screens 1–2. Coffee rows have none.

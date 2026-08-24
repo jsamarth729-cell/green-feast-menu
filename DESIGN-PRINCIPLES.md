@@ -96,10 +96,11 @@ What must **not** move, regardless of a screen's internal layout:
   content in between changes. Right now all three boards' footers show the same
   Diet Tag glossary (`.footer-legend` — `core.css` also defines `.footer-note`
   as an alternative shape, unused today but available if a future board needs
-  board-specific footer content instead). Screen 3's upsell rail *does* differ
-  today: it holds one centred gold item instead of Screens 1–2's pipe-delimited
-  combo list, because a single item left-aligned in the full-width rail left
-  most of it visibly empty.
+  board-specific footer content instead). All three boards' upsell rails also
+  render through the same `renderPipeUpsell()` (`core.js`) now — Screen 3
+  briefly had its own single-gold-pill shape while its rail carried only one
+  item, but once a second item was added it moved onto the shared renderer
+  rather than growing a second bespoke layout.
 - **Colour tokens, fonts, and the tag/macro/badge pill styling** (`core.css`)
   are shared. A screen may need a variant (e.g. Screen 2's panini-panel tags
   recolour `.tile-tag` gold instead of forest-on-cream, because the base pill
@@ -199,15 +200,21 @@ Hard-won, after going back and forth twice:
   than ~5 entries stops being scannable.
 
 **Screen 3 adds a second system on top of this one, rather than replacing it.**
-Its smoothies are sold on a functional benefit (Focus, Antioxidant, Low
-Cortisol, Women Wellness, Balance), which is not a dietary attribute, so it
-gets its own `.benefit-chip` — full word, not an abbreviation, one colour per
-benefit rather than the shared pill styling. That chip sits *alongside* the
-same Diet Tag system this section describes: a smoothie can also carry
-`Contains Nuts` (currently the only tag that applies there), abbreviated `N`
-and explained in the same footer glossary as Screens 1–2. Benefit chip and
-diet tag render together in `.smoothie-meta-row`, on their own row beneath the
-item name. Coffee cards use neither.
+Its smoothies are sold on a functional benefit — a phrase, not a dietary
+attribute, so it gets its own `.benefit-chip` (full word, not an
+abbreviation) instead of the shared pill styling. **The chip's colour is keyed
+to the drink, not to the benefit text** (`benefitAccentClass()` in
+`beverages.js`, keyed off `item.image`) — Purple Pulse is purple because it's
+blueberry, not because any particular benefit word has a colour. That
+deliberately decouples the two: renaming a benefit in the Sheet (the wording
+is free text, the owner's to change) never touches colour, and a new drink
+needs its own line in `beverages.css`'s colour map regardless of what benefit
+it's given. This chip sits *alongside* the same Diet Tag system this section
+describes: a smoothie can also carry `Contains Nuts` (currently the only tag
+that applies there), abbreviated `N` and explained in the same footer glossary
+as Screens 1–2. Benefit chip and diet tag render together in
+`.smoothie-meta-row`, on their own row beneath the item name. Coffee cards use
+neither.
 
 ---
 
@@ -299,15 +306,23 @@ same way Screen 3 did.
 | `--bar` / `--bar-dark` | `#223322` / `#1A2A1A` | upsell rail / footer |
 
 **Screen 3-scoped benefit-chip palette** (`beverages.css`, not `core.css` — see §2 on
-what stays shared vs. what a board owns):
+what stays shared vs. what a board owns). Keyed by drink slug, not by benefit
+wording — see §5's explanation of why:
 
-| class | value | benefit |
+| class | value | drink |
 |---|---|---|
-| `.b-focus` | `#2F5C8A` | Focus |
-| `.b-clarity` | `#3D7A4A` | Clarity |
-| `.b-energy` | `#6B3A78` | Energy |
-| `.b-strength` | `#6B4226` | Strength |
-| `.b-recovery` | `#B0752A` | Recovery |
+| `.acc-blue-mind` | `#A62A6D` | Blue Mind — magenta |
+| `.acc-berry-bloom` | `#A62A6D` | Berry Bloom — magenta (shares Blue Mind's; both a berry/spirulina swirl) |
+| `.acc-avo-clarity` | `#4E7C3A` | Avo Clarity — avocado green |
+| `.acc-purple-pulse` | `#5B3A8C` | Purple Pulse — blueberry purple |
+| `.acc-going-nuts` | `var(--badge-warm)` (`#7A5230`) | Going Nuts — peanut butter; reuses the existing warm-brown token rather than adding a new one |
+| `.acc-cocoa-core` | `#3D2418` | Cocoa Core — dark chocolate |
+
+⚠️ This table only covers the six smoothies that exist today. A new smoothie
+needs its own `.acc-<slug>` line here (matching the drink's own colour) — until
+it gets one, `.benefit-chip`'s unqualified rule (`var(--badge-green)`) is the
+fallback, which won't match anything and should be treated as a to-do, not a
+final colour.
 
 - Gold is the accent for **anything the customer should act on** — the hero's
   appetite copy and the Build-Your-Own tile. Do not use it decoratively, or it
@@ -471,7 +486,7 @@ Use these words in conversation, in commits, and in class names on any new scree
 | **Macro Chip** | kcal / protein / fibre readouts (Screen 3 dropped its earlier sugar column in favour of fibre, matching the others) | `.tile-macro` (small), `.macro-chip` (large, hero) |
 | **Diet Tag** | GF / PRO / FIB / N / LS — the abbreviated dietary pills. `V` (Vegan) and `LC` (Low Calorie) were retired when the menu moved away from an all-vegan lineup | `tags` column, `.tile-tag`, `TAG_ABBREV` in `core.js` |
 | **Item Badge** | Chef's Special, Most Loved (the CSS class stays `badge-spotlight` for the first — only the menu's wording changed, not the colour it maps to) | `badge` column, `.tile-badge`, `.badge-spotlight`, `.badge-loved` |
-| **Benefit Chip** | Focus / Antioxidant / Low Cortisol / Women Wellness / Balance. Screen 3 only. Coexists with Diet Tag, not a replacement for it — a smoothie can show both, stacked in `.smoothie-meta-row` below the name | `benefit` column, `.benefit-chip`, `.b-focus` … |
+| **Benefit Chip** | Free-text wording per smoothie (e.g. Focus, Antioxidant) — the owner's to write in the Sheet, not a fixed list. Screen 3 only. Coexists with Diet Tag, not a replacement for it — a smoothie can show both, stacked in `.smoothie-meta-row` below the name. Chip *colour* is keyed to the drink, not this text — see §5 and §7 | `benefit` column, `.benefit-chip`, `.acc-<slug>` … |
 
 ⚠️ **Diet Tag vs Item Badge is the easy one to get backwards.** In this codebase
 the *dietary* markers (GF/PRO/FIB/N/LS) are **tags** and *Chef's Special* is a

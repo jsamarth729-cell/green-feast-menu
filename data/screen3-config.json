@@ -3,8 +3,9 @@
     "smoothie": { "heading": "Functional Smoothies", "note": "(Sweetened with monk fruit and banana)" },
     "coffee": { "heading": "Coffee" }
   },
-  "upsell": {
-    "heading": "Power up",
-    "gold": { "text": "Add 12g protein to any smoothie", "price": "₹120" }
-  }
+  "upsellHeading": "Power up",
+  "upsell": [
+    "Add 12g protein to any smoothie | ₹120",
+    "Add 10g collagen to any smoothie | ₹120"
+  ]
 }
