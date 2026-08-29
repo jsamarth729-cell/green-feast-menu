@@ -233,13 +233,15 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/beverages
 - **Phase 4c ✅** — Published a Google Sheet tab for Screen 2 and pointed `WRAPS_SOURCE` in
   `wraps.js` at it, same as `BOWLS_SOURCE`. Both boards now read live Sheet tabs — the owner
   can edit either from a spreadsheet, no code changes needed for routine menu edits.
-- **Phase 4b ⏳** — Build Screens 3 (Beverages) and 4 (Salads & Toasts), reusing
-  `core.css`/`core.js` **and `DESIGN-PRINCIPLES.md`**. Screen 3 is built and verified
-  locally (`data/screen3-sheet.csv`); it still needs its Sheet tab published and
-  `BEVERAGES_SOURCE` in `beverages.js` pointed at the live URL (same "Go live" steps
-  Screen 2 followed in Phase 4c) before it's on GitHub Pages. Screen 4 not started.
-  Screen 3 intentionally departs from Screens 1–2's 525px dark left panel — see
-  DESIGN-PRINCIPLES §2.
+- **Phase 4b ✅ (Screen 3) / not started (Screen 4)** — Screen 3 (Beverages) is built,
+  its Sheet tab is published, and `BEVERAGES_SOURCE` in `beverages.js` points at the live
+  URL — same "Go live" steps Screen 2 followed in Phase 4c. It's been on GitHub Pages
+  through several rounds of menu and layout revisions since. Screen 3 intentionally departs
+  further from Screens 1–2 than just the panel shape: it has no 525px dark left panel, and
+  (as of a later revision) no dark header band either — its only dark anchor is the shared
+  upsell rail + footer strip at the bottom. See DESIGN-PRINCIPLES §2 for the full history
+  and the tradeoff that departure carries. Screen 4 (Salads & Toasts) is not started —
+  no code, no design pass, no Sheet tab.
 
 ## Known TODO
 - `tropical-fruit-salad` has only one photo (a 3/4 angle), so its grid tile shows that
