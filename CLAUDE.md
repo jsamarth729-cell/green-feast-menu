@@ -77,7 +77,7 @@ Google Sheet (owner edits menu)
 | `data/bowls-sheet.csv` | Local snapshot/template of the Screen 1 Sheet tab. **Not what the live board reads** — see the caching note below. |
 | `data/screen2-config.json` | Screen 2 static content: panel eyebrow/title, the panini and wrap summary stat chips (both sections share a macro range now, no per-item macros), the panini and wrap image slugs, the column-3 combo block (`combos`), and the bottom-rail upsell (`upsell`, quick add-ons only — meal upgrades moved to `combos`). |
 | `data/wraps-sheet.csv` | Local snapshot/template of the Screen 2 Sheet tab, grouped by a `section` column (`panini`/`toast`/`wrap`). **Not what the live board reads** — same caching note as `data/bowls-sheet.csv` below. |
-| `data/screen3-config.json` | Screen 3 static content: the two section headings ("Functional Smoothies", "Coffee") and the gold protein upsell. No board title — the board has no header band to put one in. **`upsell` here is a single `{heading, gold:{text,price}}` object**, unlike Screens 1–2's pipe-delimited array — Screen 3's rail holds one gold item, not a variable combo list. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. Screen 3's footer is now the same glossary block as Screens 1–2 (no board-specific footer content remains). |
+| `data/screen3-config.json` | Screen 3 static content: the two section headings ("Functional Smoothies", "Coffee") and the upsell rail. `upsellHeading` (string) + `upsell` (array of pipe-delimited `"text \| price"` strings) — same shape as Screens 1–2, rendered through the shared `renderPipeUpsell()` in `core.js`. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. Screen 3's footer is now the same glossary block as Screens 1–2 (no board-specific footer content remains). |
 | `data/screen3-sheet.csv` | Local snapshot/template of the Screen 3 Sheet tab, grouped by a `section` column (`smoothie`/`coffee`). **Not what the live board reads once the Sheet tab is published** — same caching note as `data/bowls-sheet.csv` below. |
 | `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.png` (hero) + `<slug>-top.png` (tile). |
 | `images/screen2/` | Screen 2's transparent cut-outs: the panini and wrap (`bbq-plate`) feature photos (trimmed only), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
@@ -162,8 +162,8 @@ id, section, name, description, benefit, price, kcal, protein, fibre, tags, badg
 - **description** — any occurrence of `brahmi`, `shatavari`, `ashwagandha`, or `blue spirulina`
   (case-insensitive) is automatically highlighted on the board (`POWER_INGREDIENTS` in
   `beverages.js`). No Sheet markup needed; just write the ingredient name normally.
-- Screen 3 uses **kcal/protein/sugar** (not fibre) — sugar reads as the more relevant macro
-  for smoothies and coffee than fibre does.
+- Screen 3 uses **kcal/protein/fibre**, same three macros as Screens 1–2 — there is no
+  sugar column anywhere in the Sheet or the render.
 - **image** — the slug (e.g. `blue-mind`); the code appends `images/screen3/<slug>.png`.
   Every row uses this column — unlike Screen 2, there's no shared feature photo.
 

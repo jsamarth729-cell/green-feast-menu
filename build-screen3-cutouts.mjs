@@ -7,7 +7,7 @@
    Screen 2's "toast" mode places cut-outs on one shared canvas at a uniform
    width so mismatched source framings read as a matched set (see
    DESIGN-PRINCIPLES §6 rule 2). That step is skipped here on purpose: all
-   nine Screen 3 photos are the same physical cup, same camera angle, same
+   ten Screen 3 photos are the same physical cup, same camera angle, same
    lighting — the aspect-ratio spread (0.80–0.89) is garnish height, not a
    framing mismatch. Padding every file out to a canvas sized for the
    tallest would waste ~18% of a typical file on transparent padding and,
@@ -39,6 +39,7 @@ const MAP = {
   'vietnamese-cold-brew':  'ChatGPT_Image_Aug_11__2026__03_20_35_AM-removebg-preview.png',
   'iced-latte':            'ChatGPT_Image_Aug_11__2026__03_02_49_AM-removebg-preview.png',
   'berry-bloom':           'Berry Bloom.png',
+  'spanish-ice-latte':     'spanish ice latte.png',
 };
 
 await mkdir(OUT, { recursive: true });

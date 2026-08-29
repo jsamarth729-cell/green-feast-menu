@@ -218,7 +218,7 @@
 }
 
 /* Benefit chip + diet tag(s), on their own row below the name. Some
-   benefit names ("Women Wellness") are too wide to share the name row
+   benefit names ("Low Cortisol") are too wide to share the name row
    with the price without overflowing, so this row absorbs any width —
    no ceiling on future benefit-name length. Smoothie-only: coffee has
    neither a benefit nor tags. */

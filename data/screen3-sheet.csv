@@ -1,11 +1,11 @@
 id,section,name,description,benefit,price,kcal,protein,fibre,tags,badge,image
-1,smoothie,Blue Mind,"Strawberry, blue spirulina, banana, Greek yoghurt, coconut milk",Antioxidant,299,190,7,4,,,blue-mind
-2,smoothie,Going Nuts,"Peanut butter, ashwagandha, cocoa, banana, oat milk, sea salt",Low Cortisol,299,235,9,5,Contains Nuts,,going-nuts
-3,smoothie,Avo Clarity,"Avocado, shatavari, banana, oat milk, granola, chia seeds",Women Wellness,299,280,5,9,Contains Nuts,,avo-clarity
-4,smoothie,Purple Pulse,"Blueberry, brahmi, banana, coconut milk, Greek yoghurt",Focus,299,220,8,5,,,purple-pulse
-5,smoothie,Cocoa Core,"Chocolate, cocoa, mulethi, banana, oat milk, almond flakes",Balance,299,340,9,5,Contains Nuts,,cocoa-core
-6,smoothie,Berry Bloom,"Mixed berries, blue spirulina, banana, coconut milk",Antioxidant,299,195,6,6,,,berry-bloom
-7,coffee,Iced Cold Brew,"Iced cold brew coffee, 300 ml serving",,250,5,,,,,cold-brew
+1,smoothie,Blue Mind,"Strawberry, blue spirulina, banana, Greek yoghurt, coconut milk",Antioxidant,299,155,3,3,,,blue-mind
+2,smoothie,Going Nuts,"Peanut butter, ashwagandha, cocoa, banana, oat milk, sea salt",Low Cortisol,299,235,5,5,Contains Nuts,,going-nuts
+3,smoothie,Avo Clarity,"Avocado, shatavari, banana, oat milk, granola, chia seeds",Gut Health,299,400,5,10,Contains Nuts,,avo-clarity
+4,smoothie,Purple Pulse,"Blueberry, brahmi, banana, coconut milk, Greek yoghurt",Focus,299,175,3,3,,,purple-pulse
+5,smoothie,Cocoa Core,"Chocolate, cocoa, mulethi, banana, oat milk, almond flakes",Balance,299,470,8,10,Contains Nuts,,cocoa-core
+6,smoothie,Berry Bloom,"Mixed berries, blue spirulina, banana, coconut milk",Antioxidant,299,170,3,4,,,berry-bloom
+7,coffee,Spanish Ice Latte,"Espresso cut with sweet condensed milk, 300 ml serving",,250,165,,,,,spanish-ice-latte
 8,coffee,Vietnamese Cold Brew,"Vietnamese-style cold brew coffee, 300 ml serving",,250,145,,,,,vietnamese-cold-brew
-9,coffee,Ginger Ale Cold Brew,"Cold brew coffee with ginger ale, 300 ml serving",,250,60,,,,,gingerale-cold-brew
+9,coffee,Iced Cold Brew,"Iced cold brew coffee, 300 ml serving",,250,5,,,,,cold-brew
 10,coffee,Iced Latte,"Iced latte made with oat milk, 300 ml serving",,250,85,,,,,iced-latte

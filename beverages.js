@@ -79,9 +79,10 @@ function badgeClassFor(badge) {
 /* Benefit Chip colour is keyed to the DRINK, not the benefit category —
    so it matches what's actually in the cup (Purple Pulse is purple
    because it's blueberry, not because "Focus" has a colour). This also
-   means renaming a benefit in the Sheet (e.g. Women Wellness -> Gut
-   Health) never needs a code change: the chip's colour and its text
-   come from two independent sources. See beverages.css for the map. */
+   means renaming a benefit in the Sheet (as happened when Avo Clarity's
+   benefit was renamed Women Wellness -> Gut Health) never needs a code
+   change: the chip's colour and its text come from two independent
+   sources. See beverages.css for the map. */
 function benefitAccentClass(image) {
   return 'acc-' + image;
 }
