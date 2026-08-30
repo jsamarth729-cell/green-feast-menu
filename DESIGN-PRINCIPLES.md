@@ -174,6 +174,18 @@ The hero sells one item at a time. It is **not** a summary of the grid.
   height. It was 34% before the fix and looked broken — a huge dead void with
   the bowl marooned at the bottom.
 
+**Update — the rotation now carries one non-item slide, twice per cycle.** "The
+hero sells one item at a time" is still true of every bowl slide; the offers
+slide (Screen 1's version of Screen 3's offers panel — see
+`SCREEN1-OFFERS-SLIDE-PLAN.md`) is the deliberate exception. It is safe
+specifically *because* every featured bowl also appears in the 2×5 grid to the
+right — covering the hero with the offers slide costs zero menu visibility,
+unlike Screen 2's panini panel (the only listing for paninis on that board),
+which is why this pattern was built for Screen 1 and not Screen 2. It reuses
+the hero's own slide mechanics (absolute positioning, the 0.9s cross-fade) at a
+longer 15s dwell against the bowls' 10s, inserted after the midpoint bowl and
+after the last one.
+
 ---
 
 ## 4. Grid tiles
@@ -314,6 +326,12 @@ only, no shared canvas, because a matched-set canvas has nothing to do when
 there's only one image). Two exemptions, two different justifications, one
 code path — `build-screen3-cutouts.mjs`'s header comment documents both.
 
+**A third instance: `images/nobg/extras-grid.png`**, Screen 1's offers-slide
+feature art (see `SCREEN1-OFFERS-SLIDE-PLAN.md`). Same solo-feature-art
+exemption as `protein-scoop` and `panini-hero` — one image, its own layout
+slot, nothing to normalize against. Trimmed to its alpha bounding box only,
+same as the others; no dedicated pipeline script, since it's a single file.
+
 ---
 
 ## 7. Colour
@@ -370,6 +388,9 @@ final colour.
   against. Matching the header note's yellow would also make one fact stated
   twice on the same board read as a literal repeat rather than two different
   registers (a section-wide footnote vs. a panel's headline claim).
+- **Screen 1's offers slide (`.offers-slide-amount`, `+₹50`) also uses gold.**
+  Same established "act on this" use as Screen 3's panel and the upsell rail's
+  price — not a new context, and not a fourth use.
 - Keep the dark-hero / cream-grid split. The contrast between the two halves is
   doing real legibility work, not just looking nice.
 
@@ -532,15 +553,17 @@ said `chip` since Screen 1.
 
 ⚠️ **The offers panel's typography is deliberately not canonical.**
 `.offers-amount` / `.offers-what` / `.offers-price` / `.offers-chip` /
-`.offers-sweetener` / `.offers-credit` (Screen 3's `.offers-panel`) describe an
-*add-on promotion*, not a menu item — they are not Item Name/Desc/Price under a
-seventh set of selectors, and `check-consistency.mjs` should not be made to
-treat them as such. They may use literal sizes scoped to `beverages.css` rather
-than the shared item-typography tokens. If a future board adds its own offers
-panel, give it its own scoped selectors the same way — don't retrofit these
-into `core.css` as a shared canonical group unless
-the content itself becomes a canonical concept (i.e. a menu item), not just a
-repeated layout.
+`.offers-sweetener` / `.offers-credit` (Screen 3's `.offers-panel`) and
+`.offers-slide-title` / `.offers-slide-eyebrow` / `.offers-slide-amount` /
+`.offers-slide-note` / `.offers-slide-item` (Screen 1's `.offers-slide`)
+describe an *add-on promotion*, not a menu item — they are not Item
+Name/Desc/Price under extra sets of selectors, and `check-consistency.mjs`
+should not be made to treat them as such. They may use literal sizes scoped to
+their own screen's CSS file rather than the shared item-typography tokens. If
+a future board adds its own offers surface, give it its own scoped selectors
+the same way — don't retrofit these into `core.css` as a shared canonical
+group unless the content itself becomes a canonical concept (i.e. a menu
+item), not just a repeated layout.
 
 Section Header/Title are handled differently from the Item elements above.
 Item Name/Desc/Price stayed as six separate per-screen selectors, each pointed

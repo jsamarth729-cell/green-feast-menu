@@ -14,7 +14,8 @@ const BOWLS_SOURCE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NTFd2KL
 const CONFIG_URL   = 'data/config.json';  // BYOB tile + upsell (edit here directly)
 
 const CACHE_KEY  = 'gf_bowls_v2';
-const SLIDE_MS   = 10000;
+const SLIDE_MS       = 10000;   // bowl slide
+const OFFER_SLIDE_MS = 15000;   // offers slide — more to read than a bowl name
 const REFRESH_MS = 5 * 60 * 1000;
 
 /* Escape hatch: any bowl listed here uses its original photo (marble
@@ -24,8 +25,14 @@ const REFRESH_MS = 5 * 60 * 1000;
 const HERO_CUTOUT_UNAVAILABLE = [];
 
 let currentSlide = 0;
-let featuredCount = 0;
 let slideTimer    = null;
+
+/* Per-slide dwell, parallel to the rendered slide order. Bowls and the
+   offers slide have different dwells, which a single setInterval can't
+   express — see startSlideshow(). Replaces the old featuredCount, which
+   became misleading once the rotation could be longer than the bowl
+   count. */
+let slideDurations = [];
 
 function csvRowToBowl(row) {
   return {
@@ -73,7 +80,9 @@ async function fetchBowlsData() {
   return {
     bowls,
     buildYourOwn: config.buildYourOwn,
-    upsell:       config.upsell
+    upsellHeading: config.upsellHeading,
+    upsell:        config.upsell,
+    offersSlide:   config.offersSlide
   };
 }
 
@@ -118,6 +127,34 @@ function heroSlideHTML(bowl) {
       <div class="hero-photo-wrap${hasBg ? ' has-bg' : ''}">
         <img src="${heroImageSrc(bowl)}" alt="${bowl.name}"
              onerror="this.closest('.hero-photo-wrap').classList.add('photo-error');this.remove()">
+      </div>
+    </div>`;
+}
+
+/* ── Offers slide ────────────────────────────────────────────────
+   A peer of the bowl slides, in the same rotation — not an overlay
+   panel like Screen 3's, because Screen 1's hero already rotates on
+   its own timer and a second independent overlay would fade in
+   mid-slide-transition. Content comes from config.offersSlide, not
+   the Sheet (same split as Screen 3's panel). See
+   SCREEN1-OFFERS-SLIDE-PLAN.md S1. */
+function offersSlideHTML(cfg) {
+  return `
+    <div class="hero-slide offers-slide">
+      <div class="offers-slide-title">${cfg.title}</div>
+      <div class="offers-slide-eyebrow">${cfg.eyebrow}</div>
+      <div class="offers-slide-art">
+        ${cfg.image ? `<img src="images/nobg/${cfg.image}.png" alt="${cfg.eyebrow}"
+             onerror="this.closest('.offers-slide-art').classList.add('photo-error');this.remove()">` : ''}
+      </div>
+      <div class="offers-slide-amount-row">
+        <span class="offers-slide-amount">${cfg.amount}</span>
+        <span class="offers-slide-note">${cfg.amountNote}</span>
+      </div>
+      <div class="offers-slide-items">
+        ${cfg.items.map(function (t) {
+          return `<div class="offers-slide-item">${t}</div>`;
+        }).join('')}
       </div>
     </div>`;
 }
@@ -184,23 +221,57 @@ function goToSlide(index) {
   currentSlide = index;
 }
 
+/* Recursive setTimeout rather than setInterval: bowls dwell 10s and the
+   offers slide 15s, which one interval can't express. Clearing the
+   pending timer here before re-queuing is what stops a second rotation
+   stacking on the first when render() runs again every REFRESH_MS —
+   the same discipline Screen 3's offers rotation uses. */
 function startSlideshow() {
-  if (slideTimer) clearInterval(slideTimer);
-  slideTimer = setInterval(() => {
-    goToSlide((currentSlide + 1) % featuredCount);
-  }, SLIDE_MS);
+  if (slideTimer) clearTimeout(slideTimer);
+  if (!slideDurations.length) return;   // no featured bowls -> nothing to rotate
+  queueNextSlide();
+}
+
+function queueNextSlide() {
+  const dwell = slideDurations[currentSlide] || SLIDE_MS;
+  slideTimer = setTimeout(() => {
+    goToSlide((currentSlide + 1) % slideDurations.length);
+    queueNextSlide();
+  }, dwell);
 }
 
 /* ── Full render ─────────────────────────────────────────────── */
 function render(data) {
   const featured = data.bowls.filter(b => b.featured);
-  featuredCount  = featured.length;
 
-  document.getElementById('heroSlides').innerHTML =
-    featured.map(heroSlideHTML).join('');
+  /* Interleave the offers slide after the midpoint bowl and after the
+     last one. With 7 featured bowls that is "after the 3rd" and "after
+     the 7th" exactly; written as a rule so it still behaves if the
+     owner toggles `featured` in the Sheet. floor(n/2) can only equal n
+     when n is 0, so the two positions never collide.
+     See SCREEN1-OFFERS-SLIDE-PLAN.md S2/S3. */
+  const mid = Math.floor(featured.length / 2);
+  const slidesHTML = [];
+  const durations  = [];
+
+  featured.forEach((bowl, i) => {
+    slidesHTML.push(heroSlideHTML(bowl));
+    durations.push(SLIDE_MS);
+
+    const isMid  = (i + 1) === mid;
+    const isLast = (i + 1) === featured.length;
+    if (data.offersSlide && (isMid || isLast)) {
+      slidesHTML.push(offersSlideHTML(data.offersSlide));
+      durations.push(OFFER_SLIDE_MS);
+    }
+  });
+
+  slideDurations = durations;
+
+  document.getElementById('heroSlides').innerHTML = slidesHTML.join('');
 
   document.getElementById('heroDots').innerHTML =
-    featured.map((_, i) =>
+    slidesHTML.map((_, i) =>
       `<div class="hero-dot${i === 0 ? ' active' : ''}"></div>`
     ).join('');
 
@@ -210,7 +281,7 @@ function render(data) {
   document.getElementById('bowlGrid').innerHTML =
     data.bowls.map(tileHTML).join('') + byobTileHTML(data.buildYourOwn);
 
-  renderPipeUpsell(data.upsell, 'Extras');
+  renderPipeUpsell(data.upsell, data.upsellHeading);
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

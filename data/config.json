@@ -4,8 +4,20 @@
     "description": "Choose base, protein, toppings and dressing.",
     "price": 349
   },
+  "upsellHeading": "Extras",
   "upsell": [
     "Extra protein (8–10g) | +₹50",
     "Extra premiums — feta / guacamole / beetroot hummus | +₹50"
-  ]
+  ],
+  "offersSlide": {
+    "title": "Fuel your body",
+    "eyebrow": "Bowl add-ons",
+    "image": "",
+    "amount": "+₹50",
+    "amountNote": "each",
+    "items": [
+      "Extra protein (8–10g)",
+      "Extra premiums — feta / guacamole / beetroot hummus"
+    ]
+  }
 }
