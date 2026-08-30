@@ -143,6 +143,18 @@ top" instrument back, `.board-header`'s CSS is recoverable from git history
 repo's commit log around the point Screen 3's header band was removed) rather
 than being redesigned from scratch.
 
+**Update — the coffee column now carries a dark anchor, but only part of the
+time.** The board gained a second mode: a 764px `.offers-panel` fades in over
+the coffee grid on a 30s/15s cycle, showing the smoothie add-ons at poster
+size. Its height and top edge (974px tall, top at y=0, bottom on the upsell
+rail) are identical to Screens 1–2's 525px panels — only the width differs,
+deliberately, since 525 vs 764 is a clear 1:1.46 ratio rather than a near-miss
+that could read as a failed match. This does not reverse the paragraph above:
+for two-thirds of every cycle Screen 3 is still the one board with no
+top-of-screen dark mass, and the panel is additive content (add-on
+promotion), not a return of `.board-header`. See
+`SCREEN3-OFFERS-PANEL-PLAN.md` for the full reasoning and geometry.
+
 ---
 
 ## 3. Hero panel
@@ -292,6 +304,16 @@ photos are *not* this uniform, go back to rule 2's shared-canvas approach —
 verify uniformity on a rendered contact sheet before choosing to skip it, the
 same way Screen 3 did.
 
+**Update — a second, different exemption now shares this file.**
+`protein-scoop.png` (the offers panel's feature art, see
+`SCREEN3-OFFERS-PANEL-PLAN.md` Revision 2) also skips rule 2, but not because
+it's part of a uniform set — it isn't one of the ten drinks at all. It's **solo
+feature art in its own layout slot with nothing to normalize against**, the
+same standing as Screen 2's `panini-hero` / `bbq-plate` (which are trimmed
+only, no shared canvas, because a matched-set canvas has nothing to do when
+there's only one image). Two exemptions, two different justifications, one
+code path — `build-screen3-cutouts.mjs`'s header comment documents both.
+
 ---
 
 ## 7. Colour
@@ -336,6 +358,18 @@ final colour.
   further — if a later screen starts using gold for a third purpose, gold stops
   meaning "act on this" and the rule in the first bullet above has quietly
   failed. Don't add a fourth gold use without updating this section to say why.
+- **The offers panel's `.offers-amount` numerals (`+12g`, `+10g`) are gold.**
+  This is not a new use — it's the same "anything the customer should act on"
+  rule the first bullet states, the same job an upsell-rail price already does.
+  The panel is a poster-sized version of the rail's content, not a new context
+  for the colour.
+- **The same panel's no-added-sugar claim chip is deliberately NOT gold**, and
+  does not reuse the smoothie header's yellow-highlight treatment either — it's
+  an outlined sage chip instead. The claim is informational, not a
+  call-to-action, so giving it gold would be the fourth use this section warns
+  against. Matching the header note's yellow would also make one fact stated
+  twice on the same board read as a literal repeat rather than two different
+  registers (a section-wide footnote vs. a panel's headline claim).
 - Keep the dark-hero / cream-grid split. The contrast between the two halves is
   doing real legibility work, not just looking nice.
 
@@ -495,6 +529,18 @@ the two-word form ("diet tag", "item badge"); never the bare word "badge".
 
 Likewise, the kcal/protein readouts are **chips**, not badges — the code has
 said `chip` since Screen 1.
+
+⚠️ **The offers panel's typography is deliberately not canonical.**
+`.offers-amount` / `.offers-what` / `.offers-price` / `.offers-chip` /
+`.offers-sweetener` / `.offers-credit` (Screen 3's `.offers-panel`) describe an
+*add-on promotion*, not a menu item — they are not Item Name/Desc/Price under a
+seventh set of selectors, and `check-consistency.mjs` should not be made to
+treat them as such. They may use literal sizes scoped to `beverages.css` rather
+than the shared item-typography tokens. If a future board adds its own offers
+panel, give it its own scoped selectors the same way — don't retrofit these
+into `core.css` as a shared canonical group unless
+the content itself becomes a canonical concept (i.e. a menu item), not just a
+repeated layout.
 
 Section Header/Title are handled differently from the Item elements above.
 Item Name/Desc/Price stayed as six separate per-screen selectors, each pointed

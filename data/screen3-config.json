@@ -7,5 +7,17 @@
   "upsell": [
     "Add 12g protein to any smoothie | ₹120",
     "Add 10g collagen to any smoothie | ₹120"
-  ]
+  ],
+  "offersPanel": {
+    "title": "Fuel your body",
+    "chip": "No added sugar",
+    "sweetener": "Sweetened only with banana and monk fruit",
+    "eyebrow": "Smoothie add-ons",
+    "image": "protein-scoop",
+    "credit": "Protein by <b>The Whole Truth</b>",
+    "items": [
+      { "amount": "+12g", "what": "Protein",  "price": "₹120" },
+      { "amount": "+10g", "what": "Collagen", "price": "₹120" }
+    ]
+  }
 }

@@ -5,6 +5,11 @@
    (currently just Contains Nuts) — rendered via the same tagsHTML()
    helper Screens 1-2 use, since this board now shares their footer
    glossary. See smoothieCardHTML below.
+
+   The coffee column also carries a second mode: an offers panel that
+   fades in over it on a timer, showing the smoothie add-ons at poster
+   size. See renderOffersPanel/startOfferRotation below and
+   SCREEN3-OFFERS-PANEL-PLAN.md for why.
 ══════════════════════════════════════════════════════════════════ */
 
 // ═══════════════════════════════════════════════════════════════
@@ -18,6 +23,14 @@ const CONFIG_URL       = 'data/screen3-config.json';
 
 const CACHE_KEY  = 'gf_beverages_v1';
 const REFRESH_MS = 5 * 60 * 1000;
+
+/* Offers panel dwell. Asymmetric on purpose (see the plan's J5), which
+   is why the rotation is a recursive setTimeout and not a setInterval. */
+const OFFER_COFFEE_MS = 30000;
+const OFFER_PANEL_MS  = 15000;
+
+let offerTimer   = null;
+let offerShowing = false;
 
 function csvRowToItem(row) {
   return {
@@ -141,6 +154,69 @@ function coffeeCardHTML(item) {
     </div>`;
 }
 
+/* ── Offers panel ────────────────────────────────────────────────
+   The coffee column's second mode. Content comes from
+   config.offersPanel (data/screen3-config.json), not the Sheet —
+   same split as Screen 2's panini panel. */
+function renderOffersPanel(cfg) {
+  if (!cfg) return;
+
+  document.getElementById('offersTitle').textContent     = cfg.title;
+  document.getElementById('offersChip').textContent      = cfg.chip;
+  document.getElementById('offersSweetener').textContent = cfg.sweetener;
+  document.getElementById('offersEyebrow').textContent   = cfg.eyebrow;
+
+  /* credit carries a <b> around the brand name, so this one is innerHTML.
+     It is authored copy from our own config file, not Sheet data. */
+  document.getElementById('offersCredit').innerHTML = cfg.credit;
+
+  /* The <img>'s onerror handler removes the element outright, so on a
+     later re-render it may no longer exist. Guard rather than throw —
+     a missing photo must not take the whole board down. */
+  const img = document.getElementById('offersImage');
+  if (img && cfg.image) {
+    img.src = screen3ImageSrc(cfg.image);
+    img.alt = cfg.title;
+  }
+
+  document.getElementById('offersItems').innerHTML = cfg.items.map(function (it) {
+    return `
+      <div class="offers-row">
+        <span class="offers-amount">${it.amount}</span>
+        <span class="offers-what">${it.what}</span>
+        <span class="offers-price">${it.price}</span>
+      </div>`;
+  }).join('');
+}
+
+function setOfferPhase(showing) {
+  offerShowing = showing;
+  const panel = document.getElementById('offersPanel');
+  if (showing) panel.classList.add('is-showing');
+  else         panel.classList.remove('is-showing');
+}
+
+function queueOfferFlip() {
+  offerTimer = setTimeout(function () {
+    setOfferPhase(!offerShowing);
+    queueOfferFlip();
+  }, offerShowing ? OFFER_PANEL_MS : OFFER_COFFEE_MS);
+}
+
+/* Called at the end of every render(), which runs again every
+   REFRESH_MS. Clearing the pending timer FIRST is what stops a second
+   rotation stacking on top of the first — exactly the discipline
+   startSlideshow() uses in bowls.js. Without it the panel would flip
+   twice as often after ten minutes, four times after fifteen, and so
+   on. Resetting to the coffee phase also makes each refresh restart
+   the cycle from a known state; the CSS transition plays in reverse,
+   so it is a fade rather than a hard cut. */
+function startOfferRotation() {
+  if (offerTimer) clearTimeout(offerTimer);
+  setOfferPhase(false);
+  queueOfferFlip();
+}
+
 /* ── Full render ─────────────────────────────────────────────── */
 function render(data) {
   const items  = data.items;
@@ -163,6 +239,9 @@ function render(data) {
   document.getElementById('coffeeRow').innerHTML = coffees.map(coffeeCardHTML).join('');
 
   renderPipeUpsell(config.upsell, config.upsellHeading);
+
+  renderOffersPanel(config.offersPanel);
+  startOfferRotation();
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

@@ -30,6 +30,13 @@
   --hero-bg:     #163019;
   --gold:        #FEFA67;
 
+  /* Bottom strip heights. Tokenised so a screen laying an element
+     against the strips can derive its own geometry instead of
+     re-hardcoding 64 and 42. Values unchanged from the literals
+     they replace below. */
+  --h-upsell-rail:  64px;
+  --h-footer-strip: 42px;
+
   /* ─── Item typography ─────────────────────────────────────────
      The same three elements appear on every board under six
      different class names each (.tile-name / .panini-item-name /
@@ -232,7 +239,7 @@ body {
    UPSELL RAIL — identical on every screen
 ══════════════════════════════════════════════════════════════════ */
 .upsell-rail {
-  height: 64px;
+  height: var(--h-upsell-rail);
   background: var(--bar);
   display: flex;
   align-items: center;
@@ -322,7 +329,7 @@ body {
    FOOTER STRIP — identical on every screen
 ══════════════════════════════════════════════════════════════════ */
 .footer-strip {
-  height: 42px;
+  height: var(--h-footer-strip);
   background: var(--bar-dark);
   display: flex;
   align-items: center;

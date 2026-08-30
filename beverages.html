@@ -38,6 +38,31 @@
       </div><!-- /.bev-columns -->
     </div><!-- /.main-content -->
 
+    <!-- ── Offers Panel — Screen 3 only ──────────────────────────
+         Fades in over the coffee column on a 30s/15s cycle. Lives
+         here — a direct child of .screen, out of flow — rather than
+         inside #coffeeRow, because render() rewrites #coffeeRow's
+         innerHTML every 5 minutes and would destroy it. Must stay
+         after .main-content and before .upsell-rail: that DOM order
+         is what gives the correct paint stacking with no z-index. -->
+    <div class="offers-panel" id="offersPanel">
+      <div class="offers-title" id="offersTitle"><!-- injected by JS --></div>
+      <div class="offers-chip" id="offersChip"><!-- injected by JS --></div>
+      <div class="offers-sweetener" id="offersSweetener"><!-- injected by JS --></div>
+      <div class="offers-eyebrow" id="offersEyebrow"><!-- injected by JS --></div>
+      <div class="offers-art">
+        <!-- No src attribute here on purpose: src="" makes the browser
+             request the current page as an image, which fails instantly
+             and fires onerror before JS ever assigns the real src —
+             removing this element before renderOffersPanel() runs.
+             JS sets src for the first time in renderOffersPanel(). -->
+        <img id="offersImage" alt=""
+             onerror="this.closest('.offers-art').classList.add('photo-error');this.remove()">
+      </div>
+      <div class="offers-credit" id="offersCredit"><!-- injected by JS --></div>
+      <div class="offers-items" id="offersItems"><!-- injected by JS --></div>
+    </div>
+
     <!-- ── Upsell Rail ── -->
     <div class="upsell-rail" id="upsellRail">
       <!-- injected by JS -->

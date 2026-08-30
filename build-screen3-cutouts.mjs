@@ -4,19 +4,35 @@
    build-screen2-cutouts.mjs). Trims each to its alpha bounding box and, for
    anything taller than MAX_H, downscales — no shared canvas.
 
-   Screen 2's "toast" mode places cut-outs on one shared canvas at a uniform
-   width so mismatched source framings read as a matched set (see
-   DESIGN-PRINCIPLES §6 rule 2). That step is skipped here on purpose: all
-   ten Screen 3 photos are the same physical cup, same camera angle, same
-   lighting — the aspect-ratio spread (0.80–0.89) is garnish height, not a
-   framing mismatch. Padding every file out to a canvas sized for the
-   tallest would waste ~18% of a typical file on transparent padding and,
-   because the card's photo box is height-limited, would shrink every cup
-   on screen — the exact failure §6 already records for the 900×900 toast
-   canvas before it was corrected. Instead beverages.css normalizes by
-   height (height: 100%; width: auto), verified against a rendered contact
-   sheet before this was decided. This is not a general licence to skip
-   rule 2 — it only holds because these nine sources are this uniform.
+   Two different reasons feed the same trim-only path here, covering two
+   different groups of files:
+
+   1. THE TEN DRINKS (smoothie/coffee cup photos). Screen 2's "toast" mode
+      places cut-outs on one shared canvas at a uniform width so mismatched
+      source framings read as a matched set (DESIGN-PRINCIPLES §6 rule 2).
+      That step is skipped here on purpose: all ten drink photos are the
+      same physical cup, same camera angle, same lighting — the
+      aspect-ratio spread (0.80–0.89) is garnish height, not a framing
+      mismatch. Padding every file out to a canvas sized for the tallest
+      would waste ~18% of a typical file on transparent padding and,
+      because the card's photo box is height-limited, would shrink every
+      cup on screen — the exact failure §6 already records for the 900×900
+      toast canvas before it was corrected. Instead beverages.css
+      normalizes by height (height: 100%; width: auto), verified against a
+      rendered contact sheet before this was decided. This is not a general
+      licence to skip rule 2 — it only holds because these ten sources are
+      this uniform.
+
+   2. THE OFFERS-PANEL FEATURE ART (protein-scoop). Not a drink and not
+      part of the uniform set above — it renders alone in the offers
+      panel's own layout slot (SCREEN3-OFFERS-PANEL-PLAN.md, Revision 2),
+      with nothing beside it to normalize against. That is the same §6
+      exemption Screen 2's solo feature photos (panini-hero, bbq-plate)
+      already use: a shared canvas exists to make a matched SET read as
+      matched, and a single image in a single slot has no set to match.
+      Both grounds land on the same trim-only code path, so nothing below
+      changes for this file — only this comment needed to keep asserting
+      something true once a non-cup image joined the MAP.
 
    Usage: node build-screen3-cutouts.mjs
 */
@@ -40,6 +56,7 @@ const MAP = {
   'iced-latte':            'ChatGPT_Image_Aug_11__2026__03_02_49_AM-removebg-preview.png',
   'berry-bloom':           'Berry Bloom.png',
   'spanish-ice-latte':     'spanish ice latte.png',
+  'protein-scoop':         'ChatGPT Image Aug 29, 2026, 08_27_32 AM.png',
 };
 
 await mkdir(OUT, { recursive: true });

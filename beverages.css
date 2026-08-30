@@ -260,3 +260,191 @@
    board-specific rail markup or styling remains; .upsell-addon /
    .addon-text / .addon-price / .upsell-vdiv in core.css cover it.
 ══════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   OFFERS PANEL — the coffee column's second mode.
+
+   Geometry (see SCREEN3-OFFERS-PANEL-PLAN.md §3, J2/J3):
+     width  764px = coffee column 720 + .main-content's 44px right padding
+     height 974px = 1080 − rail 64 − footer 42, derived from the tokens
+     top    0, bleeding to the screen's top and right edges
+
+   Height and vertical position are identical to Screens 1-2's 525px
+   dark panels; only the width differs. That is deliberate — see
+   DESIGN-PRINCIPLES §2 on the dark anchor.
+
+   Positioned against .screen (the only positioned ancestor — .screen
+   is position:absolute, .main-content sets no position). Being out of
+   flow means it does not disturb .screen's column flex layout.
+══════════════════════════════════════════════════════════════════ */
+.offers-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: calc(var(--h-upsell-rail) + var(--h-footer-strip));
+  width: 764px;
+  background: var(--hero-bg);
+  padding: 44px 44px 36px;
+  display: flex;
+  flex-direction: column;
+  /* Revision 2 (SCREEN3-OFFERS-PANEL-PLAN.md R4a): the stack no longer
+     stretches to fill the panel — .offers-art below has a fixed height
+     instead of flex:1, so this is what turns the leftover space into
+     even breathing room top and bottom, rather than one void. */
+  justify-content: center;
+  /* Hidden by default. JS adds .is-showing to bring it in. */
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.offers-panel.is-showing {
+  opacity: 1;
+}
+
+/* "Dip to dark": the dark ground arrives first, its contents 380ms
+   later. That gap is the whole effect — remove it and the panel reads
+   as a cross-fade, which at wall distance looks like a rendering
+   fault rather than a deliberate switch. */
+.offers-panel > * {
+  opacity: 0;
+  transition: opacity 0.30s ease;
+}
+.offers-panel.is-showing > * {
+  opacity: 1;
+  transition-delay: 0.38s;
+}
+
+/* Revision 2: no longer a top eyebrow — it now sits mid-panel, labelling
+   the add-ons that follow it (R-J3). Text changed "Power up" ->
+   "Smoothie add-ons" so it stops repeating the upsell rail's "POWER UP"
+   label, visible at the same time ~900px away. */
+.offers-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sage-light);
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.offers-title {
+  font-family: 'Playfair Display', serif;   /* a heading, not an Item Name — §12 */
+  font-size: 52px;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.1;
+  margin-bottom: 22px;
+  flex-shrink: 0;
+}
+
+/* Claim chip — the no-added-sugar promise. Sage and outlined, NEVER
+   gold: §7 reserves gold for "act on this" and the +12g/+10g numerals
+   are that use here. Deliberately a different treatment from the
+   smoothie header's yellow-highlight note (same fact, different
+   register), so the two don't read as the same thing said twice. */
+.offers-chip {
+  align-self: flex-start;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage-pale);
+  border: 2px solid rgba(200,216,200,0.45);
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.offers-sweetener {
+  font-family: 'Inter', sans-serif;
+  font-size: 23px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.74);
+  line-height: 1.35;
+  margin-bottom: 30px;
+  flex-shrink: 0;
+}
+
+.offers-art {
+  /* Revision 2 (R4b): was flex:1 — that let the art box swallow every
+     spare pixel into one large void. A fixed height plus the panel's
+     new justify-content:center (above) turns that into even space at
+     top and bottom instead. See SCREEN3-OFFERS-PANEL-PLAN.md R1/R-J6/R-J7. */
+  flex-shrink: 0;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.offers-art img {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+.offers-art.photo-error {
+  /* Image missing — the flex:1 box just collapses to empty space and
+     the numerals below carry the panel. Nothing else to do. */
+  display: flex;
+}
+
+/* Supplier credit — scoped to protein on purpose (R-J5): it sits
+   under the scoop, not floating over both price rows, so it can't
+   imply anything unverified about the collagen. */
+.offers-credit {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--sage-light);
+  text-align: center;
+  margin: 10px 0 22px;
+  flex-shrink: 0;
+}
+.offers-credit b {
+  color: rgba(255,255,255,0.88);
+  font-weight: 600;
+}
+
+.offers-items { flex-shrink: 0; }
+
+.offers-row {
+  display: flex;
+  align-items: baseline;
+  padding: 16px 0;
+  border-top: 1px solid rgba(255,255,255,0.16);
+}
+.offers-row > * + * {
+  margin-left: 16px;   /* flex gap banned on Chrome 69 — §9 */
+}
+
+/* Gold on the amount only. §7 permits gold for "anything the customer
+   should act on" — an add-on price is exactly that, the same job the
+   upsell rail's price does. This is not a fourth gold use. */
+.offers-amount {
+  font-family: var(--font-item-name);
+  font-size: 76px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+.offers-what {
+  font-family: var(--font-item-name);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.92);
+}
+.offers-price {
+  margin-left: auto;
+  font-family: 'Inter', sans-serif;
+  font-size: 38px;
+  font-weight: 600;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
