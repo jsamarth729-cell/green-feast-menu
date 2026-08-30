@@ -11,7 +11,8 @@
   ],
   "offersSlide": {
     "title": "Fuel your body",
-    "eyebrow": "Bowl add-ons",
+    "eyebrow": "Add-ons",
+    "scope": "(Bowls, Panini, Wraps)",
     "image": "extras-grid",
     "amount": "+₹50",
     "amountNote": "each",

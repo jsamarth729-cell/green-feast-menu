@@ -143,6 +143,7 @@ function offersSlideHTML(cfg) {
     <div class="hero-slide offers-slide">
       <div class="offers-slide-title">${cfg.title}</div>
       <div class="offers-slide-eyebrow">${cfg.eyebrow}</div>
+      ${cfg.scope ? `<div class="offers-slide-scope">${cfg.scope}</div>` : ''}
       <div class="offers-slide-art">
         ${cfg.image ? `<img src="images/nobg/${cfg.image}.png" alt="${cfg.eyebrow}"
              onerror="this.closest('.offers-slide-art').classList.add('photo-error');this.remove()">` : ''}

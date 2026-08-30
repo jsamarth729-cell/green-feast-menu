@@ -171,7 +171,20 @@
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #FFFFFF;
-  margin-bottom: 22px;
+  margin-bottom: 8px;   /* short gap into .offers-slide-scope below it */
+  flex-shrink: 0;
+}
+
+/* Scope note — which boards/items the add-ons apply to. Calmer than the
+   eyebrow on purpose: no tracking, no caps, muted colour, so it reads
+   as a clarifying aside rather than a second label competing with
+   "ADD-ONS". Optional — only rendered when config supplies it. */
+.offers-slide-scope {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.62);
+  margin-bottom: 22px;   /* takes over the gap .offers-slide-eyebrow used to carry into .offers-slide-art */
   flex-shrink: 0;
 }
 
