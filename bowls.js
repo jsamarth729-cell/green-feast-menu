@@ -49,7 +49,11 @@ function csvRowToBowl(row) {
 async function fetchBowlsData() {
   const [bowlsRes, configRes] = await Promise.all([
     fetch(cacheBust(BOWLS_SOURCE)),
-    fetch(CONFIG_URL)
+    /* Cache-bust the config too, not just the Sheet. The store TVs run
+       for weeks without a restart, and Chrome will happily serve this
+       JSON from its disk cache long after a deploy changed it — which
+       silently feeds render() a stale config. */
+    fetch(cacheBust(CONFIG_URL))
   ]);
   if (!bowlsRes.ok || !configRes.ok) throw new Error('fetch failed');
 

@@ -52,7 +52,14 @@ function csvRowToItem(row) {
 async function fetchBeveragesData() {
   const [itemsRes, configRes] = await Promise.all([
     fetch(cacheBust(BEVERAGES_SOURCE)),
-    fetch(CONFIG_URL)
+    /* Cache-bust the config too, not just the Sheet. The store TVs run
+       for weeks without a restart, and Chrome will happily serve this
+       JSON from its disk cache long after a deploy changed it — which
+       silently feeds render() a stale config. That is exactly how the
+       offers panel first shipped as an empty dark rectangle: the new
+       JS/CSS loaded, the old config.json did not, so offersPanel was
+       undefined and the panel rotated in with nothing inside it. */
+    fetch(cacheBust(CONFIG_URL))
   ]);
   if (!itemsRes.ok || !configRes.ok) throw new Error('fetch failed');
 
@@ -240,8 +247,18 @@ function render(data) {
 
   renderPipeUpsell(config.upsell, config.upsellHeading);
 
-  renderOffersPanel(config.offersPanel);
-  startOfferRotation();
+  /* Only rotate the panel in if there is actually content for it.
+     Without this guard a missing or stale config parks an empty dark
+     rectangle over the coffee menu for 15s of every 45s — strictly
+     worse than simply leaving the coffee grid up. Failing closed keeps
+     a bad config looking like "no panel" rather than "broken board". */
+  if (config.offersPanel) {
+    renderOffersPanel(config.offersPanel);
+    startOfferRotation();
+  } else {
+    if (offerTimer) clearTimeout(offerTimer);
+    setOfferPhase(false);
+  }
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */
