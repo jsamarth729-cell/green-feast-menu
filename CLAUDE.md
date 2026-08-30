@@ -209,6 +209,19 @@ without any error.
 - Live URLs: `.../bowls.html` (Screen 1), `.../wraps.html` (Screen 2), `.../beverages.html`
   (Screen 3)
 - Deploy = commit + push to `main`. Pages rebuilds automatically in ~1 min.
+- ⚠️ **Every deploy that touches `core.css`, `core.js`, or any `<screen>.css` /
+  `<screen>.js`: bump `?v=N` on all six references** (two `<link>` + two `<script>`
+  tags × three boards — `bowls.html`, `wraps.html`, `beverages.html`) to the same
+  new number. The kiosk TVs stay open for weeks and Chrome caches these files by
+  URL; without a version bump a deploy can land on GitHub Pages and the store
+  screens keep silently running the old code, sometimes for days, with no error
+  and no visible sign anything is wrong. `cacheBust()` (in `core.js`) already
+  covers the Sheet and `data/*.json` fetches — it does not touch the script and
+  stylesheet files themselves, which is what this covers.
+- After a version bump ships, the three physical TVs need **one manual hard
+  refresh** each (their currently-open tab predates the new `?v=`, so it can't
+  discover it on its own) — after that refresh, all future deploys pick up
+  automatically.
 
 **On the physical screens** (kiosk mode), point each TV at its own board:
 ```
