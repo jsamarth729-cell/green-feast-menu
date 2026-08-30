@@ -316,14 +316,16 @@
 /* Revision 2: no longer a top eyebrow — it now sits mid-panel, labelling
    the add-ons that follow it (R-J3). Text changed "Power up" ->
    "Smoothie add-ons" so it stops repeating the upsell rail's "POWER UP"
-   label, visible at the same time ~900px away. */
+   label, visible at the same time ~900px away.
+   Revision 3: sized up and set to white — at the old 21px sage it had
+   almost no presence on the dark ground from wall distance. */
 .offers-eyebrow {
   font-family: 'Inter', sans-serif;
-  font-size: 21px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--sage-light);
+  color: #FFFFFF;
   margin-bottom: 12px;
   flex-shrink: 0;
 }
@@ -337,11 +339,13 @@
   flex-shrink: 0;
 }
 
-/* Claim chip — the no-added-sugar promise. Sage and outlined, NEVER
-   gold: §7 reserves gold for "act on this" and the +12g/+10g numerals
-   are that use here. Deliberately a different treatment from the
-   smoothie header's yellow-highlight note (same fact, different
-   register), so the two don't read as the same thing said twice. */
+/* Revision 3: swapped order with .offers-sweetener below — the sentence
+   now sets the claim up and the chip lands it, instead of the chip
+   arriving cold. Sage and outlined, NEVER gold: §7 reserves gold for
+   "act on this" and the +12g/+10g numerals are that use here.
+   Deliberately a different treatment from the smoothie header's
+   yellow-highlight note (same fact, different register), so the two
+   don't read as the same thing said twice. */
 .offers-chip {
   align-self: flex-start;
   font-family: 'Inter', sans-serif;
@@ -353,16 +357,20 @@
   border: 2px solid rgba(200,216,200,0.45);
   border-radius: 8px;
   padding: 8px 16px;
-  margin-bottom: 14px;
+  margin-bottom: 30px;   /* Revision 3: was 14px — now the last element
+                            before the label, carries the larger gap
+                            .offers-sweetener used to carry */
   flex-shrink: 0;
 }
+/* Revision 3: now first, right under the title. */
 .offers-sweetener {
   font-family: 'Inter', sans-serif;
   font-size: 23px;
   font-weight: 400;
   color: rgba(255,255,255,0.74);
   line-height: 1.35;
-  margin-bottom: 30px;
+  margin-bottom: 12px;   /* Revision 3: was 30px — now leads into the
+                            chip, not into the label */
   flex-shrink: 0;
 }
 
@@ -393,13 +401,18 @@
 
 /* Supplier credit — scoped to protein on purpose (R-J5): it sits
    under the scoop, not floating over both price rows, so it can't
-   imply anything unverified about the collagen. */
+   imply anything unverified about the collagen.
+   Revision 3: underlined per the owner's request. No
+   text-underline-offset — that's Chrome 87, the store TVs are on
+   Chrome 69 (DESIGN-PRINCIPLES §9) — so this sits at the browser's
+   default underline offset, the only option available here. */
 .offers-credit {
   font-family: 'Inter', sans-serif;
   font-size: 20px;
   font-weight: 400;
   color: var(--sage-light);
   text-align: center;
+  text-decoration: underline;
   margin: 10px 0 22px;
   flex-shrink: 0;
 }

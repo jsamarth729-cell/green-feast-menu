@@ -3,15 +3,15 @@
     "smoothie": { "heading": "Functional Smoothies", "note": "(Sweetened with monk fruit and banana)" },
     "coffee": { "heading": "Coffee" }
   },
-  "upsellHeading": "Power up",
+  "upsellHeading": "Make it a meal",
   "upsell": [
-    "Add 12g protein to any smoothie | ₹120",
-    "Add 10g collagen to any smoothie | ₹120"
+    "Add coffee to your meal | +₹200",
+    "Add a functional smoothie to your meal | +₹250"
   ],
   "offersPanel": {
     "title": "Fuel your body",
     "chip": "No added sugar",
-    "sweetener": "Sweetened only with banana and monk fruit",
+    "sweetener": "Smoothies sweetened with banana and monk fruit",
     "eyebrow": "Smoothie add-ons",
     "image": "protein-scoop",
     "credit": "Protein by <b>The Whole Truth</b>",
