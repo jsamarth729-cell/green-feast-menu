@@ -1,20 +1,24 @@
 # Event Screens Plan — The Ritual × Green Feast
 
 **Branch:** `event/ritual-x-greenfeast`
-**Status:** planned, nothing built. No code files touched yet.
-**Written:** 2026-09-12
+**Status:** built and live on GitHub Pages. Store cutover still pending (§5).
+**Written:** 2026-09-12 — revised the same day (Screen 2 added, rmenu artwork replaced).
 
-A temporary takeover of **two** of the three live boards for a Ritual (Jaipur Run Club)
+A temporary takeover of **all three** live boards for a Ritual (Jaipur Run Club)
 collaboration event. The boards themselves are not modified — two new standalone pages are
-added, and the two TVs are pointed at them for the duration of the event.
+added, and each TV is pointed at its own one for the duration of the event.
 
 | New page | Replaces | Shows |
 |---|---|---|
 | `rmain.html` | Screen 1 — Bowls (`bowls.html`) | The Ritual × Green Feast logo lockup |
 | `rmenu.html` | Screen 3 — Beverages (`beverages.html`) | "Today's Selection" event menu |
+| `rwrap.html` | Screen 2 — Wraps/Paninis (`wraps.html`) | Post-run carbs video, looping |
 
-Screen 2 (Wraps, Paninis & Open Toasts) is **untouched** and keeps running the normal menu
-throughout. Screen 4 does not exist yet.
+Screen 4 does not exist yet.
+
+**Because Screen 2 is now taken over too, the price conflict recorded in §8 is gone.**
+Screen 2 was the only board showing Avo Feta Toast at ₹329; with all three TVs on event
+artwork, the ₹349 on `rmenu` is the only price on the wall. Owner's decision: ₹349 stands.
 
 ⚠️ The names are not self-evident and will not be in six months: **`rmain` is the bowls
 screen** (it carries the branding, so it's the "main" wall) and **`rmenu` is the beverages
@@ -51,13 +55,19 @@ routine.
 ## 2. Files to add
 
 ```
-rmain.html                    new — Screen 1 TV, event mode
-rmenu.html                    new — Screen 3 TV, event mode
-images/events/rmain.png       new — 1920×1080 logo lockup
-images/events/rmenu.png       new — 1920×1080 "Today's Selection"
-build-event-art.mjs           new — offline sharp script, source art → 1920×1080
-EVENT-SCREENS-PLAN.md         this file
+rmain.html                     Screen 1 TV, event mode
+rmenu.html                     Screen 3 TV, event mode
+rwrap.html                     Screen 2 TV, event mode (video)
+images/events/rmain.png        1920×1080 logo lockup, lossless PNG (280KB)
+images/events/rmenu.jpg        1920×1080 "Today's Selection", JPEG q95 (659KB)
+images/events/rwrap.mp4        1920×1080 H.264, 50.33s, silent, looping (6.9MB)
+images/events/rwrap-poster.jpg first video frame, shown while the mp4 buffers
+build-event-art.mjs            offline pipeline for all four assets above
+EVENT-SCREENS-PLAN.md          this file
 ```
+
+`ffmpeg-static` was added as a devDependency for the video work — offline tooling only,
+same standing as `sharp`. Nothing new reaches the live site.
 
 `.gitignore` already permits these: the PNG ignore rules are **root-anchored** (`/*.png`),
 so `images/events/*.png` commits normally. No `.gitignore` change needed.
@@ -176,7 +186,16 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/rmenu.htm
 chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/beverages.html
 ```
 
+**Screen 2 TV (wraps/paninis)**
+```
+chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/rwrap.html
+```
+```
+chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/wraps.html
+```
+
 Label them plainly — "EVENT screen" / "NORMAL menu" — and put both on each TV's desktop.
+Six shortcuts total, two per TV.
 
 Sequence on the day:
 1. **Pre-warm, the day before.** Open each event URL once on its TV, confirm it paints,
@@ -185,7 +204,9 @@ Sequence on the day:
 2. At cutover: `Alt+F4` to close the kiosk window, double-click **EVENT screen**.
 3. After the event: `Alt+F4`, double-click **NORMAL menu**.
 
-**Screen 2 is not touched at any point.** Do not close or refresh it.
+The `rwrap` video matters most for the pre-warm step: it is 6.9MB, so on cold store wifi
+the first load shows the poster frame while it buffers. Pre-warming means it plays
+instantly at cutover.
 
 ---
 
@@ -217,6 +238,29 @@ dropping in new artwork rather than rebuilding this.
 - **PNG over JPEG** — see §4; measured smaller *and* sharper for this kind of artwork.
 - **Pages named as the owner named them** (`rmain`/`rmenu`) rather than something
   self-describing like `event-bowls.html`. Mapping recorded at the top of this file.
+- **`muted` on the video is load-bearing, not cosmetic.** Chrome blocks
+  autoplay-with-sound (policy from Chrome 66; the TVs run 69), and a blocked video parks
+  on frame 1 with no error anyone can see. The source has no audio track at all, so
+  nothing is lost. Verified in-browser: autoplaying, looping, wrapping 49.8s → 0.21s.
+- **The video was re-encoded, not stream-copied, to cut the intro.** Its Canva export
+  opened with exactly 5.000s of blank white (measured frame-by-frame), which would have
+  flashed white on every loop. `-c copy` can only cut on a keyframe and would have left
+  some of it in. Re-encoding at CRF 20 cut exactly and came out *smaller* than the source
+  (11.9MB → 6.9MB).
+- **`rmenu` is JPEG while `rmain` is PNG**, decided per-asset rather than globally. The
+  replacement `rmenu` design embeds photographs; a 256-colour palette PNG banded them
+  (max channel error 79/255) and lossless PNG cost 2.9MB, so it ships as JPEG q95 4:4:4 at
+  659KB with max error 21 and no ringing on the text. `rmain` is flat brand art and stays
+  lossless for 280KB.
+- **`rmenu`'s replacement source is 1672×941 — below the 1920×1080 canvas** — so it is
+  upscaled ~1.15×. Accepted because measured text heights still beat the original artwork
+  at board scale (kcal parentheticals 19.5px cap vs 14.9px). A native 1920 or 2× Canva
+  re-export would be sharper and is worth doing if the design is ever revised.
+- **A Canva artifact in `rmenu`'s source is patched in the pipeline.** A pale desaturated
+  ~20×260px rectangle sat on the right edge of the top-right region (blue-minus-green −2.2
+  there against −14.6 for the cream around it). `patchRmenuEdge()` mirrors the clean ground
+  below it upward over the strip. The proper fix is a clean re-export; this keeps the board
+  correct meanwhile.
 
 ---
 
