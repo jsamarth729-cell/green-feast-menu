@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Green Feast × The Ritual — Post-Run</title>
+  <!--
+    Temporary event takeover for Screen 2's TV (Wraps, Paninis & Open
+    Toasts). See EVENT-SCREENS-PLAN.md. Same dependency-free approach as
+    rmenu.html / rmain.html — no core.css/core.js, no fonts, no JS — so
+    this page never needs a ?v=N bump when core.* changes for the real
+    boards.
+
+    `muted` is REQUIRED, not cosmetic: Chrome blocks autoplay-with-sound
+    (policy landed in Chrome 66; the store TVs run 69). Without it the
+    video parks on frame 1 forever and reports nothing. The source has no
+    audio track at all, so nothing is lost by it.
+
+    `poster` shows the first content frame while the 6.9MB file downloads
+    over store wifi, instead of a black rectangle.
+  -->
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #111111; /* dark, matching the video's own letterbox edges */
+      overflow: hidden;    /* display-only screen, no scrollbar */
+      cursor: none;        /* in case a mouse is ever plugged into the TV */
+    }
+    .event-art {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0; /* not `inset` — needs Chrome 87 */
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Chrome 31+ for video; letterboxes rather than crops */
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <video class="event-art"
+         src="images/events/rwrap.mp4"
+         poster="images/events/rwrap-poster.jpg"
+         autoplay muted loop playsinline preload="auto"></video>
+</body>
+</html>
