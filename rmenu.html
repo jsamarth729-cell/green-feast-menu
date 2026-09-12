@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Green Feast × The Ritual — Today's Selection</title>
+  <!--
+    Temporary event takeover for Screen 3's TV (Beverages). See
+    EVENT-SCREENS-PLAN.md for the full plan and why this page is
+    deliberately dependency-free: no core.css/core.js, no fonts, no JS.
+    A one-image page needs none of that, and it means this page never
+    needs a ?v=N bump when core.* changes for the real boards.
+  -->
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #FFF7CF; /* the artwork's own ground colour */
+      overflow: hidden;    /* display-only screen, no scrollbar */
+      cursor: none;        /* in case a mouse is ever plugged into the TV */
+    }
+    .event-art {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0; /* not `inset` — needs Chrome 87 */
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Chrome 32+; letterboxes rather than crops */
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <img class="event-art" src="images/events/rmenu.png" alt="Today's Selection — Green Feast × The Ritual">
+</body>
+</html>
