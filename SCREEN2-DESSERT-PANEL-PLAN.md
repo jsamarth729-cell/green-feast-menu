@@ -753,3 +753,340 @@ accepted; the 500px cut-out ships as-is.
 - **Hoisting the rotation into `core.js`.** Two boards now carry near-identical
   timer code (`beverages.js`, `wraps.js`). If Screen 4 adds a third, hoist it into
   one shared helper then, and re-verify Screen 3's rotation when it happens.
+
+---
+---
+
+# REVISION 2: Restyle as a board section, not a poster
+
+**Status:** plan only. No code changed yet. Revision 1 is built and committed on
+`screen2-dessert-panel` (`28cf337`, plus the 690px fix `7cca543`), **not merged, not
+pushed**. This revision edits that work on the same branch.
+
+## R2.1 Owner feedback (2026-09-30, on the Revision 1 build)
+
+1. **No sand/orange background, no heavy shadow.** The desserts should read as a
+   **section of the board**, in the same visual language as "Open Toasts", not as
+   a separate poster laid over it.
+2. **Fonts don't follow the board's hierarchy.** The spaced-caps eyebrow, the 56px
+   Playfair title, the Montserrat serving labels and the 22px description are type
+   styles that exist nowhere else on the board.
+3. **Prices are too big.** The large-price treatment belongs to "Make it a meal",
+   which has a different job (upsell). The dessert is a menu item; its prices
+   should look like every other item price.
+
+**Interpretation, to confirm on review:** the panel becomes "the next section in the
+column". When it fades in, the "Open Toasts" heading and cards are replaced *in
+place* by a "Healthier Indulgences" heading and one card, at the same positions,
+with the same heading style and the same card chrome. That makes it a separate
+section by name and content, and seamless in design.
+
+## R2.2 Decisions (replace D1, D6 and D8 of Revision 1)
+
+| # | Decision | Rationale |
+|---|---|---|
+| R2-J1 | **Panel ground is `var(--cream)`, the board's own background. No `box-shadow`.** | Feedback 1. The panel stops being an object and becomes a region of the board. It is still opaque, so it still hides the toasts. |
+| R2-J2 | **The heading reuses the board's own section header markup and classes:** `.section-header` + `.section-title` ("Healthier Indulgences": Playfair 38px, forest, 4px underline), the exact classes "Open Toasts" uses. | Feedback 2. With no new heading style, there's nothing to drift. `wraps.css`'s `.section-header { padding-top: 20px }` applies automatically, so the heading lands where "Open Toasts" sits. |
+| R2-J3 | **Open layout, no card (owner's choice, R2.11).** The plate sits straight on the cream, like the wrap photo in the middle column, with the text below it. The text uses the **wrap list's own classes**: `.wrap-name` for the name, `.wrap-desc` for the description and `.wrap-price` for prices, plus `.tile-rupee`. | Feedback 2 and 3. The wrap classes are the board's left-aligned, on-cream text styles, so the dessert reads like the Wraps column beside it. Their sizes come from the canonical tokens (`--fs-item-name`, `--fs-item-desc`, `--fs-item-price`), and `check-consistency.mjs` already covers those selectors, so nothing needs adding to it. |
+| R2-J4 | **Prices render like every item price:** `.wrap-price` (26px Inter 600, forest) with the small superscript `₹` (`.tile-rupee`). Config prices become numbers (`149`, `249`), not `"₹149"` strings. | Feedback 3. The big-numeral treatment stays unique to "Make it a meal" and the Screen 3 add-ons. |
+| R2-J5 | **The two serving lines are the only new text style**: `.dessert-serving`, `font-size: var(--fs-item-desc)` (a token, not a literal), weight 600, `var(--forest)`. One row per serving (label left, price right), divided by the same thin rule the wrap rows use. | The wraps have one price each; this item has two. That is the only real shape difference. |
+| R2-J6 | **Content aligns exactly with the toast column.** The panel box stays 1230–1920 × 0–974 (the 690px fix). Inner padding `0 44px 20px 4.5px` puts content at x 1234.5–1876, y 0–954: the toast column's exact box (§4). | So the heading and card land where "Open Toasts" and its cards were. The swap reads as the section changing, not as something sliding over it. |
+| R2-J7 | **The photo box absorbs the column height** (`.dessert-photo { flex: 1; min-height: 0 }`, like `.wrap-photo-wrap`). The text block below it is `flex-shrink: 0`, and the content ends at y 954, like the toast grid + combo block. | It fills the column the same way the Wraps column does (text fixed, photo takes the rest). |
+| R2-J8 | **The photo renders at natural size (500×396), no upscaling, with the wrap photo's drop-shadow** (`drop-shadow(0 14px 30px rgba(40,63,40,0.22))`). | `width/height: auto` with `max-*: 100%` never scales up, so it stays crisp from the 500px preview. The shadow is the **same** one the plated wrap photo already has on this cream: it grounds the cream plate, and it isn't a new style. An HD cut-out later (§15 item 1) could render larger, still with no code change. |
+| R2-J9 | **Timing and mechanics unchanged:** 30s/15s, same fade timings, same fail-closed guard, same timer code. | Only styling and markup change. |
+| R2-J10 | **The `--dessert-*` colours and the burnt-orange accent are deleted.** | Nothing uses them any more. DESIGN-PRINCIPLES §7 goes back to having no dessert-specific colour. |
+
+**What the fade now looks like:** the cream ground fades in over 450ms (the toasts
+fade out underneath it). Then, 380ms later, the heading and card fade in. On the
+wall that reads as "the section changed". There's no dark or sand "dip" any more,
+which is intended: the owner wants it seamless.
+
+> ⚠️ **R2.11 was answered (heading: yes; layout: open).** Steps R2.4–R2.6 and the
+> R2.9 checks below are written for the **open** layout. Anything in this revision
+> that mentions a card (`.dessert-card`, `.toast-card` or `.toast-*` classes) is
+> superseded.
+
+## R2.3 Step 1: `data/screen2-config.json`
+
+Replace the `dessertPanel` block with:
+
+```json
+  "dessertPanel": {
+    "heading": "Healthier Indulgences",
+    "name": "Quinoa Orange Cake",
+    "desc": "A tender quinoa sponge, crowned with fresh mandarin and a glossy dark chocolate drizzle.",
+    "image": "quinoa-orange-cake",
+    "items": [
+      { "label": "1 serving",  "price": 149 },
+      { "label": "2 servings", "price": 249 }
+    ]
+  }
+```
+
+- `eyebrow` becomes `heading`, and is title case now: it's a Section Title, and
+  every Section Title on the board is title case ("Open Toasts").
+- `title` becomes `name`, because it's an Item Name now (§12 vocabulary).
+- Prices become numbers, rendered as `<span class="tile-rupee">₹</span>149` like
+  every other price on the board.
+
+## R2.4 Step 2: `wraps.html`
+
+Replace the whole `<div class="dessert-panel" id="dessertPanel">…</div>` block (the
+comment above it stays; update its first line to say "a second section" instead of
+"fades in over"):
+
+```html
+    <div class="dessert-panel" id="dessertPanel">
+      <div class="section-header">
+        <h1 class="section-title" id="dessertHeading"><!-- injected by JS --></h1>
+      </div>
+      <div class="dessert-body" id="dessertBody"><!-- injected by JS --></div>
+    </div>
+```
+
+The panel now has exactly two direct children (the header and the body), which are
+what the `> *` fade rule staggers in.
+
+## R2.5 Step 3: `wraps.css`
+
+**3a.** Replace the file's whole `DESSERT PANEL` block (from its header comment down
+to the end of the file) with:
+
+```css
+/* ═══════════════════════════════════════════════════════════════
+   DESSERT PANEL: the right column's second mode, "Healthier
+   Indulgences". Fades in over the toast column (toast cards + combo
+   block) on a 30s/15s cycle. Mechanics copied from Screen 3's offers
+   panel; see SCREEN2-DESSERT-PANEL-PLAN.md.
+
+   Revision 2: styled as a SECTION of this board, not a poster. The
+   ground is the board's own cream, with no panel shadow; the heading
+   is the shared .section-header/.section-title; the plate sits
+   straight on the cream like the wrap photo, and the text uses the
+   wrap list's own name/desc/price classes, so every size comes from
+   the canonical tokens (§12). The owner asked for it to read as the
+   next section in the column, not a panel laid over it.
+
+   Geometry:
+     box    1230–1920 × 0–974. The width is 690, not the column's
+            685.5: its left edge sits in the column gutter so the
+            toast column's half-pixel start (1234.5) can't show
+            through (the Revision 1 sliver).
+     padding 0 44px 20px 4.5px puts the content at 1234.5–1876 ×
+            0–954, the toast column's exact box, so the heading lands
+            exactly where "Open Toasts" was.
+══════════════════════════════════════════════════════════════════ */
+.dessert-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: calc(var(--h-upsell-rail) + var(--h-footer-strip));
+  width: 690px;
+  background: var(--cream);
+  padding: 0 44px 20px 4.5px;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.dessert-panel.is-showing {
+  opacity: 1;
+}
+
+/* Ground first, contents 380ms later: the toasts fade out under
+   the cream, then the heading and body fade in. It reads as the
+   section changing rather than a cross-fade glitch. */
+.dessert-panel > * {
+  opacity: 0;
+  transition: opacity 0.30s ease;
+}
+.dessert-panel.is-showing > * {
+  opacity: 1;
+  transition-delay: 0.38s;
+}
+
+/* Open layout (owner's choice): photo straight on the cream, text
+   below. Same structure as the Wraps column beside it: the photo box
+   absorbs the spare height, the text block stays its natural size. */
+.dessert-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dessert-photo {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Natural size, never upscaled (500px remove.bg preview). The shadow
+   is .wrap-photo-wrap img's own, so the two plated photos on this
+   board are grounded the same way. */
+.dessert-photo img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 14px 30px rgba(40,63,40,0.22));
+}
+.dessert-photo.photo-error {
+  display: flex;
+}
+
+/* Name/desc/price come from .wrap-name / .wrap-desc / .wrap-price
+   above (canonical tokens). This block just stops the text being
+   squeezed by the photo box. */
+.dessert-info {
+  flex-shrink: 0;
+  margin-top: 16px;
+}
+.dessert-info .wrap-desc {
+  margin-bottom: 10px;
+}
+
+/* Two serving sizes instead of one price: the only shape difference
+   from a wrap row. The same thin divider the wrap rows use. */
+.dessert-serving-row {
+  display: flex;
+  align-items: baseline;
+  padding: 10px 0;
+  border-top: 1px solid rgba(88,120,88,0.12);
+}
+.dessert-serving {
+  font-size: var(--fs-item-desc);
+  font-weight: 600;
+  color: var(--forest);
+}
+```
+
+Chrome 69: no flex `gap` (none needed: `.wrap-price` has `margin-left: auto`), no
+`inset`.
+
+**3b.** Nothing else in `wraps.css` changes. In particular, **don't edit
+`.wrap-name`, `.wrap-desc` or `.wrap-price`.** The dessert reuses them as they are,
+so the real wrap rows can't be affected.
+
+## R2.6 Step 4: `wraps.js`
+
+Only `renderDessertPanel()` changes. It now builds the body with a template, the
+same way `wrapRowHTML()` builds a wrap row. `setDessertPhase`, `queueDessertFlip`,
+`startDessertRotation`, the constants and the fail-closed guard in `render()` stay
+**untouched**.
+
+```js
+function dessertBodyHTML(cfg) {
+  const rows = cfg.items.map(function (it) {
+    return `
+      <div class="dessert-serving-row">
+        <span class="dessert-serving">${it.label}</span>
+        <span class="wrap-price"><span class="tile-rupee">₹</span>${it.price}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="dessert-photo">
+      <img src="${screen2ImageSrc(cfg.image)}" alt="${cfg.name}"
+           onerror="this.closest('.dessert-photo').classList.add('photo-error');this.remove()">
+    </div>
+    <div class="dessert-info">
+      <div class="wrap-name">${cfg.name}</div>
+      ${cfg.desc ? `<div class="wrap-desc">${cfg.desc}</div>` : ''}
+      ${rows}
+    </div>`;
+}
+
+function renderDessertPanel(cfg) {
+  document.getElementById('dessertHeading').textContent = cfg.heading;
+  document.getElementById('dessertBody').innerHTML      = dessertBodyHTML(cfg);
+}
+```
+
+- Rebuilding the body with `innerHTML` on every render also removes Revision 1's
+  "the `<img>` may already have been removed by onerror" problem, since a fresh
+  `<img>` is created each time. The guard that handled it goes away with it.
+- Keep the block comment above `renderDessertPanel`, updated to say the body
+  mirrors the Wraps column's text styles.
+
+## R2.7 Step 5: no version bump beyond `?v=5`
+
+`?v=5` has never been deployed, so it already covers this revision. Don't bump to 6.
+
+## R2.8 Documentation (same commit)
+
+- **`CLAUDE.md`**
+  - Line 72 (`wraps.*` row): "a 690px sand `.dessert-panel` … showing the Quinoa
+    Orange Cake at poster size" becomes "a `.dessert-panel` (cream, board-section
+    styling: a 'Healthier Indulgences' section header, the plate on cream, and text
+    in the wrap list's styles)".
+    Keep the rest.
+  - `data/screen2-config.json` row: the `dessertPanel` shape becomes
+    `{heading, name, desc, image, items:[{label, price}]}`, with `price` a number.
+- **`DESIGN-PRINCIPLES.md`**
+  - **§2, lines ~158–164:** rewrite the Screen 2 update paragraph. It is now cream
+    and deliberately **seamless**: a second section that swaps in place of Open
+    Toasts, reusing the section header and the wrap list's text styles. It is **not** a dark
+    anchor, and doesn't try to be one; the panini panel remains the board's dark
+    anchor. Drop the "sand" and "matching bookends" wording, but keep the owner's
+    reason (no second green mass).
+  - **§3, line ~197:** keep it (the panini-panel point still holds).
+  - **§6, lines ~348–349:** keep the solo-feature-art note. Add that it renders at
+    natural size, straight on the cream, with the same drop-shadow as the wrap
+    photo.
+  - **§7, lines ~414–421:** **delete** the whole `.dessert-price` / burnt-orange /
+    `--dessert-*` bullet. Replace it with one line: the dessert panel adds no
+    colour, and its prices are ordinary forest Item Prices.
+  - **§12, lines ~583–585:** **delete** the "dessert panel's typography is
+    deliberately not canonical" note. Replace it with: the dessert text uses the
+    wrap list's canonical classes (`.wrap-name` / `.wrap-desc` / `.wrap-price`), so
+    it is covered by `check-consistency.mjs`; the only new text selector is
+    `.dessert-serving` (token-sized).
+- **`SCREEN2-DESSERT-PANEL-PLAN.md`:** this section is the record. Earlier sections
+  stay as history.
+- **`build-screen2-cutouts.mjs`:** no change. It's still `feature` mode.
+
+## R2.9 Verification
+
+Serve on 3100 and use Playwright at 1920×1080. Force the phase with
+`setDessertPhase(true)` **after** the first `render()` has finished (calling it
+earlier gets reset by `startDessertRotation`), then wait 1.5s.
+
+| Check | Expected |
+|---|---|
+| `node check-consistency.mjs` | clean, unchanged output |
+| Menu phase vs `.playwright-mcp/baseline-wraps.png` | 0 differing bytes |
+| `#dessertPanel` box | 1230, 0, 1920, 974 |
+| Panel background | `rgb(245, 240, 232)` (cream); `box-shadow` is `none` |
+| Dessert `.section-header` box vs Open Toasts' header | same left (1234.5), top, width and height |
+| Dessert `.section-title` computed style | same font-family, size, weight, colour and border as "Open Toasts" |
+| `.dessert-body` box | left 1234.5, right 1876, top ≈ 92.8 (= `.toast-grid` top), bottom 954 |
+| `.wrap-name` / `.wrap-desc` / `.wrap-price` in the dessert | computed font family, size, weight and colour identical to a real wrap row's (24px Montserrat / 18px / 26px) |
+| Desc | fully visible, no ellipsis (clamped at 2 lines; must fit) |
+| Image | loads, rendered 500×396 (natural size), no `.photo-error`, filter identical to `.wrap-photo-wrap img` |
+| Serving rows | 2 rows; prices show a superscript ₹ + 149 / 249, right-aligned at x 1876 |
+| Colour audit | nothing in the panel computes to `rgb(180, 84, 15)` or `rgb(241, 223, 198)` |
+| Overflow | `scrollHeight <= clientHeight` on the panel and on `.dessert-body` |
+| Real wrap rows | the menu-phase 0-byte diff above proves they're untouched |
+| Edge check | zoom the panel's left edge at the header's height: no sliver |
+| Rotation / fail-closed | re-run the Revision 1 checks 12g and 12h (timer code is unchanged, so this is a quick confirmation) |
+| Screens 1 and 3 | still render normally |
+| Chrome 69 audit | no `?.`, `??`, `inset`, flex `gap` in the diff |
+
+Take a panel-phase screenshot, `.playwright-mcp/dessert-panel-r2.png`, for the
+owner.
+
+## R2.10 Commit
+
+One commit on `screen2-dessert-panel`:
+`Screen 2: restyle dessert panel as a board section`
+Files: `wraps.html`, `wraps.css`, `wraps.js`, `data/screen2-config.json`,
+`CLAUDE.md`, `DESIGN-PRINCIPLES.md`, `SCREEN2-DESSERT-PANEL-PLAN.md`.
+**Don't merge or push.** The owner reviews at http://localhost:3100/wraps.html first.
+
+## R2.11 Owner answers (2026-09-30)
+
+1. **Heading:** "Healthier Indulgences", title case. **Confirmed.**
+2. **Layout:** **open**, not a card. The plate sits straight on the cream, with the
+   text below it. R2.4–R2.6 and R2.9 are written for this.

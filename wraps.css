@@ -480,54 +480,38 @@
 
 
 /* ═══════════════════════════════════════════════════════════════
-   DESSERT PANEL: the right column's second mode ("Healthier
-   indulgences"). Screen 2's version of Screen 3's offers panel;
-   same mechanics, own selectors (DESIGN-PRINCIPLES §12).
+   DESSERT PANEL: the right column's second mode, "Healthier
+   Indulgences". Fades in over the toast column (toast cards + combo
+   block) on a 30s/15s cycle. Mechanics copied from Screen 3's offers
+   panel; see SCREEN2-DESSERT-PANEL-PLAN.md.
 
-   Geometry (measured, see SCREEN2-DESSERT-PANEL-PLAN.md §4):
-     width  690px = toast column 641.5 + .content-panel's 44px right
-                    padding (685.5), plus 4.5px reaching back into the
-                    24px column gutter. Was 686 (left edge 1234), which
-                    left the toast column's half-pixel start (1234.5)
-                    exposed: the Open Toasts underline showed through
-                    as a 1px grey sliver. Left edge now 1230, safely
-                    inside the gutter (1210.5–1234.5).
-     height 974px = 1080 − rail − footer, derived from the tokens
-     top    0, bleeding to the screen's top and right edges
-   Height and top edge match the panini panel exactly; only width
-   differs, as on Screen 3.
+   Revision 2: styled as a SECTION of this board, not a poster. The
+   ground is the board's own cream, with no panel shadow; the heading
+   is the shared .section-header/.section-title; the plate sits
+   straight on the cream like the wrap photo, and the text uses the
+   wrap list's own name/desc/price classes, so every size comes from
+   the canonical tokens (§12). The owner asked for it to read as the
+   next section in the column, not a panel laid over it.
 
-   Sand, not green or dark: the panini panel on this same board is
-   already the dark-green mass, and a second one would make the
-   board read as two matching bookends (owner's call). Gold is not
-   used here; it is invisible on a light ground. Prices take
-   --dessert-accent instead (DESIGN-PRINCIPLES §7).
-
-   Covers both the toast cards and the combo block for 15s of every
-   45s. Accepted tradeoff, same as Screen 3's coffee column.
+   Geometry:
+     box    1230–1920 × 0–974. The width is 690, not the column's
+            685.5: its left edge sits in the column gutter so the
+            toast column's half-pixel start (1234.5) can't show
+            through (the Revision 1 sliver).
+     padding 0 44px 20px 4.5px puts the content at 1234.5–1876 ×
+            0–954, the toast column's exact box, so the heading lands
+            exactly where "Open Toasts" was.
 ══════════════════════════════════════════════════════════════════ */
 .dessert-panel {
-  /* Scoped to this surface only. Not core.css tokens: nothing else
-     on any board uses them. --dessert-ink is the same dark chocolate
-     as Screen 3's .acc-cocoa-core, not a new colour. */
-  --dessert-bg:     #F1DFC6;
-  --dessert-ink:    #3D2418;
-  --dessert-accent: #B4540F;
-
   position: absolute;
   top: 0;
   right: 0;
   bottom: calc(var(--h-upsell-rail) + var(--h-footer-strip));
   width: 690px;
-  background: var(--dessert-bg);
-  /* Sand against cream is a gentle step; the shadow gives the one
-     edge that meets the board (left) a clear line. */
-  box-shadow: -10px 0 28px rgba(61,36,24,0.14);
-  padding: 44px 44px 36px;
+  background: var(--cream);
+  padding: 0 44px 20px 4.5px;
   display: flex;
   flex-direction: column;
-  justify-content: center;   /* fixed-height art + centred stack: even
-                                breathing room, not one void (Screen 3 R1) */
   opacity: 0;
   transition: opacity 0.45s ease;
 }
@@ -535,9 +519,9 @@
   opacity: 1;
 }
 
-/* Ground first, contents 380ms later. Same timing as Screen 3's
-   "dip to dark". The delay matters more here, since sand-on-cream
-   is a softer step than dark-on-cream. */
+/* Ground first, contents 380ms later: the toasts fade out under
+   the cream, then the heading and body fade in. It reads as the
+   section changing rather than a cross-fade glitch. */
 .dessert-panel > * {
   opacity: 0;
   transition: opacity 0.30s ease;
@@ -547,97 +531,58 @@
   transition-delay: 0.38s;
 }
 
-.dessert-eyebrow {
-  font-family: 'Inter', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  /* --dessert-ink at 78%. Alpha lives in the colour, NOT in opacity:
-     .dessert-panel.is-showing > * sets opacity:1 on every direct
-     child and would silently override it. */
-  color: rgba(61,36,24,0.78);
-  margin-bottom: 12px;
-  flex-shrink: 0;
+/* Open layout (owner's choice): photo straight on the cream, text
+   below. Same structure as the Wraps column beside it: the photo box
+   absorbs the spare height, the text block stays its natural size. */
+.dessert-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
-.dessert-title {
-  font-family: 'Playfair Display', serif;   /* a heading, like .panini-title,
-                                               not an Item Name (§12) */
-  font-size: 56px;
-  font-weight: 600;
-  color: var(--dessert-ink);
-  line-height: 1.1;
-  margin-bottom: 10px;
-  flex-shrink: 0;
-}
-/* Ingredient line. Same job as an Item Desc but on the panel's own
-   ground and scale, so non-canonical (§12) with a literal size. */
-.dessert-desc {
-  font-family: 'Inter', sans-serif;
-  font-size: 22px;
-  font-weight: 400;
-  color: rgba(61,36,24,0.85);
-  line-height: 1.35;
-  margin-bottom: 24px;
-  flex-shrink: 0;
-  /* The approved copy is two lines. Clamp at two so a longer edit in
-     config can't push the price rows off the panel. Ship all three
-     -webkit- companions (§9). */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-
-.dessert-art {
-  flex-shrink: 0;
-  height: 410px;   /* bounded on purpose, NOT flex:1 (Screen 3 R1/R-J7).
-                      410 not 440: pays for the two-line desc. */
+.dessert-photo {
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 28px;
 }
-.dessert-art img {
-  height: 100%;
-  width: auto;
+/* Natural size, never upscaled (500px remove.bg preview). The shadow
+   is .wrap-photo-wrap img's own, so the two plated photos on this
+   board are grounded the same way. */
+.dessert-photo img {
   max-width: 100%;
-  object-fit: contain;
+  max-height: 100%;
+  width: auto;
+  height: auto;
   display: block;
-  /* Carries the cream plate's edge against the sand ground. Same
-     role as .wrap-photo-wrap's drop-shadow on the cream board. */
-  filter: drop-shadow(0 18px 32px rgba(61,36,24,0.28));
+  filter: drop-shadow(0 14px 30px rgba(40,63,40,0.22));
 }
-.dessert-art.photo-error {
+.dessert-photo.photo-error {
   display: flex;
 }
 
-.dessert-items { flex-shrink: 0; }
+/* Name/desc/price come from .wrap-name / .wrap-desc / .wrap-price
+   above (canonical tokens). This block just stops the text being
+   squeezed by the photo box. */
+.dessert-info {
+  flex-shrink: 0;
+  margin-top: 16px;
+}
+.dessert-info .wrap-desc {
+  margin-bottom: 10px;
+}
 
-.dessert-row {
+/* Two serving sizes instead of one price: the only shape difference
+   from a wrap row. The same thin divider the wrap rows use. */
+.dessert-serving-row {
   display: flex;
   align-items: baseline;
-  padding: 16px 0;
-  border-top: 1px solid rgba(61,36,24,0.18);
+  padding: 10px 0;
+  border-top: 1px solid rgba(88,120,88,0.12);
 }
-.dessert-row > * + * {
-  margin-left: 16px;   /* flex gap banned on Chrome 69 (§9) */
-}
-.dessert-label {
-  font-family: var(--font-item-name);
-  font-size: 30px;
+.dessert-serving {
+  font-size: var(--fs-item-desc);
   font-weight: 600;
-  color: var(--dessert-ink);
-}
-/* The price is this panel's "act on this" element: the job gold does
-   everywhere else, in a hue that survives a light ground (§7). */
-.dessert-price {
-  margin-left: auto;
-  font-family: var(--font-item-name);
-  font-size: 64px;
-  font-weight: 700;
-  color: var(--dessert-accent);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  flex-shrink: 0;
+  color: var(--forest);
 }
