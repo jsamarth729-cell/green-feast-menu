@@ -89,6 +89,12 @@ Measured with Playwright at 1920×1080 on `main` (`cbee086`), `transform: none`:
 | `.combo-block` | 1234.5 | 742.4 | 1876 | 954 | 641.5 × 211.6 |
 | `.upsell-rail` | 0 | 974 | 1920 | 1038 | 1920 × 64 |
 
+> **Post-build fix (2026-09-30):** shipped at **690px** (left 1230), not 686. At 686
+> the toast column's half-pixel start (x=1234.5) let the Open Toasts underline show
+> through as a 1px grey sliver on the panel's left edge. 690 puts the edge inside
+> the column gutter. The 686 reasoning below is kept as written; inner content
+> width becomes 602px.
+
 **Panel box: `width: 686px`**, giving left 1234, top 0, right 1920, bottom 974.
 - 686 = the toast column's 641.5 + `.content-panel`'s 44px right padding, rounded up
   half a pixel so the panel edge lands on a whole pixel. It overlaps the 24px gutter

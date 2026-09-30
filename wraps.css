@@ -485,8 +485,13 @@
    same mechanics, own selectors (DESIGN-PRINCIPLES §12).
 
    Geometry (measured, see SCREEN2-DESSERT-PANEL-PLAN.md §4):
-     width  686px = toast column 641.5 + .content-panel's 44px right
-                    padding, rounded to a whole pixel
+     width  690px = toast column 641.5 + .content-panel's 44px right
+                    padding (685.5), plus 4.5px reaching back into the
+                    24px column gutter. Was 686 (left edge 1234), which
+                    left the toast column's half-pixel start (1234.5)
+                    exposed: the Open Toasts underline showed through
+                    as a 1px grey sliver. Left edge now 1230, safely
+                    inside the gutter (1210.5–1234.5).
      height 974px = 1080 − rail − footer, derived from the tokens
      top    0, bleeding to the screen's top and right edges
    Height and top edge match the panini panel exactly; only width
@@ -513,7 +518,7 @@
   top: 0;
   right: 0;
   bottom: calc(var(--h-upsell-rail) + var(--h-footer-strip));
-  width: 686px;
+  width: 690px;
   background: var(--dessert-bg);
   /* Sand against cream is a gentle step; the shadow gives the one
      edge that meets the board (left) a clear line. */

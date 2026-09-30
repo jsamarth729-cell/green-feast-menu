@@ -156,7 +156,7 @@ promotion), not a return of `.board-header`. See
 `SCREEN3-OFFERS-PANEL-PLAN.md` for the full reasoning and geometry.
 
 **Update — Screen 2 now has a right-side second mode too, and it is sand, not
-dark.** A 686px `.dessert-panel` fades in over the toast column (toast cards
+dark.** A 690px `.dessert-panel` fades in over the toast column (toast cards
 and the combo block) on the same 30s/15s cycle. It is warm sand rather than
 dark on purpose: the board's dark anchor is already the panini panel, and a
 second dark-green mass would make the board read as two matching bookends. Its
