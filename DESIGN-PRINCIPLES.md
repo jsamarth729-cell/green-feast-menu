@@ -155,6 +155,14 @@ top-of-screen dark mass, and the panel is additive content (add-on
 promotion), not a return of `.board-header`. See
 `SCREEN3-OFFERS-PANEL-PLAN.md` for the full reasoning and geometry.
 
+**Update — Screen 2 now has a right-side second mode too, and it is sand, not
+dark.** A 686px `.dessert-panel` fades in over the toast column (toast cards
+and the combo block) on the same 30s/15s cycle. It is warm sand rather than
+dark on purpose: the board's dark anchor is already the panini panel, and a
+second dark-green mass would make the board read as two matching bookends. Its
+height and top edge (974px, top at y=0) match the panini panel exactly; only
+width differs, as on Screen 3. See `SCREEN2-DESSERT-PANEL-PLAN.md`.
+
 ---
 
 ## 3. Hero panel
@@ -185,6 +193,11 @@ which is why this pattern was built for Screen 1 and not Screen 2. It reuses
 the hero's own slide mechanics (absolute positioning, the 0.9s cross-fade) at a
 longer 15s dwell against the bowls' 10s, inserted after the midpoint bowl and
 after the last one.
+
+Screen 2's dessert panel does not change the point above about the panini
+panel: it covers the **toast column**, not the panini panel, so the paninis stay
+visible throughout. Toasts and the meal combos accept the same 1-in-3 hidden
+time as Screen 3's coffee (15s of every 45s).
 
 ---
 
@@ -332,6 +345,13 @@ exemption as `protein-scoop` and `panini-hero` — one image, its own layout
 slot, nothing to normalize against. Trimmed to its alpha bounding box only,
 same as the others; no dedicated pipeline script, since it's a single file.
 
+**A fourth instance: `images/screen2/quinoa-orange-cake.png`**, Screen 2's
+dessert-panel feature art (see `SCREEN2-DESSERT-PANEL-PLAN.md`). Same solo-feature-art
+exemption, trimmed only, via `build-screen2-cutouts.mjs`'s `feature` mode. It is
+also a second rule 5 casualty: the built-in background remover deleted the cream
+plate entirely (cream on a cream backdrop) and left the sponge semi-transparent, so
+the cut-out was made externally (remove.bg) with the plate kept.
+
 ---
 
 ## 7. Colour
@@ -391,6 +411,15 @@ final colour.
 - **Screen 1's offers slide (`.offers-slide-amount`, `+₹50`) also uses gold.**
   Same established "act on this" use as Screen 3's panel and the upsell rail's
   price — not a new context, and not a fourth use.
+- **Screen 2's dessert panel price (`.dessert-price`) is the "act on this" use, but
+  in `--dessert-accent` burnt orange (`#B4540F`), not gold**, because gold
+  (`#FEFA67`) is near-invisible on the panel's light sand ground. The job is the
+  same as gold's elsewhere; only the hue changes. The three colours
+  (`--dessert-bg #F1DFC6`, `--dessert-ink #3D2418`, `--dessert-accent`) are
+  scoped custom properties on `.dessert-panel` in `wraps.css`, not `core.css`
+  tokens. The accent is not a general-purpose colour and not a new gold use: do
+  not use it anywhere else on the board. `--dessert-ink` reuses Cocoa Core's
+  chocolate (`.acc-cocoa-core`), not a new colour.
 - Keep the dark-hero / cream-grid split. The contrast between the two halves is
   doing real legibility work, not just looking nice.
 
@@ -550,6 +579,13 @@ the two-word form ("diet tag", "item badge"); never the bare word "badge".
 
 Likewise, the kcal/protein readouts are **chips**, not badges — the code has
 said `chip` since Screen 1.
+
+⚠️ **The dessert panel's typography is deliberately not canonical either.**
+`.dessert-eyebrow` / `.dessert-title` / `.dessert-desc` / `.dessert-label` /
+`.dessert-price` (Screen 2's `.dessert-panel`) sit outside Item Name/Desc/Price
+for the same reason as the offers surfaces below: they belong to a poster-scale
+panel, use literal sizes scoped to `wraps.css`, and should not be folded into the
+canonical group or into `check-consistency.mjs`.
 
 ⚠️ **The offers panel's typography is deliberately not canonical.**
 `.offers-amount` / `.offers-what` / `.offers-price` / `.offers-chip` /

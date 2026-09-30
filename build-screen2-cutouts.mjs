@@ -5,7 +5,7 @@
    three Open Toasts cards to a common width and vertical centre, so they
    read as a matched set side by side (DESIGN-PRINCIPLES §6 rule 2).
 
-   "feature" mode (panini hero, wrap hero) only trims to the alpha bounding
+   "feature" mode (panini hero, wrap hero, dessert panel) only trims to the alpha bounding
    box — each stands alone in its own layout slot, nothing to match it to.
 
    Usage: node build-screen2-cutouts.mjs
@@ -40,6 +40,7 @@ const MAP = {
   'panini-hero':        { file: 'Panini no bg.png',                              mode: 'feature' },
   'mex-chipotle':        { file: 'mex_chipotle_no_bg-removebg-preview.png',       mode: 'feature' },
   'bbq-plate':           { file: 'BBQ_Protien_with plate.png',                    mode: 'feature' },
+  'quinoa-orange-cake':  { file: 'Orange_Quinoa_Cake-removebg-preview.png',      mode: 'feature' },
   'avo-feta-toast':      { file: 'avo_feta_no_nbg-removebg-preview.png',          mode: 'toast' },
   'earthy-hummus-toast': { file: 'earthy_hummus_no_bg-removebg-preview.png',      mode: 'toast' },
   'mango-salsa-toast':   { file: 'mango_salsa_no_bg-removebg-preview.png',        mode: 'toast' },

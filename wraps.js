@@ -2,6 +2,11 @@
    SCREEN 2 — Wraps, Paninis & Open Toasts.
    Loads after core.js (scaling, CSV parsing, fetch+cache, fullscreen,
    tag abbreviations all live there).
+
+   The right column also carries a second mode: a dessert panel that
+   fades in over the toasts + combo block on a timer. See
+   renderDessertPanel/startDessertRotation below and
+   SCREEN2-DESSERT-PANEL-PLAN.md for why.
 ══════════════════════════════════════════════════════════════════ */
 
 // ═══════════════════════════════════════════════════════════════
@@ -15,6 +20,15 @@ const CONFIG_URL   = 'data/screen2-config.json';
 
 const CACHE_KEY  = 'gf_wraps_v1';
 const REFRESH_MS = 5 * 60 * 1000;
+
+/* Dessert panel dwell. Asymmetric on purpose, same as Screen 3's
+   offers panel, which is why the rotation is a recursive setTimeout
+   and not a setInterval. */
+const DESSERT_MENU_MS  = 30000;
+const DESSERT_PANEL_MS = 15000;
+
+let dessertTimer   = null;
+let dessertShowing = false;
 
 function csvRowToItem(row) {
   return {
@@ -151,6 +165,70 @@ function comboBlockHTML(cfg) {
   return `<div class="combo-heading"><span class="combo-star">★</span>${cfg.heading}</div>${rows}`;
 }
 
+/* ── Dessert panel ───────────────────────────────────────────────
+   The right column's second mode. Content comes from
+   config.dessertPanel (data/screen2-config.json), not the Sheet.
+   Same split as the panini panel. Mechanics are a copy of
+   beverages.js's offers panel; see SCREEN2-DESSERT-PANEL-PLAN.md D9
+   for why this isn't hoisted into core.js yet. */
+function renderDessertPanel(cfg) {
+  document.getElementById('dessertEyebrow').textContent = cfg.eyebrow;
+  document.getElementById('dessertTitle').textContent   = cfg.title;
+
+  /* Optional line: hide it when blank so it doesn't leave an empty
+     24px gap (same pattern as smoothieNote in beverages.js). */
+  const descEl = document.getElementById('dessertDesc');
+  if (cfg.desc) {
+    descEl.textContent = cfg.desc;
+    descEl.style.display = '';
+  } else {
+    descEl.style.display = 'none';
+  }
+
+  /* onerror removes the <img> outright, so on a later re-render it
+     may be gone. Guard rather than throw: a missing photo must not
+     take the whole board down. */
+  const img = document.getElementById('dessertImage');
+  if (img && cfg.image) {
+    img.src = screen2ImageSrc(cfg.image);
+    img.alt = cfg.title;
+  }
+
+  document.getElementById('dessertItems').innerHTML = cfg.items.map(function (it) {
+    return `
+      <div class="dessert-row">
+        <span class="dessert-label">${it.label}</span>
+        <span class="dessert-price">${it.price}</span>
+      </div>`;
+  }).join('');
+}
+
+function setDessertPhase(showing) {
+  dessertShowing = showing;
+  const panel = document.getElementById('dessertPanel');
+  if (showing) panel.classList.add('is-showing');
+  else         panel.classList.remove('is-showing');
+}
+
+function queueDessertFlip() {
+  dessertTimer = setTimeout(function () {
+    setDessertPhase(!dessertShowing);
+    queueDessertFlip();
+  }, dessertShowing ? DESSERT_PANEL_MS : DESSERT_MENU_MS);
+}
+
+/* Runs at the end of every render(), i.e. every REFRESH_MS. Clearing
+   the pending timer FIRST stops a second rotation stacking on the
+   first (otherwise the panel flips twice as often after ten minutes,
+   four times after fifteen...). Resetting to the menu phase restarts
+   the cycle from a known state; the CSS transition makes it a fade,
+   not a cut. */
+function startDessertRotation() {
+  if (dessertTimer) clearTimeout(dessertTimer);
+  setDessertPhase(false);
+  queueDessertFlip();
+}
+
 /* ── Full render ─────────────────────────────────────────────── */
 function render(data) {
   const items  = data.items;
@@ -178,6 +256,19 @@ function render(data) {
          onerror="this.closest('.wrap-photo-wrap').classList.add('photo-error');this.remove()">`;
 
   renderPipeUpsell(config.upsell, 'Extras');
+
+  /* Only rotate the panel in if there's content for it. Without this
+     guard a missing or stale config parks an empty sand rectangle
+     over the toasts for 15s of every 45s, strictly worse than just
+     leaving the toasts up. Fail closed. (Screen 3 shipped exactly
+     this bug once; see the comment in fetchWrapsData on stale config.) */
+  if (config.dessertPanel) {
+    renderDessertPanel(config.dessertPanel);
+    startDessertRotation();
+  } else {
+    if (dessertTimer) clearTimeout(dessertTimer);
+    setDessertPhase(false);
+  }
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

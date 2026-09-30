@@ -31,5 +31,15 @@
   "upsell": [
     "Extra protein (8–10g) | +₹50",
     "Extra premiums — feta / guacamole / beetroot hummus | +₹50"
-  ]
+  ],
+  "dessertPanel": {
+    "eyebrow": "Healthier indulgences",
+    "title": "Quinoa Orange Cake",
+    "desc": "A tender quinoa sponge, crowned with fresh mandarin and a glossy dark chocolate drizzle.",
+    "image": "quinoa-orange-cake",
+    "items": [
+      { "label": "1 serving",  "price": "₹149" },
+      { "label": "2 servings", "price": "₹249" }
+    ]
+  }
 }

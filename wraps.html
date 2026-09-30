@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="core.css?v=4">
-  <link rel="stylesheet" href="wraps.css?v=4">
+  <link rel="stylesheet" href="core.css?v=5">
+  <link rel="stylesheet" href="wraps.css?v=5">
 </head>
 <body>
   <div class="screen" id="screen">
@@ -65,6 +65,27 @@
 
     </div><!-- /.main-content -->
 
+    <!-- ── Dessert Panel: Screen 2 only ────────────────────────────
+         Fades in over the right column (toasts + combo) on a 30s/15s
+         cycle. A direct child of .screen, out of flow, not inside
+         #toastGrid: render() rewrites that innerHTML every 5 minutes
+         and would destroy it. Must stay after .main-content and
+         before .upsell-rail; that DOM order gives the right paint
+         stacking with no z-index. -->
+    <div class="dessert-panel" id="dessertPanel">
+      <div class="dessert-eyebrow" id="dessertEyebrow"><!-- injected by JS --></div>
+      <div class="dessert-title" id="dessertTitle"><!-- injected by JS --></div>
+      <div class="dessert-desc" id="dessertDesc"><!-- injected by JS --></div>
+      <div class="dessert-art">
+        <!-- No src attribute on purpose: src="" requests the page itself
+             as an image, fails instantly, and onerror removes this <img>
+             before JS assigns the real src. (Screen 3 lesson.) -->
+        <img id="dessertImage" alt=""
+             onerror="this.closest('.dessert-art').classList.add('photo-error');this.remove()">
+      </div>
+      <div class="dessert-items" id="dessertItems"><!-- injected by JS --></div>
+    </div>
+
     <!-- ── Upsell Rail ── -->
     <div class="upsell-rail" id="upsellRail">
       <!-- injected by JS -->
@@ -84,7 +105,7 @@
 
   </div><!-- /.screen -->
 
-  <script src="core.js?v=4"></script>
-  <script src="wraps.js?v=4"></script>
+  <script src="core.js?v=5"></script>
+  <script src="wraps.js?v=5"></script>
 </body>
 </html>
