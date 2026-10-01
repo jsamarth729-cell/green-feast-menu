@@ -615,9 +615,10 @@
   color: rgba(61,36,24,0.75);
 }
 
-/* The photograph: 770px square, bleeding off left (-40), right
-   (770-40-690 = 40) and bottom (-120). A downscale from the 1254px
-   source, so it stays crisp. */
+/* The photograph: 690px square, the panel's exact width, so the plate
+   touches both side edges and the photo's own edges stay hidden. It
+   bleeds off the bottom only (-107 = -120 x 690/770). A downscale from
+   the 1254px source, so it stays crisp. */
 .dessert-photo {
   flex: 1;
   min-height: 0;
@@ -625,20 +626,21 @@
 }
 .dessert-photo img {
   position: absolute;
-  left: -40px;
-  bottom: -120px;
-  width: 770px;
-  height: 770px;
+  left: 0;
+  bottom: -107px;
+  width: 690px;
+  height: 690px;
   display: block;
 }
 /* Melts the photo's top edge into the ground so there's no seam.
+   Anchored to the photo's top edge (690 - 107 = 583px above the box
+   bottom; 583 - 120 = 463), so the text block's height doesn't matter.
    Literal colours: the alpha end can't take a custom property. */
 .dessert-photo-fade {
   position: absolute;
-  top: -40px;   /* the text block's height varies, and the img is
-                   bottom-anchored: reach up to cover its top edge */
+  bottom: 463px;
   left: 0;
   right: 0;
-  height: 130px;
+  height: 120px;
   background: linear-gradient(#E4D5C4, rgba(228,213,196,0));
 }

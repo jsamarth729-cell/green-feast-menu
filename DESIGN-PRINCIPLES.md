@@ -159,7 +159,7 @@ promotion), not a return of `.board-header`. See
 through photography, not a dark mass.** A 690px `.dessert-panel` fades in over
 the toast column (toast cards and the combo block) on the same 30s/15s cycle.
 Its ground is the photograph's own warm backdrop tone and the un-cut photo
-bleeds off its left, right and bottom edges. It is still not a dark anchor (the
+is the panel's exact width (690px, so the plate touches both side edges) and bleeds off the bottom only. It is still not a dark anchor (the
 panini panel remains the board's); a second dark-green mass was ruled out by the
 owner, and an earlier cream "board section" version was rejected as too
 consistent. Its height and top edge (974px, top at y=0) match the panini panel;
@@ -351,8 +351,9 @@ same as the others; no dedicated pipeline script, since it's a single file.
 Screen 2's dessert panel (see `SCREEN2-DESSERT-PANEL-PLAN.md`, Revision 3). It is
 the first un-cut photograph on any board; every other food photo is a transparent
 cut-out. That is deliberate: the panel's ground *is* the photo's backdrop, which
-is what lets it stand out while staying warm and quiet. It bleeds off three edges
-of the panel, so nothing looks "placed". It is not a precedent: grid and list
+is what lets it stand out while staying warm and quiet. It is the panel's exact
+width (690px, so the plate touches both side edges) and bleeds off the bottom
+only, so nothing looks "placed". It is not a precedent: grid and list
 items stay cut-outs. It is re-encoded to JPEG (`photo` mode in
 `build-screen2-cutouts.mjs`) because a 1254px PNG photo is ~2MB. The built-in
 background remover also failed on this photo (a second rule 5 case: it deleted the
