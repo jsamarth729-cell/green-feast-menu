@@ -232,12 +232,13 @@
 
 /* ─── Open Toasts — vertical, 1-up (was a 3-up row before the menu
    dropped to 2 toasts and the layout moved to three parallel columns).
-   Card internals (photo top, centered text) are unchanged. ────────── */
+   Card internals: photo left, name + desc beside it, footer full width
+   below. Was photo top / centered text — that stacked ~150px of text
+   under the photo and capped it at 186x130 in a 642x309 card; side by
+   side it gets ~319x223 at the same card size and font tokens. ────── */
 /* flex:1 lets this block absorb whatever vertical slack the column has
-   left over, and .toast-photo-wrap below (flex:1 too) is what actually
-   spends it — so the photo grows automatically instead of leaving dead
-   space, and a longer description typed into the Sheet later shrinks
-   the photo instead of overflowing the board. */
+   left over, and each card's photo cell is what spends it — so the
+   photo grows automatically instead of leaving dead space. */
 .toast-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -247,37 +248,52 @@
   flex: 1;
   min-height: 0;
 }
+/* Fixed 339px photo column (319px photo + 20px gutter): 223px of photo
+   height x the 900:630 image ratio. A fixed width, not an auto column
+   sized off the image, because that depends on percentage-height
+   resolution Chrome 69 may not do the same way. The two 1fr rows above
+   and below name/desc centre the text block beside the photo. */
 .toast-card {
   background: var(--card);
   border-radius: 14px;
   box-shadow: 0 2px 10px rgba(40,63,40,0.06), 0 1px 3px rgba(40,63,40,0.04);
   padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  display: grid;
+  grid-template-columns: 339px 1fr;
+  grid-template-rows: 1fr auto auto 1fr auto;
+  grid-template-areas:
+    "photo ."
+    "photo name"
+    "photo desc"
+    "photo ."
+    "foot  foot";
+  text-align: left;
   position: relative;
   /* Grid items get an implicit min-height:auto (= content size), which
      blocks the row from actually stretching this card down to the
      grid's stretched track height — it overflows into whatever sits
      below the grid instead of shrinking. min-height:0 here is what
-     lets .toast-photo-wrap's flex:1 below actually take effect. */
+     lets the photo cell take only the height that's left. */
   min-height: 0;
 }
+/* The img is absolutely positioned against this cell rather than sized
+   with max-height:100% — a percentage height on a child of a stretched
+   grid item is exactly what a 2018 engine can resolve to auto, which
+   would silently bring back the small photo. The cell's height comes
+   from the grid; the image contributes nothing to it, so a longer
+   description can't push the card taller. */
 .toast-photo-wrap {
-  width: 100%;
-  flex: 1;
+  grid-area: photo;
+  position: relative;
   min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
+  margin: 0 20px 10px 0;
 }
 .toast-photo-wrap img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }
@@ -287,9 +303,10 @@
   justify-content: center;
 }
 .toast-name-row {
+  grid-area: name;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   margin-bottom: 6px;
 }
 .toast-name-row > * + * {
@@ -302,22 +319,26 @@
   color: var(--forest);
   line-height: 1.2;
 }
+/* 4-line clamp: the ~271px text column wraps today's descriptions to 3
+   lines; the 4th is headroom for a longer Sheet edit. Worst case
+   (2-line name + 4-line desc, ~160px) still fits the ~223px beside the
+   photo. */
 .toast-desc {
+  grid-area: desc;
   font-size: var(--fs-item-desc);
   color: var(--c-item-desc);
   line-height: 1.32;
-  margin-bottom: 10px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 4;
   overflow: hidden;
 }
 .toast-footer {
+  grid-area: foot;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-top: auto;
   padding-top: 10px;
   border-top: 1px solid rgba(88,120,88,0.12);
 }
