@@ -419,7 +419,7 @@ final colour.
   price — not a new context, and not a fourth use.
 - **Screen 2's dessert panel ground (`#E4D5C4`) is sampled from its photograph.**
   Its ink is the existing Cocoa Core `#3D2418`. No gold (invisible on a light
-  ground) and no orange; its prices are ordinary-size Item Prices in cocoa. Not a
+  ground) and no orange; its prices sit in cocoa-outlined stat chips (the owner's choice), the board's existing summary-chip style. Not a
   new accent.
 - Keep the dark-hero / cream-grid split. The contrast between the two halves is
   doing real legibility work, not just looking nice.
@@ -567,7 +567,7 @@ Use these words in conversation, in commits, and in class names on any new scree
 | **Section Title** | The on-screen heading for a Section | `.section-title` in `core.css`. `.section-title--lg` is Power Bowls' variant, since it's the one section that fills Screen 1's entire grid panel rather than stacking with others |
 | **Item Name** | The dish/drink name | `.tile-name`, `.panini-item-name`, `.toast-name`, `.wrap-name`, `.dessert-name`, `.smoothie-name`, `.coffee-name` |
 | **Item Desc** | The description under the name — clamped to 2 lines on most boards, 3 on Screen 1 (its descriptions run longer; see the bowl tile's `-webkit-line-clamp`) | `.tile-desc`, `.panini-item-desc`, `.toast-desc`, `.wrap-desc`, `.dessert-desc`, `.smoothie-desc`, `.coffee-desc` |
-| **Item Price** | The price | `.tile-price`, `.panini-item-price`, `.toast-price`, `.wrap-price`, `.dessert-price`, `.smoothie-price`, `.coffee-price` |
+| **Item Price** | The price | `.tile-price`, `.panini-item-price`, `.toast-price`, `.wrap-price`, `.smoothie-price`, `.coffee-price` |
 | **Macro Chip** | kcal / protein / fibre readouts (Screen 3 dropped its earlier sugar column in favour of fibre, matching the others) | `.tile-macro` (small), `.macro-chip` (large, hero) |
 | **Diet Tag** | GF / PRO / FIB / N / LS — the abbreviated dietary pills. `V` (Vegan) and `LC` (Low Calorie) were retired when the menu moved away from an all-vegan lineup | `tags` column, `.tile-tag`, `TAG_ABBREV` in `core.js` |
 | **Item Badge** | Chef's Special, Most Loved (the CSS class stays `badge-spotlight` for the first — only the menu's wording changed, not the colour it maps to) | `badge` column, `.tile-badge`, `.badge-spotlight`, `.badge-loved` |
@@ -583,8 +583,11 @@ said `chip` since Screen 1.
 
 The dessert panel's `.dessert-eyebrow` / `.dessert-title` are headings that mirror
 `.panini-eyebrow` / `.panini-title` (non-canonical). Its `.dessert-name` /
-`.dessert-desc` / `.dessert-price` **are** canonical, take their sizes from the
+`.dessert-desc` **are** canonical, take their sizes from the
 tokens, and are listed in `check-consistency.mjs`.
+There is no `.dessert-price`: the prices render as `.stat-value` inside
+`.dessert-servings .stat-chip`, a deliberate reuse of the stat-chip component
+(recoloured cocoa), not an Item Price.
 
 ⚠️ **The offers panel's typography is deliberately not canonical.**
 `.offers-amount` / `.offers-what` / `.offers-price` / `.offers-chip` /

@@ -54,7 +54,6 @@ const CANONICAL = {
     ['wraps.css',     'panini-item-price'],
     ['wraps.css',     'toast-price'],
     ['wraps.css',     'wrap-price'],
-    ['wraps.css',     'dessert-price'],
     ['beverages.css', 'smoothie-price'],
     ['beverages.css', 'coffee-price'],
   ],

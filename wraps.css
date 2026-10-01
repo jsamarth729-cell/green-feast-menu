@@ -573,25 +573,25 @@
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
+/* Servings as the board's own stat chips (the owner's choice), the
+   same construction as the panini/wrap summary chips, recoloured
+   cocoa for the light ground (gold is invisible here). Same variant
+   pattern as .wrap-stats .stat-chip. */
 .dessert-servings {
   display: flex;
-  align-items: baseline;
-  margin-top: 10px;
+  margin-top: 14px;
 }
 .dessert-servings > * + * {
-  margin-left: 28px;   /* flex gap banned on Chrome 69 (§9) */
+  margin-left: 10px;   /* flex gap banned on Chrome 69 (§9) */
 }
-.dessert-serving {
-  font-size: var(--fs-item-desc);
-  font-weight: 600;
+.dessert-servings .stat-chip {
+  border-color: rgba(61,36,24,0.55);
+}
+.dessert-servings .stat-value {
   color: var(--dessert-ink);
 }
-.dessert-price {
-  font-family: 'Inter', sans-serif;
-  font-size: var(--fs-item-price);
-  font-weight: 600;
-  color: var(--dessert-ink);
-  margin-left: 6px;
+.dessert-servings .stat-label {
+  color: rgba(61,36,24,0.75);
 }
 
 /* The photograph: 770px square, bleeding off left (-40), right
@@ -614,9 +614,10 @@
    Literal colours: the alpha end can't take a custom property. */
 .dessert-photo-fade {
   position: absolute;
-  top: 0;
+  top: -40px;   /* the text block's height varies, and the img is
+                   bottom-anchored: reach up to cover its top edge */
   left: 0;
   right: 0;
-  height: 90px;
+  height: 130px;
   background: linear-gradient(#E4D5C4, rgba(228,213,196,0));
 }

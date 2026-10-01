@@ -174,7 +174,11 @@ function comboBlockHTML(cfg) {
    for why this isn't hoisted into core.js yet. */
 function dessertItemHTML(cfg) {
   const servings = cfg.items.map(function (it) {
-    return `<span class="dessert-serving">${it.label}<span class="dessert-price"><span class="tile-rupee">₹</span>${it.price}</span></span>`;
+    return `
+      <div class="stat-chip">
+        <span class="stat-value"><span class="tile-rupee">₹</span>${it.price}</span>
+        <span class="stat-label">${it.label}</span>
+      </div>`;
   }).join('');
   return `
     <div class="dessert-name">${cfg.name}</div>
