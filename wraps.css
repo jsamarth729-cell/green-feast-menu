@@ -483,33 +483,34 @@
    DESSERT PANEL: the right column's second mode, "Healthier
    Indulgences". Fades in over the toast column (toast cards + combo
    block) on a 30s/15s cycle. Mechanics copied from Screen 3's offers
-   panel; see SCREEN2-DESSERT-PANEL-PLAN.md.
+   panel; see SCREEN2-DESSERT-PANEL-PLAN.md (Revision 3).
 
-   Revision 2: styled as a SECTION of this board, not a poster. The
-   ground is the board's own cream, with no panel shadow; the heading
-   is the shared .section-header/.section-title; the plate sits
-   straight on the cream like the wrap photo, and the text uses the
-   wrap list's own name/desc/price classes, so every size comes from
-   the canonical tokens (§12). The owner asked for it to read as the
-   next section in the column, not a panel laid over it.
+   It stands out through PHOTOGRAPHY, not colour: the ground is the
+   photograph's own backdrop tone, and the un-cut photo bleeds off the
+   panel's left, right and bottom edges. That makes it the one
+   un-cut photo on any board, deliberately (DESIGN-PRINCIPLES §6).
+   Headings reuse the panini panel's eyebrow/title specs in cocoa, so
+   "Healthier / Indulgences" mirrors "Signature / Panini Range"; the
+   name, desc and prices use the canonical item tokens.
 
-   Geometry:
-     box    1230–1920 × 0–974. The width is 690, not the column's
-            685.5: its left edge sits in the column gutter so the
-            toast column's half-pixel start (1234.5) can't show
-            through (the Revision 1 sliver).
-     padding 0 44px 20px 4.5px puts the content at 1234.5–1876 ×
-            0–954, the toast column's exact box, so the heading lands
-            exactly where "Open Toasts" was.
+   Box: 1230–1920 × 0–974. 690px wide, not the column's 685.5: the
+   left edge sits in the column gutter so the toast column's
+   half-pixel start (1234.5) can't show through.
 ══════════════════════════════════════════════════════════════════ */
 .dessert-panel {
+  /* Scoped to this surface. Not core.css tokens: nothing else uses
+     them. --dessert-bg is sampled from the photo's backdrop;
+     --dessert-ink is Screen 3's Cocoa Core colour, not a new one. */
+  --dessert-bg:  #E4D5C4;
+  --dessert-ink: #3D2418;
+
   position: absolute;
   top: 0;
   right: 0;
   bottom: calc(var(--h-upsell-rail) + var(--h-footer-strip));
   width: 690px;
-  background: var(--cream);
-  padding: 0 44px 20px 4.5px;
+  background: var(--dessert-bg);
+  overflow: hidden;   /* the photo bleeds off three edges */
   display: flex;
   flex-direction: column;
   opacity: 0;
@@ -519,9 +520,7 @@
   opacity: 1;
 }
 
-/* Ground first, contents 380ms later: the toasts fade out under
-   the cream, then the heading and body fade in. It reads as the
-   section changing rather than a cross-fade glitch. */
+/* Ground first, contents 380ms later (Screen 3's "dip" timing). */
 .dessert-panel > * {
   opacity: 0;
   transition: opacity 0.30s ease;
@@ -531,58 +530,93 @@
   transition-delay: 0.38s;
 }
 
-/* Open layout (owner's choice): photo straight on the cream, text
-   below. Same structure as the Wraps column beside it: the photo box
-   absorbs the spare height, the text block stays its natural size. */
-.dessert-body {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.dessert-photo {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-/* Natural size, never upscaled (500px remove.bg preview). The shadow
-   is .wrap-photo-wrap img's own, so the two plated photos on this
-   board are grounded the same way. */
-.dessert-photo img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 14px 30px rgba(40,63,40,0.22));
-}
-.dessert-photo.photo-error {
-  display: flex;
-}
-
-/* Name/desc/price come from .wrap-name / .wrap-desc / .wrap-price
-   above (canonical tokens). This block just stops the text being
-   squeezed by the photo box. */
-.dessert-info {
+.dessert-text {
   flex-shrink: 0;
-  margin-top: 16px;
+  padding: 52px 56px 0 52px;
+  position: relative;
+  z-index: 1;   /* above the photo's fade */
 }
-.dessert-info .wrap-desc {
-  margin-bottom: 10px;
+/* .panini-eyebrow's spec, in cocoa (gold is invisible on this ground). */
+.dessert-eyebrow {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--dessert-ink);
+  margin-bottom: 6px;
 }
-
-/* Two serving sizes instead of one price: the only shape difference
-   from a wrap row. The same thin divider the wrap rows use. */
-.dessert-serving-row {
+/* .panini-title's spec, in cocoa. */
+.dessert-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px;
+  font-weight: 600;
+  color: var(--dessert-ink);
+  line-height: 1.15;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(61,36,24,0.22);
+}
+.dessert-name {
+  font-family: var(--font-item-name);
+  font-size: var(--fs-item-name);
+  font-weight: 600;
+  color: var(--dessert-ink);
+  line-height: 1.25;
+  margin-top: 18px;
+}
+.dessert-desc {
+  font-size: var(--fs-item-desc);
+  color: rgba(61,36,24,0.9);
+  line-height: 1.3;
+  margin: 4px 0 8px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.dessert-servings {
   display: flex;
   align-items: baseline;
-  padding: 10px 0;
-  border-top: 1px solid rgba(88,120,88,0.12);
+  margin-top: 10px;
+}
+.dessert-servings > * + * {
+  margin-left: 28px;   /* flex gap banned on Chrome 69 (§9) */
 }
 .dessert-serving {
   font-size: var(--fs-item-desc);
   font-weight: 600;
-  color: var(--forest);
+  color: var(--dessert-ink);
+}
+.dessert-price {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--fs-item-price);
+  font-weight: 600;
+  color: var(--dessert-ink);
+  margin-left: 6px;
+}
+
+/* The photograph: 770px square, bleeding off left (-40), right
+   (770-40-690 = 40) and bottom (-120). A downscale from the 1254px
+   source, so it stays crisp. */
+.dessert-photo {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.dessert-photo img {
+  position: absolute;
+  left: -40px;
+  bottom: -120px;
+  width: 770px;
+  height: 770px;
+  display: block;
+}
+/* Melts the photo's top edge into the ground so there's no seam.
+   Literal colours: the alpha end can't take a custom property. */
+.dessert-photo-fade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background: linear-gradient(#E4D5C4, rgba(228,213,196,0));
 }

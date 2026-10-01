@@ -33,10 +33,11 @@
     "Extra premiums — feta / guacamole / beetroot hummus | +₹50"
   ],
   "dessertPanel": {
-    "heading": "Healthier Indulgences",
+    "eyebrow": "Healthier",
+    "title": "Indulgences",
     "name": "Quinoa Orange Cake",
     "desc": "A tender quinoa sponge, crowned with fresh mandarin and a glossy dark chocolate drizzle.",
-    "image": "quinoa-orange-cake",
+    "photo": "quinoa-orange-cake-photo.jpg",
     "items": [
       { "label": "1 serving",  "price": 149 },
       { "label": "2 servings", "price": 249 }

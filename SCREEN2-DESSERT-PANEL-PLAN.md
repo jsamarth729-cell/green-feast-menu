@@ -1090,3 +1090,398 @@ Files: `wraps.html`, `wraps.css`, `wraps.js`, `data/screen2-config.json`,
 1. **Heading:** "Healthier Indulgences", title case. **Confirmed.**
 2. **Layout:** **open**, not a card. The plate sits straight on the cream, with the
    text below it. R2.4–R2.6 and R2.9 are written for this.
+
+---
+---
+
+# REVISION 3: Light, full-bleed photograph (mockup option 4)
+
+**Status:** plan only. No code changed yet. Revisions 1–2 are committed on
+`screen2-dessert-panel` (`28cf337`, `7cca543`, `3a2afd2`), **not merged, not pushed**.
+This revision replaces Revision 2's look on the same branch.
+**Design reference:** canvas https://claude.ai/artifact/DhZKLw5YgPksQaEE8ynvSm, page
+"Round 2 · Stand-out", artboard **"4 · Light, full-bleed photograph"**
+(`project/Editorial.dc.html`). The owner chose this one on 2026-10-01. Its geometry
+and styles are transcribed exactly below, so the executor doesn't need the canvas.
+
+## R3.1 Why
+
+The owner rejected Revision 2 and the Round 1 mockups as **too consistent**: the
+dessert should stand out a little without looking out of place. That's the job
+Screen 3's dark offers panel does. Option 4 does it **through photography, not
+colour**:
+- The panel's ground is the photo's own warm backdrop tone.
+- The original photograph (plate, cake and backdrop, **not** a cut-out) bleeds off
+  the panel's left, right and bottom edges.
+- The text sits above it in dark cocoa, using the panini panel's existing
+  heading styles.
+
+## R3.2 Decisions (supersede R2-J1 → R2-J10)
+
+| # | Decision | Rationale |
+|---|---|---|
+| R3-J1 | **Panel ground `#E4D5C4`**: the photo's backdrop tone (sampled mid-frame, 228/213/196). | The photograph's backdrop and the panel ground read as one surface. The 90px fade (R3-J5) hides the seam. |
+| R3-J2 | **Ink `#3D2418`**, the same cocoa as Screen 3's `.acc-cocoa-core`. No new colour. **No gold** (invisible on a light ground). **No orange.** | Owner rejected the orange accent. Cocoa ties to the chocolate drizzle and reads ~9:1 on the ground. |
+| R3-J3 | **Headings reuse the panini panel's styles, recoloured cocoa:** eyebrow "Healthier" = `.panini-eyebrow`'s spec (Playfair italic 24px); title "Indulgences" = `.panini-title`'s spec (Playfair 600 50px, 1.15 line height, 18px bottom padding, 1px rule). | Owner: fonts must follow the board's hierarchy. "Signature / Panini Range" on the left, "Healthier / Indulgences" on the right: the same voice, mirrored. |
+| R3-J4 | **Name, description and prices use the canonical tokens:** `--font-item-name`/`--fs-item-name`, `--fs-item-desc`, `--fs-item-price`, under new screen-scoped selectors (`.dessert-name`/`.dessert-desc`/`.dessert-price`), which get **added to `check-consistency.mjs`**. | Normal item sizes (the owner rejected big prices) and enforced like every other Item Name/Desc/Price. Own selectors are needed because the colour differs (cocoa, not forest); §12 allows that, as with `.panini-item-*`. |
+| R3-J5 | **The photo is the original, un-cut photograph**, rendered 770×770 at `left: -40px; bottom: -120px` inside a flex:1 box, with a 90px top fade from the ground colour to transparent. | Exactly the chosen mockup. 1254px source → 770px display, a downscale, so it's crisp (the 500px cut-out problem goes away). It bleeds left/right/bottom, so the plate's sides and bottom go off-frame and nothing looks "placed". |
+| R3-J6 | **Panel box unchanged:** 1230–1920 × 0–974 (690px), no box-shadow. | The 690px fix stays. The Option 4 mockup has no shadow, so the hard left edge against the cream wraps column is the edge, the way Screen 3's panel has a hard edge. |
+| R3-J7 | **The two servings sit side by side in one row** under the description: "1 serving ₹149" then "2 servings ₹249", 28px apart. | As in the mockup. It keeps the text block short so the photo gets the height. |
+| R3-J8 | **Timing, transition, timer code and fail-closed guard unchanged.** | Only content, markup and styling change. |
+| R3-J9 | **The cut-out `images/screen2/quinoa-orange-cake.png` is deleted, with its `MAP` entry.** | Nothing uses it any more. An unused 380KB asset with a pipeline entry is clutter that invites confusion later. The source cut-out stays in the gitignored `Screen 2/` folder if it's ever wanted. |
+
+**Design-rule departure to record (DESIGN-PRINCIPLES §6):** this is the **first
+un-cut photograph on any board**. Every other food photo is a transparent cut-out.
+It's deliberate: the panel's ground *is* the photo's backdrop, which is what lets it
+stand out while staying warm and quiet. It is not a precedent for menu items. Grid
+and list items stay cut-outs.
+
+## R3.3 Step 1: the photograph asset
+
+1. Copy the owner's original photo into the gitignored source folder:
+   `C:\Users\hp\AppData\Local\Temp\claude\d--Sam-SAMARTH-STEPPING-INTO-BUSINESS-AI-Claude-Code-Sessions-QSR-Menu\a33eff0b-3adb-419e-9726-27ec178f1062\images\1.png`
+   → `Screen 2\quinoa-orange-cake-photo.png`
+   (1254×1254, 3 channels, no alpha. That's expected: it's a photograph.)
+2. `build-screen2-cutouts.mjs`: add a third mode, `photo`. It does **no trim** (there's
+   no alpha) and writes a **JPEG**, since a 1254² PNG photo is ~2.1MB to pull over
+   store wifi.
+   - Replace the cut-out's MAP line with:
+     ```js
+     'quinoa-orange-cake-photo': { file: 'quinoa-orange-cake-photo.png',             mode: 'photo' },
+     ```
+   - Add after `feature()`:
+     ```js
+     // Photo: an un-cut photograph (no alpha, nothing to trim). Re-encoded as
+     // JPEG because a photo this size is ~2MB as PNG. Used by the dessert panel,
+     // the one place a board shows a backdrop photo (DESIGN-PRINCIPLES §6).
+     async function photo(file) {
+       return sharp(file).jpeg({ quality: 84, mozjpeg: true }).toBuffer();
+     }
+     ```
+   - In the loop, branch before `trimToBbox` so `photo` mode never trims, and write `.jpg`:
+     ```js
+     for (const [slug, { file, mode }] of Object.entries(MAP)) {
+       const name = `${slug}.${mode === 'photo' ? 'jpg' : 'png'}`;
+       try {
+         if (mode === 'photo') {
+           const out = await photo(path.join(SRC, file));
+           await writeFile(path.join(OUT, name), out);
+           console.log(`  OK   ${name.padEnd(28)} ${(out.length / 1024).toFixed(0).padStart(4)} KB  [photo]`);
+           continue;
+         }
+         // …existing trim/toast/feature body unchanged…
+     ```
+   - Header comment: replace the `"feature" mode (panini hero, wrap hero, dessert
+     panel)` wording with feature = panini + wrap hero, and a one-line description
+     of `photo` mode.
+3. Run `node build-screen2-cutouts.mjs`. Expect `images/screen2/quinoa-orange-cake-photo.jpg`
+   (~150–300KB). `git status` must show **no** change to any other
+   `images/screen2/*.png`.
+4. `git rm images/screen2/quinoa-orange-cake.png` (R3-J9).
+
+## R3.4 Step 2: `data/screen2-config.json`
+
+Replace the `dessertPanel` block:
+
+```json
+  "dessertPanel": {
+    "eyebrow": "Healthier",
+    "title": "Indulgences",
+    "name": "Quinoa Orange Cake",
+    "desc": "A tender quinoa sponge, crowned with fresh mandarin and a glossy dark chocolate drizzle.",
+    "photo": "quinoa-orange-cake-photo.jpg",
+    "items": [
+      { "label": "1 serving",  "price": 149 },
+      { "label": "2 servings", "price": 249 }
+    ]
+  }
+```
+
+`photo` is a **full filename** (not a slug): it's the board's only JPEG, so
+`screen2ImageSrc()` (which appends `.png`) isn't used for it.
+
+## R3.5 Step 3: `wraps.html`
+
+Replace the `<div class="dessert-panel" id="dessertPanel">…</div>` block. Keep the
+comment above it, but reword its first line to "a full-bleed photo panel":
+
+```html
+    <div class="dessert-panel" id="dessertPanel">
+      <div class="dessert-text">
+        <div class="dessert-eyebrow" id="dessertEyebrow"><!-- injected by JS --></div>
+        <div class="dessert-title" id="dessertTitle"><!-- injected by JS --></div>
+        <div id="dessertItem"><!-- injected by JS --></div>
+      </div>
+      <div class="dessert-photo" id="dessertPhoto"><!-- injected by JS --></div>
+    </div>
+```
+
+Two direct children (text, photo), which the `> *` fade staggers in.
+
+## R3.6 Step 4: `wraps.css`
+
+Replace the whole DESSERT PANEL block (header comment to end of file):
+
+```css
+/* ═══════════════════════════════════════════════════════════════
+   DESSERT PANEL: the right column's second mode, "Healthier
+   Indulgences". Fades in over the toast column (toast cards + combo
+   block) on a 30s/15s cycle. Mechanics copied from Screen 3's offers
+   panel; see SCREEN2-DESSERT-PANEL-PLAN.md (Revision 3).
+
+   It stands out through PHOTOGRAPHY, not colour: the ground is the
+   photograph's own backdrop tone, and the un-cut photo bleeds off the
+   panel's left, right and bottom edges. That makes it the one
+   un-cut photo on any board, deliberately (DESIGN-PRINCIPLES §6).
+   Headings reuse the panini panel's eyebrow/title specs in cocoa, so
+   "Healthier / Indulgences" mirrors "Signature / Panini Range"; the
+   name, desc and prices use the canonical item tokens.
+
+   Box: 1230–1920 × 0–974. 690px wide, not the column's 685.5: the
+   left edge sits in the column gutter so the toast column's
+   half-pixel start (1234.5) can't show through.
+══════════════════════════════════════════════════════════════════ */
+.dessert-panel {
+  /* Scoped to this surface. Not core.css tokens: nothing else uses
+     them. --dessert-bg is sampled from the photo's backdrop;
+     --dessert-ink is Screen 3's Cocoa Core colour, not a new one. */
+  --dessert-bg:  #E4D5C4;
+  --dessert-ink: #3D2418;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: calc(var(--h-upsell-rail) + var(--h-footer-strip));
+  width: 690px;
+  background: var(--dessert-bg);
+  overflow: hidden;   /* the photo bleeds off three edges */
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.dessert-panel.is-showing {
+  opacity: 1;
+}
+
+/* Ground first, contents 380ms later (Screen 3's "dip" timing). */
+.dessert-panel > * {
+  opacity: 0;
+  transition: opacity 0.30s ease;
+}
+.dessert-panel.is-showing > * {
+  opacity: 1;
+  transition-delay: 0.38s;
+}
+
+.dessert-text {
+  flex-shrink: 0;
+  padding: 52px 56px 0 52px;
+  position: relative;
+  z-index: 1;   /* above the photo's fade */
+}
+/* .panini-eyebrow's spec, in cocoa (gold is invisible on this ground). */
+.dessert-eyebrow {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--dessert-ink);
+  margin-bottom: 6px;
+}
+/* .panini-title's spec, in cocoa. */
+.dessert-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px;
+  font-weight: 600;
+  color: var(--dessert-ink);
+  line-height: 1.15;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(61,36,24,0.22);
+}
+.dessert-name {
+  font-family: var(--font-item-name);
+  font-size: var(--fs-item-name);
+  font-weight: 600;
+  color: var(--dessert-ink);
+  line-height: 1.25;
+  margin-top: 18px;
+}
+.dessert-desc {
+  font-size: var(--fs-item-desc);
+  color: rgba(61,36,24,0.9);
+  line-height: 1.3;
+  margin: 4px 0 8px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.dessert-servings {
+  display: flex;
+  align-items: baseline;
+  margin-top: 10px;
+}
+.dessert-servings > * + * {
+  margin-left: 28px;   /* flex gap banned on Chrome 69 (§9) */
+}
+.dessert-serving {
+  font-size: var(--fs-item-desc);
+  font-weight: 600;
+  color: var(--dessert-ink);
+}
+.dessert-price {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--fs-item-price);
+  font-weight: 600;
+  color: var(--dessert-ink);
+  margin-left: 6px;
+}
+
+/* The photograph: 770px square, bleeding off left (-40), right
+   (770-40-690 = 40) and bottom (-120). A downscale from the 1254px
+   source, so it stays crisp. */
+.dessert-photo {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.dessert-photo img {
+  position: absolute;
+  left: -40px;
+  bottom: -120px;
+  width: 770px;
+  height: 770px;
+  display: block;
+}
+/* Melts the photo's top edge into the ground so there's no seam.
+   Literal colours: the alpha end can't take a custom property. */
+.dessert-photo-fade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background: linear-gradient(#E4D5C4, rgba(228,213,196,0));
+}
+```
+
+Chrome 69: `linear-gradient`, custom properties, `calc()` and `-webkit-line-clamp`
+(with its companions) are all fine. No flex `gap`, no `inset`.
+
+## R3.7 Step 5: `wraps.js`
+
+Replace `dessertBodyHTML()` and `renderDessertPanel()`. The timer functions, the
+constants and the fail-closed guard in `render()` stay **untouched**.
+
+```js
+function dessertItemHTML(cfg) {
+  const servings = cfg.items.map(function (it) {
+    return `<span class="dessert-serving">${it.label}<span class="dessert-price"><span class="tile-rupee">₹</span>${it.price}</span></span>`;
+  }).join('');
+  return `
+    <div class="dessert-name">${cfg.name}</div>
+    ${cfg.desc ? `<div class="dessert-desc">${cfg.desc}</div>` : ''}
+    <div class="dessert-servings">${servings}</div>`;
+}
+
+function renderDessertPanel(cfg) {
+  document.getElementById('dessertEyebrow').textContent = cfg.eyebrow;
+  document.getElementById('dessertTitle').textContent   = cfg.title;
+  document.getElementById('dessertItem').innerHTML      = dessertItemHTML(cfg);
+  /* Rebuilt every render, so a fresh <img> each time: onerror removing
+     a previous one can't break a later render. */
+  document.getElementById('dessertPhoto').innerHTML = cfg.photo ? `
+    <img src="images/screen2/${cfg.photo}" alt="${cfg.name}"
+         onerror="this.remove()">
+    <div class="dessert-photo-fade"></div>` : '';
+}
+```
+
+Update the block comment above it: the panel is a full-bleed photo panel, with
+content from `config.dessertPanel`.
+
+## R3.8 Step 6: `check-consistency.mjs`
+
+Add the three new canonical selectors (R3-J4), one line in each group:
+
+```js
+    ['wraps.css',     'dessert-name'],    // in 'Item Name'
+    ['wraps.css',     'dessert-desc'],    // in 'Item Desc'
+    ['wraps.css',     'dessert-price'],   // in 'Item Price'
+```
+
+The run must stay clean (all three use tokens). Note the script's §3 "fixed
+heights" check iterates Item Desc too; `.dessert-desc` has no fixed height, so
+nothing is reported.
+
+## R3.9 Step 7: no version bump
+
+`?v=5` has still never been deployed, so it covers this. Don't bump.
+
+## R3.10 Documentation (same commit)
+
+- **`CLAUDE.md`**
+  - `wraps.*` row: the dessert panel is now "a full-bleed photo panel (warm photo-
+    backdrop ground, the un-cut photograph bleeding off three edges, 'Healthier /
+    Indulgences' in the panini panel's heading styles, in cocoa)". Keep the rest.
+  - `data/screen2-config.json` row: `dessertPanel` = `{eyebrow, title, name, desc,
+    photo, items:[{label, price}]}`. `photo` is a full filename (JPEG); `price` is a
+    number.
+  - `images/screen2/` row: replace the `quinoa-orange-cake.png` mention with
+    `quinoa-orange-cake-photo.jpg`, the dessert panel's un-cut photograph (the only
+    non-cut-out photo on any board).
+  - `build-screen2-cutouts.mjs` row: feature mode covers two photos again (panini,
+    wrap), plus a `photo` mode that re-encodes an un-cut photo to JPEG with no trim.
+- **`DESIGN-PRINCIPLES.md`**
+  - **§2:** rewrite the Screen 2 dessert update paragraph. It stands out through
+    photography, not a dark mass. The ground is the photo backdrop's tone, the
+    photo bleeds off three edges, and it is still not a dark anchor (the panini
+    panel is). Keep the owner's reasons: no second green mass, Revision 2 too
+    consistent.
+  - **§6:** replace the "fourth instance … quinoa-orange-cake" solo-cut-out note with
+    the **un-cut photograph exception** (R3.2's "design-rule departure" text,
+    condensed). Keep the record that the built-in remover failed on this photo.
+  - **§7:** one bullet. The dessert panel's ground `#E4D5C4` is sampled from its
+    photograph; its ink is the existing Cocoa Core `#3D2418`; no gold (light
+    ground); prices are ordinary-size Item Prices in cocoa. Not a new accent.
+  - **§12:** the dessert note says `.dessert-eyebrow`/`.dessert-title` are
+    headings, mirroring `.panini-eyebrow`/`.panini-title` (non-canonical), while
+    `.dessert-name`/`.dessert-desc`/`.dessert-price` **are** canonical and now
+    listed in `check-consistency.mjs`. Add them to the canonical table's
+    "Implemented today as" column.
+
+## R3.11 Verification
+
+Serve on 3100 (start it if it isn't running; check the page title) and use
+Playwright at 1920×1080. Wait until `#dessertTitle` has text before calling
+`setDessertPhase(true)`, then wait 1.5s.
+
+| Check | Expected |
+|---|---|
+| `node check-consistency.mjs` | clean, with `.dessert-name`/`-desc`/`-price` listed `ok` using tokens |
+| Menu phase vs `.playwright-mcp/baseline-wraps.png` | 0 differing bytes |
+| `#dessertPanel` box | 1230, 0, 1920, 974; `box-shadow: none`; background `rgb(228, 213, 196)` |
+| Eyebrow / title | Playfair italic 24px / Playfair 600 50px, both `rgb(61, 36, 24)` |
+| Name / desc / price | 24px Montserrat / 18px / 26px Inter, cocoa; desc 2 lines, no ellipsis |
+| Servings | one row, "1 serving ₹149" and "2 servings ₹249", with a superscript ₹ |
+| Photo | `naturalWidth` 1254; rendered 770×770; `img.getBoundingClientRect()` left 1190, bottom 1094 (it bleeds); no broken image |
+| Fade div | present, 690×90 at the photo box's top |
+| Text vs photo | `.dessert-text` bottom ≤ `.dessert-photo` top (no overlap) |
+| Colour audit | nothing in the panel computes to `rgb(254, 250, 103)`, `rgb(180, 84, 15)` or `rgb(241, 223, 198)` |
+| Rotation / fail-closed | re-run 12g and 12h (unchanged timer code: quick confirmation) |
+| Asset | `images/screen2/quinoa-orange-cake-photo.jpg` committed; `quinoa-orange-cake.png` deleted; no other `images/screen2/*` changed |
+| Chrome 69 audit | no `?.`, `??`, `inset`, flex `gap`, `fromEntries` in the diff |
+
+Screenshot `.playwright-mcp/dessert-panel-r3.png` (panel phase) for the owner.
+
+## R3.12 Commit
+
+One commit on `screen2-dessert-panel`:
+`Screen 2: dessert panel as a full-bleed photo panel`
+Files: `wraps.html`, `wraps.css`, `wraps.js`, `data/screen2-config.json`,
+`build-screen2-cutouts.mjs`, `check-consistency.mjs`,
+`images/screen2/quinoa-orange-cake-photo.jpg` (added),
+`images/screen2/quinoa-orange-cake.png` (deleted), `CLAUDE.md`,
+`DESIGN-PRINCIPLES.md`, `SCREEN2-DESSERT-PANEL-PLAN.md`.
+**Don't merge or push.** The owner reviews at http://localhost:3100/wraps.html first.

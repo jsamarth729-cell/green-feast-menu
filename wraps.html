@@ -66,17 +66,19 @@
     </div><!-- /.main-content -->
 
     <!-- ── Dessert Panel: Screen 2 only ────────────────────────────
-         A second section for the right column (toasts + combo): fades in
-         over them on a 30s/15s cycle. A direct child of .screen, out of flow, not inside
+         A full-bleed photo panel for the right column (toasts + combo):
+         fades in over them on a 30s/15s cycle. A direct child of .screen, out of flow, not inside
          #toastGrid: render() rewrites that innerHTML every 5 minutes
          and would destroy it. Must stay after .main-content and
          before .upsell-rail; that DOM order gives the right paint
          stacking with no z-index. -->
     <div class="dessert-panel" id="dessertPanel">
-      <div class="section-header">
-        <h1 class="section-title" id="dessertHeading"><!-- injected by JS --></h1>
+      <div class="dessert-text">
+        <div class="dessert-eyebrow" id="dessertEyebrow"><!-- injected by JS --></div>
+        <div class="dessert-title" id="dessertTitle"><!-- injected by JS --></div>
+        <div id="dessertItem"><!-- injected by JS --></div>
       </div>
-      <div class="dessert-body" id="dessertBody"><!-- injected by JS --></div>
+      <div class="dessert-photo" id="dessertPhoto"><!-- injected by JS --></div>
     </div>
 
     <!-- ── Upsell Rail ── -->

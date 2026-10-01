@@ -166,37 +166,32 @@ function comboBlockHTML(cfg) {
 }
 
 /* ── Dessert panel ───────────────────────────────────────────────
-   The right column's second mode. Content comes from
-   config.dessertPanel (data/screen2-config.json), not the Sheet.
-   The body mirrors the Wraps column's text styles (.wrap-name /
-   .wrap-desc / .wrap-price), so it takes canonical sizes from the
-   tokens. Timer mechanics are a copy of beverages.js's offers panel;
-   see SCREEN2-DESSERT-PANEL-PLAN.md D9 for why this isn't hoisted
-   into core.js yet. */
-function dessertBodyHTML(cfg) {
-  const rows = cfg.items.map(function (it) {
-    return `
-      <div class="dessert-serving-row">
-        <span class="dessert-serving">${it.label}</span>
-        <span class="wrap-price"><span class="tile-rupee">₹</span>${it.price}</span>
-      </div>`;
+   The right column's second mode: a full-bleed photo panel. Content
+   comes from config.dessertPanel (data/screen2-config.json), not the
+   Sheet. Name/desc/prices use the canonical item tokens
+   (.dessert-name/-desc/-price). Timer mechanics are a copy of
+   beverages.js's offers panel; see SCREEN2-DESSERT-PANEL-PLAN.md D9
+   for why this isn't hoisted into core.js yet. */
+function dessertItemHTML(cfg) {
+  const servings = cfg.items.map(function (it) {
+    return `<span class="dessert-serving">${it.label}<span class="dessert-price"><span class="tile-rupee">₹</span>${it.price}</span></span>`;
   }).join('');
-
   return `
-    <div class="dessert-photo">
-      <img src="${screen2ImageSrc(cfg.image)}" alt="${cfg.name}"
-           onerror="this.closest('.dessert-photo').classList.add('photo-error');this.remove()">
-    </div>
-    <div class="dessert-info">
-      <div class="wrap-name">${cfg.name}</div>
-      ${cfg.desc ? `<div class="wrap-desc">${cfg.desc}</div>` : ''}
-      ${rows}
-    </div>`;
+    <div class="dessert-name">${cfg.name}</div>
+    ${cfg.desc ? `<div class="dessert-desc">${cfg.desc}</div>` : ''}
+    <div class="dessert-servings">${servings}</div>`;
 }
 
 function renderDessertPanel(cfg) {
-  document.getElementById('dessertHeading').textContent = cfg.heading;
-  document.getElementById('dessertBody').innerHTML      = dessertBodyHTML(cfg);
+  document.getElementById('dessertEyebrow').textContent = cfg.eyebrow;
+  document.getElementById('dessertTitle').textContent   = cfg.title;
+  document.getElementById('dessertItem').innerHTML      = dessertItemHTML(cfg);
+  /* Rebuilt every render, so a fresh <img> each time: onerror removing
+     a previous one can't break a later render. */
+  document.getElementById('dessertPhoto').innerHTML = cfg.photo ? `
+    <img src="images/screen2/${cfg.photo}" alt="${cfg.name}"
+         onerror="this.remove()">
+    <div class="dessert-photo-fade"></div>` : '';
 }
 
 function setDessertPhase(showing) {

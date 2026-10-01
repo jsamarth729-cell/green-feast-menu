@@ -155,15 +155,15 @@ top-of-screen dark mass, and the panel is additive content (add-on
 promotion), not a return of `.board-header`. See
 `SCREEN3-OFFERS-PANEL-PLAN.md` for the full reasoning and geometry.
 
-**Update — Screen 2 now has a right-side second mode too, and it is cream and
-deliberately seamless.** A 690px `.dessert-panel` fades in over the toast column
-(toast cards and the combo block) on the same 30s/15s cycle, as a second
-*section* that swaps in place of Open Toasts: it reuses the shared section
-header and the wrap list's text styles, with no panel shadow. It is not a dark
-anchor and doesn't try to be one; the panini panel remains the board's dark
-anchor, and a second dark-green mass was ruled out by the owner. Its height and
-top edge (974px, top at y=0) match the panini panel; only width differs. See
-`SCREEN2-DESSERT-PANEL-PLAN.md` (Revision 2).
+**Update — Screen 2 now has a right-side second mode too, and it stands out
+through photography, not a dark mass.** A 690px `.dessert-panel` fades in over
+the toast column (toast cards and the combo block) on the same 30s/15s cycle.
+Its ground is the photograph's own warm backdrop tone and the un-cut photo
+bleeds off its left, right and bottom edges. It is still not a dark anchor (the
+panini panel remains the board's); a second dark-green mass was ruled out by the
+owner, and an earlier cream "board section" version was rejected as too
+consistent. Its height and top edge (974px, top at y=0) match the panini panel;
+only width differs. See `SCREEN2-DESSERT-PANEL-PLAN.md` (Revision 3).
 
 ---
 
@@ -347,14 +347,16 @@ exemption as `protein-scoop` and `panini-hero` — one image, its own layout
 slot, nothing to normalize against. Trimmed to its alpha bounding box only,
 same as the others; no dedicated pipeline script, since it's a single file.
 
-**A fourth instance: `images/screen2/quinoa-orange-cake.png`**, Screen 2's
-dessert-panel feature art (see `SCREEN2-DESSERT-PANEL-PLAN.md`). Same solo-feature-art
-exemption, trimmed only, via `build-screen2-cutouts.mjs`'s `feature` mode. It is
-also a second rule 5 casualty: the built-in background remover deleted the cream
-plate entirely (cream on a cream backdrop) and left the sponge semi-transparent, so
-the cut-out was made externally (remove.bg) with the plate kept. It renders at
-natural size (never upscaled), straight on the cream, with the same drop-shadow as
-the wrap photo.
+**The un-cut photograph exception: `images/screen2/quinoa-orange-cake-photo.jpg`**,
+Screen 2's dessert panel (see `SCREEN2-DESSERT-PANEL-PLAN.md`, Revision 3). It is
+the first un-cut photograph on any board; every other food photo is a transparent
+cut-out. That is deliberate: the panel's ground *is* the photo's backdrop, which
+is what lets it stand out while staying warm and quiet. It bleeds off three edges
+of the panel, so nothing looks "placed". It is not a precedent: grid and list
+items stay cut-outs. It is re-encoded to JPEG (`photo` mode in
+`build-screen2-cutouts.mjs`) because a 1254px PNG photo is ~2MB. The built-in
+background remover also failed on this photo (a second rule 5 case: it deleted the
+cream plate and left the sponge semi-transparent).
 
 ---
 
@@ -415,8 +417,10 @@ final colour.
 - **Screen 1's offers slide (`.offers-slide-amount`, `+₹50`) also uses gold.**
   Same established "act on this" use as Screen 3's panel and the upsell rail's
   price — not a new context, and not a fourth use.
-- **Screen 2's dessert panel adds no colour.** Its prices are ordinary forest Item
-  Prices, not gold and not an accent.
+- **Screen 2's dessert panel ground (`#E4D5C4`) is sampled from its photograph.**
+  Its ink is the existing Cocoa Core `#3D2418`. No gold (invisible on a light
+  ground) and no orange; its prices are ordinary-size Item Prices in cocoa. Not a
+  new accent.
 - Keep the dark-hero / cream-grid split. The contrast between the two halves is
   doing real legibility work, not just looking nice.
 
@@ -561,9 +565,9 @@ Use these words in conversation, in commits, and in class names on any new scree
 | **Section** | A menu grouping: Power Bowls, Panini, Open Toast, Wraps, Functional Smoothies, Coffee. Slug form. | `section` column in the Sheet |
 | **Section Header** | The row holding a Section Title (and, on Screen 3's smoothie row, an inline note) | `.section-header` in `core.css`. `--<slug>` modifier classes exist on the markup (`--bowls`, `--toasts`, `--wraps`, `--smoothies`, `--coffee`) for section-specific spacing — `--coffee` adds top margin — but carry no colour; the underline is uniform, see below |
 | **Section Title** | The on-screen heading for a Section | `.section-title` in `core.css`. `.section-title--lg` is Power Bowls' variant, since it's the one section that fills Screen 1's entire grid panel rather than stacking with others |
-| **Item Name** | The dish/drink name | `.tile-name`, `.panini-item-name`, `.toast-name`, `.wrap-name`, `.smoothie-name`, `.coffee-name` |
-| **Item Desc** | The description under the name — clamped to 2 lines on most boards, 3 on Screen 1 (its descriptions run longer; see the bowl tile's `-webkit-line-clamp`) | `.tile-desc`, `.panini-item-desc`, `.toast-desc`, `.wrap-desc`, `.smoothie-desc`, `.coffee-desc` |
-| **Item Price** | The price | `.tile-price`, `.panini-item-price`, `.toast-price`, `.wrap-price`, `.smoothie-price`, `.coffee-price` |
+| **Item Name** | The dish/drink name | `.tile-name`, `.panini-item-name`, `.toast-name`, `.wrap-name`, `.dessert-name`, `.smoothie-name`, `.coffee-name` |
+| **Item Desc** | The description under the name — clamped to 2 lines on most boards, 3 on Screen 1 (its descriptions run longer; see the bowl tile's `-webkit-line-clamp`) | `.tile-desc`, `.panini-item-desc`, `.toast-desc`, `.wrap-desc`, `.dessert-desc`, `.smoothie-desc`, `.coffee-desc` |
+| **Item Price** | The price | `.tile-price`, `.panini-item-price`, `.toast-price`, `.wrap-price`, `.dessert-price`, `.smoothie-price`, `.coffee-price` |
 | **Macro Chip** | kcal / protein / fibre readouts (Screen 3 dropped its earlier sugar column in favour of fibre, matching the others) | `.tile-macro` (small), `.macro-chip` (large, hero) |
 | **Diet Tag** | GF / PRO / FIB / N / LS — the abbreviated dietary pills. `V` (Vegan) and `LC` (Low Calorie) were retired when the menu moved away from an all-vegan lineup | `tags` column, `.tile-tag`, `TAG_ABBREV` in `core.js` |
 | **Item Badge** | Chef's Special, Most Loved (the CSS class stays `badge-spotlight` for the first — only the menu's wording changed, not the colour it maps to) | `badge` column, `.tile-badge`, `.badge-spotlight`, `.badge-loved` |
@@ -577,9 +581,10 @@ the two-word form ("diet tag", "item badge"); never the bare word "badge".
 Likewise, the kcal/protein readouts are **chips**, not badges — the code has
 said `chip` since Screen 1.
 
-The dessert panel's text uses the wrap list's canonical classes (`.wrap-name` /
-`.wrap-desc` / `.wrap-price`), so it is covered by `check-consistency.mjs`; the only
-new text selector is `.dessert-serving` (sized from `--fs-item-desc`).
+The dessert panel's `.dessert-eyebrow` / `.dessert-title` are headings that mirror
+`.panini-eyebrow` / `.panini-title` (non-canonical). Its `.dessert-name` /
+`.dessert-desc` / `.dessert-price` **are** canonical, take their sizes from the
+tokens, and are listed in `check-consistency.mjs`.
 
 ⚠️ **The offers panel's typography is deliberately not canonical.**
 `.offers-amount` / `.offers-what` / `.offers-price` / `.offers-chip` /

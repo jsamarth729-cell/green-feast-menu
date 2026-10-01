@@ -5,8 +5,11 @@
    three Open Toasts cards to a common width and vertical centre, so they
    read as a matched set side by side (DESIGN-PRINCIPLES §6 rule 2).
 
-   "feature" mode (panini hero, wrap hero, dessert panel) only trims to the alpha bounding
+   "feature" mode (panini hero, wrap hero) only trims to the alpha bounding
    box — each stands alone in its own layout slot, nothing to match it to.
+
+   "photo" mode (dessert panel) is for an un-cut photograph: no alpha, no
+   trim, re-encoded as JPEG.
 
    Usage: node build-screen2-cutouts.mjs
 */
@@ -40,7 +43,7 @@ const MAP = {
   'panini-hero':        { file: 'Panini no bg.png',                              mode: 'feature' },
   'mex-chipotle':        { file: 'mex_chipotle_no_bg-removebg-preview.png',       mode: 'feature' },
   'bbq-plate':           { file: 'BBQ_Protien_with plate.png',                    mode: 'feature' },
-  'quinoa-orange-cake':  { file: 'Orange_Quinoa_Cake-removebg-preview.png',      mode: 'feature' },
+  'quinoa-orange-cake-photo': { file: 'quinoa-orange-cake-photo.png',             mode: 'photo' },
   'avo-feta-toast':      { file: 'avo_feta_no_nbg-removebg-preview.png',          mode: 'toast' },
   'earthy-hummus-toast': { file: 'earthy_hummus_no_bg-removebg-preview.png',      mode: 'toast' },
   'mango-salsa-toast':   { file: 'mango_salsa_no_bg-removebg-preview.png',        mode: 'toast' },
@@ -81,6 +84,13 @@ async function feature(trimmed) {
   return sharp(trimmed).png({ compressionLevel: 9 }).toBuffer();
 }
 
+// Photo: an un-cut photograph (no alpha, nothing to trim). Re-encoded as
+// JPEG because a photo this size is ~2MB as PNG. Used by the dessert panel,
+// the one place a board shows a backdrop photo (DESIGN-PRINCIPLES §6).
+async function photo(file) {
+  return sharp(file).jpeg({ quality: 84, mozjpeg: true }).toBuffer();
+}
+
 // Toast: place on a shared wide canvas at uniform width, vertically
 // centred, so the three cards read as a matched set.
 async function toast(trimmed, bw, bh) {
@@ -102,8 +112,14 @@ async function toast(trimmed, bw, bh) {
 }
 
 for (const [slug, { file, mode }] of Object.entries(MAP)) {
-  const name = `${slug}.png`;
+  const name = `${slug}.${mode === 'photo' ? 'jpg' : 'png'}`;
   try {
+    if (mode === 'photo') {
+      const out = await photo(path.join(SRC, file));
+      await writeFile(path.join(OUT, name), out);
+      console.log(`  OK   ${name.padEnd(28)} ${(out.length / 1024).toFixed(0).padStart(4)} KB  [photo]`);
+      continue;
+    }
     const { trimmed, bw, bh } = await trimToBbox(path.join(SRC, file));
     const out = mode === 'toast' ? await toast(trimmed, bw, bh) : await feature(trimmed);
     await writeFile(path.join(OUT, name), out);
