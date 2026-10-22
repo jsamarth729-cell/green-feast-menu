@@ -16,6 +16,8 @@ const CONFIG_URL   = 'data/config.json';  // BYOB tile + upsell (edit here direc
 const CACHE_KEY  = 'gf_bowls_v2';
 const SLIDE_MS       = 10000;   // bowl slide
 const OFFER_SLIDE_MS = 15000;   // offers slide — more to read than a bowl name
+const PROMO_MENU_MS  = 30000;   // promo hidden, board readable
+const PROMO_SHOW_MS  =  5000;   // promo overlay covering the board
 const REFRESH_MS = 5 * 60 * 1000;
 
 /* Escape hatch: any bowl listed here uses its original photo (marble
@@ -33,6 +35,12 @@ let slideTimer    = null;
    became misleading once the rotation could be longer than the bowl
    count. */
 let slideDurations = [];
+
+/* Promo overlay state, deliberately separate from the hero rotation
+   above: the overlay covers the whole board including the hero, so it
+   cannot be a slide in the rotation it hides. */
+let promoTimer   = null;
+let promoShowing = false;
 
 function csvRowToBowl(row) {
   return {
@@ -241,6 +249,40 @@ function queueNextSlide() {
   }, dwell);
 }
 
+/* ── Taash Party promo overlay ───────────────────────────────────
+   A direct copy of Screen 3's offers-panel rotation
+   (setOfferPhase / queueOfferFlip / startOfferRotation in
+   beverages.js) with the two dwells changed. Kept as its own pair of
+   functions rather than folded into the hero slideshow because the
+   overlay covers the hero as well. */
+function setPromoPhase(showing) {
+  promoShowing = showing;
+  const overlay = document.getElementById('promoOverlay');
+  if (!overlay) return;
+  if (showing) overlay.classList.add('is-showing');
+  else         overlay.classList.remove('is-showing');
+}
+
+function queuePromoFlip() {
+  promoTimer = setTimeout(function () {
+    setPromoPhase(!promoShowing);
+    queuePromoFlip();
+  }, promoShowing ? PROMO_SHOW_MS : PROMO_MENU_MS);
+}
+
+/* Called at the end of every render(), which runs again every
+   REFRESH_MS. Clearing the pending timer FIRST is what stops a second
+   rotation stacking on the first — the same discipline
+   startSlideshow() uses above and startOfferRotation() uses in
+   beverages.js. Without it the promo would appear twice as often
+   after ten minutes. Resetting to the menu phase also restarts every
+   refresh from a known state. */
+function startPromoRotation() {
+  if (promoTimer) clearTimeout(promoTimer);
+  setPromoPhase(false);
+  queuePromoFlip();
+}
+
 /* ── Full render ─────────────────────────────────────────────── */
 function render(data) {
   const featured = data.bowls.filter(b => b.featured);
@@ -283,6 +325,8 @@ function render(data) {
     data.bowls.map(tileHTML).join('') + byobTileHTML(data.buildYourOwn);
 
   renderPipeUpsell(data.upsell, data.upsellHeading);
+
+  startPromoRotation();
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

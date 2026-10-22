@@ -399,3 +399,36 @@
   font-weight: 300;
   line-height: 1;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   TAASH PARTY PROMO OVERLAY
+   Screen 1's second "second mode". Unlike Screen 2's dessert panel
+   and Screen 3's offers panel — which each cover one column so the
+   rest of the menu stays readable (DESIGN-PRINCIPLES §3) — this one
+   covers the whole board, because the artwork is a single 1920×1080
+   composition that cannot be cropped to a column. The tradeoff was
+   accepted on duration: 5s of every 35s is 14% hidden, against the
+   33% (15s of 45s) those column panels already hide.
+══════════════════════════════════════════════════════════════════ */
+.promo-overlay {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;  /* not `inset` — needs Chrome 87 */
+  background: var(--hero-bg);  /* so a failed image shows dark green, not white */
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.promo-overlay.is-showing {
+  opacity: 1;
+}
+
+.promo-art {
+  width: 100%;
+  height: 100%;
+  /* Artwork and overlay are both exactly 1920×1080, so this is
+     equivalent to `contain` — chosen because it additionally
+     guarantees no edge sliver of the menu can show through. */
+  object-fit: cover;
+  display: block;
+}
