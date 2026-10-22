@@ -14,7 +14,7 @@
    Run from the repo root: node build-webp-assets.mjs
 */
 import sharp from 'sharp';
-import { readdir } from 'fs/promises';
+import { readdir, writeFile } from 'fs/promises';
 
 const WEBP = { quality: 90 };   // alphaQuality defaults to 100: lossless edges
 
@@ -51,8 +51,12 @@ for (const dir of ['images/nobg', 'images/screen2', 'images/screen3']) {
       if (w) pipe = pipe.resize({ width: w, withoutEnlargement: true });
     }
 
+    /* Write the encoded buffer straight out. Passing it back through
+       sharp(buf).toFile(out) decodes and RE-ENCODES it at sharp's default
+       quality (80), so every file would carry two lossy generations
+       instead of one. */
     const buf = await pipe.webp(WEBP).toBuffer();
-    await sharp(buf).toFile(out);
+    await writeFile(out, buf);
 
     const { size } = await import('fs').then(m => m.promises.stat(src));
     before += size; after += buf.length; count++;
