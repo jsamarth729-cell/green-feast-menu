@@ -97,17 +97,17 @@ async function fetchBowlsData() {
 /* ── Image path helpers ──────────────────────────────────────────
    bowl.image is a slug (e.g. "mediterranean-bliss"), not a filename.
    build-bowl-cutouts.mjs produces two transparent cut-outs per item:
-     images/nobg/<slug>-top.png   flat overhead, for the grid tile
-     images/nobg/<slug>-side.png  3/4 angle,    for the hero
+     images/nobg/<slug>-top.webp  flat overhead, for the grid tile
+     images/nobg/<slug>-side.webp 3/4 angle,    for the hero
    images/<slug>-side.jpg is the un-cut original, used only by the
    HERO_CUTOUT_UNAVAILABLE fallback above.                          */
 function tileImageSrc(bowl) {
-  return `images/nobg/${bowl.image}-top.png`;
+  return `images/nobg/${bowl.image}-top.webp`;
 }
 function heroImageSrc(bowl) {
   return HERO_CUTOUT_UNAVAILABLE.includes(bowl.image)
     ? `images/${bowl.image}-side.jpg`
-    : `images/nobg/${bowl.image}-side.png`;
+    : `images/nobg/${bowl.image}-side.webp`;
 }
 
 /* ── Build hero slide HTML ───────────────────────────────────── */
@@ -153,7 +153,7 @@ function offersSlideHTML(cfg) {
       <div class="offers-slide-eyebrow">${cfg.eyebrow}</div>
       ${cfg.scope ? `<div class="offers-slide-scope">${cfg.scope}</div>` : ''}
       <div class="offers-slide-art">
-        ${cfg.image ? `<img src="images/nobg/${cfg.image}.png" alt="${cfg.eyebrow}"
+        ${cfg.image ? `<img src="images/nobg/${cfg.image}.webp" alt="${cfg.eyebrow}"
              onerror="this.closest('.offers-slide-art').classList.add('photo-error');this.remove()">` : ''}
       </div>
       <div class="offers-slide-amount-row">

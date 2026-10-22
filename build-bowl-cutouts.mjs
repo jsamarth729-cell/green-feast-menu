@@ -6,7 +6,7 @@
    clipped, and the crop is then derived from the alpha bounding box. The old
    pipeline cropped first and sliced six bowls in half.
 
-   Output: images/nobg/<slug>-side.png (hero) and <slug>-top.png (tile),
+   Output: images/nobg/<slug>-side.webp (hero) and <slug>-top.webp (tile),
    every bowl trimmed to its own edges then scaled to a uniform width and
    baseline, so they all read at the same size on screen.               */
 import { removeBackground } from '@imgly/background-removal-node';
@@ -198,15 +198,25 @@ async function normalize(trimmed, bw, bh, kind, mul) {
     ? CANVAS - Math.round(CANVAS * HERO_BOTTOM_GAP) - newH   // bottom-aligned
     : Math.round((CANVAS - newH) / 2);                        // centred
 
-  return sharp({ create: { width: CANVAS, height: CANVAS, channels: 4,
+  const canvas = await sharp({ create: { width: CANVAS, height: CANVAS, channels: 4,
                            background: { r: 0, g: 0, b: 0, alpha: 0 } } })
     .composite([{ input: resized, left: Math.max(0, left), top: Math.max(0, top) }])
-    .png({ compressionLevel: 9 }).toBuffer();
+    .png().toBuffer();
+
+  /* Tiles render at 123px, heroes at up to 501px (measured in-browser at the
+     1920x1080 canvas). The 900px canvas above is what the alignment maths needs;
+     this is the only place the output is scaled down to roughly 2x what the
+     screen actually shows. WebP because these are photographs — PNG was costing
+     ~12MB for the nine tiles alone. alphaQuality defaults to 100, so the cut-out
+     edges stay lossless. */
+  let finished = sharp(canvas);
+  if (kind === 'top') finished = finished.resize({ width: 246 });
+  return finished.webp({ quality: 90 }).toBuffer();
 }
 
 for (const [slug, pair] of Object.entries(MAP)) {
   for (const kind of ['side', 'top']) {
-    const name = `${slug}-${kind}.png`;
+    const name = `${slug}-${kind}.webp`;
     try {
       const { trimmed, bw, bh, opaquePct, clipped, strayPixels } =
         await cutout(path.join(SRC, pair[kind]));

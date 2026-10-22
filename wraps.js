@@ -65,7 +65,7 @@ async function fetchWrapsData() {
 }
 
 function screen2ImageSrc(slug) {
-  return `images/screen2/${slug}.png`;
+  return `images/screen2/${slug}.webp`;
 }
 
 /* ── Panini panel (left, static — no slideshow) ─────────────────── */

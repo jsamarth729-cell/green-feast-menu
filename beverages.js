@@ -71,7 +71,7 @@ async function fetchBeveragesData() {
 }
 
 function screen3ImageSrc(slug) {
-  return `images/screen3/${slug}.png`;
+  return `images/screen3/${slug}.webp`;
 }
 
 /* Functional ingredients get highlighted wherever they appear in a description.

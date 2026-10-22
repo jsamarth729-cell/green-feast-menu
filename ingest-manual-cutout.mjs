@@ -74,17 +74,25 @@ async function normalize(trimmed, bw, bh, kind) {
     ? CANVAS - Math.round(CANVAS * HERO_BOTTOM_GAP) - newH
     : Math.round((CANVAS - newH) / 2);
 
-  return sharp({ create: { width: CANVAS, height: CANVAS, channels: 4,
+  const canvas = await sharp({ create: { width: CANVAS, height: CANVAS, channels: 4,
                            background: { r: 0, g: 0, b: 0, alpha: 0 } } })
     .composite([{ input: resized, left: Math.max(0, left), top: Math.max(0, top) }])
-    .png({ compressionLevel: 9 }).toBuffer();
+    .png().toBuffer();
+
+  /* Mirrors the output step of build-bowl-cutouts.mjs — keep the two in
+     step. Tiles render at 123px, so the finished 900px canvas is scaled to
+     246 wide; heroes keep 900. WebP quality 90 (alphaQuality defaults to
+     100, so the cut-out edges stay lossless). The boards request .webp. */
+  let finished = sharp(canvas);
+  if (kind === 'top') finished = finished.resize({ width: 246 });
+  return finished.webp({ quality: 90 }).toBuffer();
 }
 
 const { trimmed, bw, bh } = await trimToBbox(inputFile);
 const out = await normalize(trimmed, bw, bh, kind);
-const outPath = path.join(OUT, `${slug}-${kind}.png`);
+const outPath = path.join(OUT, `${slug}-${kind}.webp`);
 await writeFile(outPath, out);
 
 console.log(`OK   ${outPath}`);
-console.log(`     source bbox ${bw}x${bh} -> normalized to ${CANVAS}x${CANVAS} canvas`);
+console.log(`     source bbox ${bw}x${bh} -> normalized on a ${CANVAS}x${CANVAS} canvas${kind === 'top' ? ', scaled to 246 wide' : ''}`);
 console.log(`     (${(out.length / 1024).toFixed(0)} KB)`);
