@@ -42,7 +42,8 @@ import path from 'path';
 
 const OUT   = './images/screen3';
 const SRC   = './Screen3';
-const MAX_H = 600; // ~2.7x the largest on-screen display height (214px). Never upscale.
+const MAX_H = 500; // ~2.3x the largest on-screen display height (217px), and exactly
+                   // 2x protein-scoop's 250px slot. Never upscale.
 
 const MAP = {
   'blue-mind':             'ChatGPT Image Aug 11, 2026, 02_55_48 AM.png',
@@ -87,17 +88,17 @@ async function trimToBbox(file) {
 }
 
 for (const [slug, file] of Object.entries(MAP)) {
-  const name = `${slug}.png`;
+  const name = `${slug}.webp`;
   try {
     const { trimmed, bw, bh } = await trimToBbox(path.join(SRC, file));
     let out = trimmed;
     let outW = bw, outH = bh;
     if (bh > MAX_H) {
-      out = await sharp(trimmed).resize({ height: MAX_H }).png({ compressionLevel: 9 }).toBuffer();
+      out = await sharp(trimmed).resize({ height: MAX_H }).webp({ quality: 90 }).toBuffer();
       const m = await sharp(out).metadata();
       outW = m.width; outH = m.height;
     } else {
-      out = await sharp(trimmed).png({ compressionLevel: 9 }).toBuffer();
+      out = await sharp(trimmed).webp({ quality: 90 }).toBuffer();
     }
     await writeFile(path.join(OUT, name), out);
     console.log(`  OK   ${name.padEnd(28)} bbox ${String(bw).padStart(4)}x${String(bh).padStart(4)}` +

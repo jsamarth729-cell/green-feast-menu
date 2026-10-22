@@ -82,11 +82,11 @@ Google Sheet (owner edits menu)
 | `data/wraps-sheet.csv` | Local snapshot/template of the Screen 2 Sheet tab, grouped by a `section` column (`panini`/`toast`/`wrap`). **Not what the live board reads** — same caching note as `data/bowls-sheet.csv` below. |
 | `data/screen3-config.json` | Screen 3 static content: the two section headings ("Functional Smoothies", "Coffee") and the upsell rail. `upsellHeading` (string) + `upsell` (array of pipe-delimited `"text \| price"` strings) — same shape as Screens 1–2, rendered through the shared `renderPipeUpsell()` in `core.js`. The smoothie section's sweetener disclaimer lives on `sections.smoothie.note` (rendered inline next to the "Functional Smoothies" heading), not on `upsell` — it's scoped to that section, not the rail. Screen 3's footer is now the same glossary block as Screens 1–2 (no board-specific footer content remains). `offersPanel` (`{title, chip, sweetener, eyebrow, image, credit, items:[{amount,what,price}]}`) is the content for the offers-panel second mode — a separate, deliberate content set from `upsell`; the rail keeps its own two add-ons unchanged. `credit` may carry a `<b>` tag (e.g. naming a supplier) and is injected via `innerHTML`, not `textContent` — every other field is plain text. |
 | `data/screen3-sheet.csv` | Local snapshot/template of the Screen 3 Sheet tab, grouped by a `section` column (`smoothie`/`coffee`). **Not what the live board reads once the Sheet tab is published** — same caching note as `data/bowls-sheet.csv` below. |
-| `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.png` (hero) + `<slug>-top.png` (tile), plus `extras-grid.png` — the offers slide's feature art (solo image, no shared canvas; see DESIGN-PRINCIPLES §6). |
-| `images/screen2/` | Screen 2's transparent cut-outs: the panini and wrap (`bbq-plate`) feature photos (trimmed only), plus `quinoa-orange-cake-photo.jpg`, the dessert panel's un-cut photograph (the only non-cut-out photo on any board), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). |
-| `images/screen3/` | Screen 3's transparent cut-outs: one per smoothie/coffee (`<slug>.png`), plus `protein-scoop.png` — the offers panel's feature art. All trimmed to alpha bounding box only — **no shared canvas** (a deliberate departure from the Screen 2 pattern; see DESIGN-PRINCIPLES §6), though the ten drinks and the scoop are exempt from rule 2 for two different reasons (uniform cup set; solo feature art with nothing to normalize against). The board normalizes the drinks by CSS height; the scoop renders at a fixed 250px height in the offers panel. |
+| `images/nobg/` | Screen 1's transparent cut-outs: `<slug>-side.webp` (hero, 900px) + `<slug>-top.webp` (tile, 246px wide), plus `extras-grid.webp` — the offers slide's feature art (solo image, no shared canvas; see DESIGN-PRINCIPLES §6). All WebP at ~2× on-screen size (`build-webp-assets.mjs` did the one-off conversion; the pipelines now emit `.webp` directly). The old `.png` twins are kept in the repo until every TV is on the `.webp` code — then they can be deleted. |
+| `images/screen2/` | Screen 2's transparent cut-outs: the panini and wrap (`bbq-plate`) feature photos (trimmed only), plus `quinoa-orange-cake-photo.jpg`, the dessert panel's un-cut photograph (the only non-cut-out photo on any board), plus the three Open Toasts photos (normalized to a shared canvas so they read as a matched set). Cut-outs are WebP at ~2× on-screen width (toasts 638px, panini 1162px, bbq-plate 1240px); old `.png` twins kept for now. |
+| `images/screen3/` | Screen 3's transparent cut-outs: one per smoothie/coffee (`<slug>.webp`), plus `protein-scoop.webp` — the offers panel's feature art. All trimmed to alpha bounding box only — **no shared canvas** (a deliberate departure from the Screen 2 pattern; see DESIGN-PRINCIPLES §6), though the ten drinks and the scoop are exempt from rule 2 for two different reasons (uniform cup set; solo feature art with nothing to normalize against). The board normalizes the drinks by CSS height; the scoop renders at a fixed 250px height in the offers panel. Files are WebP capped at 500px tall (`MAX_H`); old `.png` twins kept for now. |
 | `images/` | The square JPG crops Screen 1's cut-outs were built from. Kept as the `HERO_CUTOUT_UNAVAILABLE` fallback source. |
-| `build-bowl-cutouts.mjs` | **Screen 1's image pipeline.** Original photo → background removal → alpha repair → isolate subject → trim → normalize. Run from the repo root. |
+| `build-bowl-cutouts.mjs` | **Screen 1's image pipeline.** Original photo → background removal → alpha repair → isolate subject → trim → normalize → write `.webp` (tiles scaled to 246px wide). Run from the repo root. |
 | `ingest-manual-cutout.mjs` | Normalizes a hand-cut transparent PNG through the same path, for when the remover fails on a photo (see DESIGN-PRINCIPLES §6). |
 | `build-screen2-cutouts.mjs` | Screen 2's image pipeline. Trims hand-cut PNGs to their alpha bounding box; its trim-only `feature` mode covers two photos (panini hero, wrap hero), plus a `photo` mode that re-encodes an un-cut photo to JPEG with no trim; the three Open Toasts photos additionally get placed on a shared canvas at uniform width. Source art lives in the local, gitignored `Screen 2/` folder — this script reads from there. |
 | `build-screen3-cutouts.mjs` | Screen 3's image pipeline. Trims pre-background-removed PNGs to their alpha bounding box only — no shared canvas. Two groups share this path for different reasons: the ten drinks are all the same cup, angle and lighting (a uniform set); `protein-scoop` is solo feature art in its own layout slot with nothing to normalize against (same exemption as Screen 2's `panini-hero`/`bbq-plate`). Source art lives in the local, gitignored `Screen3/` folder — this script reads from there. |
@@ -121,7 +121,7 @@ id, name, description, price, kcal, protein, fibre, tags, badge, image, featured
 - **featured** — `TRUE` puts the bowl in the rotating hero slideshow (left panel). Not every
   bowl needs to be featured; weak photos can stay in the grid and be left out of rotation.
 - **image** — the **slug**, with no extension (e.g. `thai-zen`). The code appends
-  `-side.png` / `-top.png` and the `images/nobg/` path itself.
+  `-side.webp` / `-top.webp` and the `images/nobg/` path itself.
 - **img_x / img_y / img_scale** — per-bowl framing nudge on the tile (see below).
   Blank = 50/50/1. Rarely needed now that `build-bowl-cutouts.mjs` normalizes size
   and position automatically.
@@ -167,7 +167,7 @@ id, section, name, description, benefit, price, kcal, protein, fibre, tags, badg
   `beverages.js`). No Sheet markup needed; just write the ingredient name normally.
 - Screen 3 uses **kcal/protein/fibre**, same three macros as Screens 1–2 — there is no
   sugar column anywhere in the Sheet or the render.
-- **image** — the slug (e.g. `blue-mind`); the code appends `images/screen3/<slug>.png`.
+- **image** — the slug (e.g. `blue-mind`); the code appends `images/screen3/<slug>.webp`.
   Every row uses this column — unlike Screen 2, there's no shared feature photo.
 
 ⚠️ **Important caching note:** Google's published-CSV link is cached on **Google's servers
@@ -262,8 +262,10 @@ chrome.exe --kiosk https://jsamarth729-cell.github.io/green-feast-menu/beverages
 ## Known TODO
 - `tropical-fruit-salad` has only one photo (a 3/4 angle), so its grid tile shows that
   angle rather than a true overhead like the other eight. Needs a new photograph.
-- Cut-out PNGs are 900×900 regardless of use; tiles display them at 123px. Downscaling the
-  `-top.png` files would cut first-paint time on store wifi if the boards ever feel slow.
+- The old cut-out `.png` files in `images/nobg/`, `images/screen2/` and `images/screen3/`
+  are dead weight (~35 MB) now that the boards load `.webp`. They are kept only so TVs still
+  running the cached `?v=8` code keep working — delete them in a follow-up once all three
+  TVs have been hard-refreshed onto `?v=9`.
 
 ---
 

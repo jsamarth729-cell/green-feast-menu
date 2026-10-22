@@ -80,8 +80,13 @@ async function trimToBbox(file) {
 
 // Feature: just trim, keep native aspect ratio (no canvas padding — the
 // layout box for each feature photo sizes itself around this).
-async function feature(trimmed) {
-  return sharp(trimmed).png({ compressionLevel: 9 }).toBuffer();
+// Output is WebP, downscaled to ~2x the measured on-screen width (never
+// upscaled); a slug with no entry in FEATURE_W keeps its native size.
+const FEATURE_W = { 'panini-hero': 1162, 'bbq-plate': 1240 };
+async function feature(trimmed, slug) {
+  let img = sharp(trimmed);
+  if (FEATURE_W[slug]) img = img.resize({ width: FEATURE_W[slug], withoutEnlargement: true });
+  return img.webp({ quality: 90 }).toBuffer();
 }
 
 // Photo: an un-cut photograph (no alpha, nothing to trim). Re-encoded as
@@ -105,14 +110,18 @@ async function toast(trimmed, bw, bh) {
   const left = Math.round((TOAST_CANVAS_W - newW) / 2);
   const top  = Math.round((TOAST_CANVAS_H - newH) / 2);
 
-  return sharp({ create: { width: TOAST_CANVAS_W, height: TOAST_CANVAS_H, channels: 4,
+  const canvas = await sharp({ create: { width: TOAST_CANVAS_W, height: TOAST_CANVAS_H, channels: 4,
                            background: { r: 0, g: 0, b: 0, alpha: 0 } } })
     .composite([{ input: resized, left: Math.max(0, left), top: Math.max(0, top) }])
-    .png({ compressionLevel: 9 }).toBuffer();
+    .png().toBuffer();
+
+  // Cards render at 319px wide; scale the finished shared canvas to ~2x that
+  // (638). Scaling the whole canvas keeps the matched-set relationship intact.
+  return sharp(canvas).resize({ width: 638 }).webp({ quality: 90 }).toBuffer();
 }
 
 for (const [slug, { file, mode }] of Object.entries(MAP)) {
-  const name = `${slug}.${mode === 'photo' ? 'jpg' : 'png'}`;
+  const name = `${slug}.${mode === 'photo' ? 'jpg' : 'webp'}`;
   try {
     if (mode === 'photo') {
       const out = await photo(path.join(SRC, file));
@@ -121,7 +130,7 @@ for (const [slug, { file, mode }] of Object.entries(MAP)) {
       continue;
     }
     const { trimmed, bw, bh } = await trimToBbox(path.join(SRC, file));
-    const out = mode === 'toast' ? await toast(trimmed, bw, bh) : await feature(trimmed);
+    const out = mode === 'toast' ? await toast(trimmed, bw, bh) : await feature(trimmed, slug);
     await writeFile(path.join(OUT, name), out);
     console.log(`  OK   ${name.padEnd(28)} bbox ${String(bw).padStart(4)}x${String(bh).padStart(4)}` +
                 ` (${(bw / bh).toFixed(2)})  ${(out.length / 1024).toFixed(0).padStart(4)} KB  [${mode}]`);
