@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="core.css?v=7">
-  <link rel="stylesheet" href="bowls.css?v=7">
+  <link rel="stylesheet" href="core.css?v=8">
+  <link rel="stylesheet" href="bowls.css?v=8">
 </head>
 <body>
   <div class="screen" id="screen">
@@ -52,9 +52,21 @@
       <div class="footer-wordmark">Green&nbsp;Feast</div>
     </div>
 
+    <!-- ── Taash Party promo overlay ─────────────────────────────
+         LAST child of .screen on purpose. This project uses no
+         z-index anywhere, so paint order is DOM order — only the
+         final child can cover the upsell rail and footer too.
+         It also sits outside .main-content and #upsellRail, which
+         render() rewrites every 5 minutes, so the refresh can never
+         destroy it. Same reasoning as Screen 3's .offers-panel. -->
+    <div class="promo-overlay" id="promoOverlay">
+      <img class="promo-art" src="images/promos/taash-party.webp"
+           alt="Green Feast hosting your Taash Party">
+    </div>
+
   </div><!-- /.screen -->
 
-  <script src="core.js?v=7"></script>
-  <script src="bowls.js?v=7"></script>
+  <script src="core.js?v=8"></script>
+  <script src="bowls.js?v=8"></script>
 </body>
 </html>
