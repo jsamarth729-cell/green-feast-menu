@@ -17,7 +17,7 @@ const CACHE_KEY  = 'gf_bowls_v2';
 const SLIDE_MS       = 10000;   // bowl slide
 const OFFER_SLIDE_MS = 15000;   // offers slide — more to read than a bowl name
 const PROMO_MENU_MS  = 30000;   // promo hidden, board readable
-const PROMO_SHOW_MS  =  5000;   // promo overlay covering the board
+const PROMO_SHOW_MS  =  7000;   // promo overlay covering the board
 const REFRESH_MS = 5 * 60 * 1000;
 
 /* Escape hatch: any bowl listed here uses its original photo (marble

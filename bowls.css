@@ -407,7 +407,7 @@
    rest of the menu stays readable (DESIGN-PRINCIPLES §3) — this one
    covers the whole board, because the artwork is a single 1920×1080
    composition that cannot be cropped to a column. The tradeoff was
-   accepted on duration: 5s of every 35s is 14% hidden, against the
+   accepted on duration: 7s of every 37s is 19% hidden, against the
    33% (15s of 45s) those column panels already hide.
 ══════════════════════════════════════════════════════════════════ */
 .promo-overlay {
