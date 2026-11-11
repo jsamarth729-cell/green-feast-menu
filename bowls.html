@@ -66,7 +66,7 @@
            time in renderPromo(), from data/config.json's promo.image. A blank
            promo.image leaves this element empty and the overlay never shows.
            Same reasoning as beverages.html's offers art. -->
-      <img class="promo-art" id="promoArt" alt="">
+      <img class="promo-art" id="promoArt" alt="" onerror="promoArtFailed()">
     </div>
 
   </div><!-- /.screen -->

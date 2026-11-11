@@ -305,6 +305,22 @@ function renderPromo(cfg) {
   return true;
 }
 
+/* onerror from the overlay's <img>. Without this a mistyped promo.image
+   leaves the rotation running over an element that never loads, so the
+   board fades to an empty dark-green rectangle (the overlay's own
+   --hero-bg) for the full dwell, every cycle — a confusing failure for a
+   non-technical owner whose only mistake was a filename. Going dormant
+   instead makes a typo mean "no promo", which is what they'd expect.
+   Dropping the src also lets the next render() re-set it and retry, so
+   correcting the filename recovers on its own without a TV refresh. */
+function promoArtFailed() {
+  if (promoTimer) clearTimeout(promoTimer);
+  promoTimer = null;
+  setPromoPhase(false);
+  const art = document.getElementById('promoArt');
+  if (art) art.removeAttribute('src');
+}
+
 /* Called at the end of every render(), which runs again every REFRESH_MS.
    Clearing the pending timer FIRST is what stops a second rotation stacking
    on the first — the same discipline startSlideshow() uses above and
