@@ -16,8 +16,12 @@ const CONFIG_URL   = 'data/config.json';  // BYOB tile + upsell (edit here direc
 const CACHE_KEY  = 'gf_bowls_v2';
 const SLIDE_MS       = 10000;   // bowl slide
 const OFFER_SLIDE_MS = 15000;   // offers slide — more to read than a bowl name
+/* Fallbacks only. The live values come from data/config.json's promo block,
+   so the dwells can be retuned without a ?v= bump or a TV refresh. These
+   apply when the key is missing or not a number — a NaN would make
+   setTimeout fire immediately and flash the overlay. */
 const PROMO_MENU_MS  = 30000;   // promo hidden, board readable
-const PROMO_SHOW_MS  =  5000;   // promo overlay covering the board
+const PROMO_SHOW_MS  =  7000;   // promo overlay covering the board
 const REFRESH_MS = 5 * 60 * 1000;
 
 /* Escape hatch: any bowl listed here uses its original photo (marble
@@ -90,7 +94,8 @@ async function fetchBowlsData() {
     buildYourOwn: config.buildYourOwn,
     upsellHeading: config.upsellHeading,
     upsell:        config.upsell,
-    offersSlide:   config.offersSlide
+    offersSlide:   config.offersSlide,
+    promo:         config.promo
   };
 }
 
@@ -267,19 +272,50 @@ function queuePromoFlip() {
   promoTimer = setTimeout(function () {
     setPromoPhase(!promoShowing);
     queuePromoFlip();
-  }, promoShowing ? PROMO_SHOW_MS : PROMO_MENU_MS);
+  }, promoShowing ? promoShowMs : promoMenuMs);
 }
 
-/* Called at the end of every render(), which runs again every
-   REFRESH_MS. Clearing the pending timer FIRST is what stops a second
-   rotation stacking on the first — the same discipline
-   startSlideshow() uses above and startOfferRotation() uses in
-   beverages.js. Without it the promo would appear twice as often
-   after ten minutes. Resetting to the menu phase also restarts every
-   refresh from a known state. */
-function startPromoRotation() {
+/* Resolved from config each render, with the constants as fallbacks. Held in
+   module state because queuePromoFlip() re-reads them on every flip. */
+let promoShowMs = PROMO_SHOW_MS;
+let promoMenuMs = PROMO_MENU_MS;
+
+/* Points the overlay at the configured image and reports whether there is a
+   promo to run at all. A blank or missing promo.image is the off switch: the
+   src is never set, so nothing loads and the overlay stays empty. */
+function renderPromo(cfg) {
+  const art = document.getElementById('promoArt');
+  if (!art) return false;
+
+  const file = cfg && cfg.image ? String(cfg.image).trim() : '';
+  if (!file) {
+    art.removeAttribute('src');
+    art.alt = '';
+    return false;
+  }
+
+  const num = (v, fallback) =>
+    typeof v === 'number' && isFinite(v) && v > 0 ? v : fallback;
+  promoShowMs = num(cfg.showMs, PROMO_SHOW_MS);
+  promoMenuMs = num(cfg.menuMs, PROMO_MENU_MS);
+
+  const src = 'images/promos/' + file;
+  if (art.getAttribute('src') !== src) art.src = src;   // avoid a reload each render
+  art.alt = cfg.alt || '';
+  return true;
+}
+
+/* Called at the end of every render(), which runs again every REFRESH_MS.
+   Clearing the pending timer FIRST is what stops a second rotation stacking
+   on the first — the same discipline startSlideshow() uses above and
+   startOfferRotation() uses in beverages.js. With no configured image the
+   timer stays cleared and the overlay is forced hidden, so the mechanism is
+   dormant rather than removed. */
+function startPromoRotation(cfg) {
   if (promoTimer) clearTimeout(promoTimer);
+  promoTimer = null;
   setPromoPhase(false);
+  if (!renderPromo(cfg)) return;
   queuePromoFlip();
 }
 
@@ -326,7 +362,7 @@ function render(data) {
 
   renderPipeUpsell(data.upsell, data.upsellHeading);
 
-  startPromoRotation();
+  startPromoRotation(data.promo);
 }
 
 /* ── Boot ────────────────────────────────────────────────────── */

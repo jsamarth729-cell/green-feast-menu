@@ -20,5 +20,10 @@
       "Extra protein (8–10g)",
       "Extra premiums — feta / guacamole / beetroot hummus"
     ]
+  },
+  "promo": {
+    "image": "",
+    "showMs": 7000,
+    "menuMs": 30000
   }
 }
