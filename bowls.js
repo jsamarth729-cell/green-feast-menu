@@ -182,11 +182,17 @@ function tileHTML(bowl) {
      colour it maps to. Don't "fix" this mismatch. */
   if (bowl.badge === "Chef's Special") badgeClass = 'badge-spotlight';
   if (bowl.badge === 'Most Loved')     badgeClass = 'badge-loved';
+  if (bowl.badge === 'Signature')      badgeClass = 'badge-signature';
 
   const tags = tagsHTML(bowl.tags);
 
+  /* The Signature Bowl is the board's one gold-accented tile. Driven by the
+     badge value, not the slug, so the owner can move it to another bowl from
+     the Sheet without a code change. */
+  const tileClass = bowl.badge === 'Signature' ? 'bowl-tile signature-tile' : 'bowl-tile';
+
   return `
-    <div class="bowl-tile">
+    <div class="${tileClass}">
       ${hasBadge ? `<div class="tile-badge ${badgeClass}">${bowl.badge}</div>` : ''}
       <div class="tile-photo-wrap">
         <img src="${tileImageSrc(bowl)}" alt="${bowl.name}"

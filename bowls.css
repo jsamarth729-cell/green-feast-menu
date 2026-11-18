@@ -380,24 +380,39 @@
 .bowl-tile.byob-tile {
   background: var(--forest);
 }
-.byob-tile .tile-name { color: var(--gold); }
-.byob-tile .tile-desc { color: var(--gold); -webkit-line-clamp: 3; }
-.byob-tile .tile-price { color: var(--gold); }
+/* White, not gold. Gold is now reserved for the Signature tile so that it is
+   the only gold-accented tile on the grid — that exclusivity is what makes it
+   stand out. Do not reintroduce gold here. */
+.byob-tile .tile-name { color: #FFFFFF; }
+.byob-tile .tile-desc { color: #FFFFFF; -webkit-line-clamp: 3; }
+.byob-tile .tile-price { color: #FFFFFF; }
 
 .byob-icon {
   width: 123px;
   height: 123px;
   border-radius: 50%;
   background: rgba(255,255,255,0.10);
-  border: 2px solid var(--gold);
+  border: 2px solid #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 44px;
-  color: var(--gold);
+  color: #FFFFFF;
   font-weight: 300;
   line-height: 1;
+}
+
+/* ─── Signature tile ─────────────────────────────────────────────
+   The board's one gold-accented tile. DESIGN-PRINCIPLES §7 reserves gold for
+   what the customer should act on, and the BYOB tile gave up its gold for
+   this — being the only gold on the grid is what makes it read as special
+   from queue distance. box-sizing is border-box globally, so the border does
+   not change the tile's grid footprint. 3px, not 2px: a thinner rule
+   disappears at viewing distance on a 40" screen. */
+.bowl-tile.signature-tile {
+  border: 3px solid var(--gold);
+  box-shadow: 0 2px 14px rgba(184,149,106,0.28), 0 1px 3px rgba(40,63,40,0.06);
 }
 
 /* ═══════════════════════════════════════════════════════════════

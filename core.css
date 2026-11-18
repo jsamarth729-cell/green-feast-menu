@@ -226,6 +226,9 @@ body {
 }
 .tile-badge.badge-spotlight { background: var(--badge-green); }
 .tile-badge.badge-loved     { background: var(--badge-warm); }
+/* Gold pill needs dark text — the other two are white-on-dark, so inverting
+   it is part of what makes the Signature item read as a different class. */
+.tile-badge.badge-signature { background: var(--gold); color: var(--forest); }
 
 /* Rupee mark — superscript, slightly smaller than the number */
 .tile-rupee {
