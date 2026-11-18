@@ -366,11 +366,23 @@ cream plate and left the sponge semi-transparent).
 | token | value | role |
 |---|---|---|
 | `--hero-bg` | `#163019` | hero panel — deliberately darker than `--forest` |
-| `--gold` | `#FEFA67` | hero description, macro chips, BYOB tile |
+| `--gold` | `#FEFA67` | hero description, macro chips, BYOB tile — **dark backgrounds only** |
+| `--gold-deep` | `#C9A227` | Signature tile border + badge — the gold for **light** backgrounds |
 | `--cream` | `#F5F0E8` | grid background |
 | `--card` | `#FFFFFF` | tile background |
 | `--forest` | `#283F28` | body text on cream, BYOB tile background |
 | `--bar` / `--bar-dark` | `#223322` / `#1A2A1A` | upsell rail / footer |
+
+**There are two golds, and picking the wrong one makes an element disappear.**
+`--gold` is a 70%-lightness yellow: 12.97:1 against `--hero-bg`, which is the
+legibility it was chosen for — but only **1.10:1 on white**, so as a border or
+rule on a cream or white tile it is effectively invisible. Screen 1's Signature
+tile shipped its border in `--gold` and read as a washed-out lemon line for
+exactly that reason. `--gold-deep` is the same hue family at 47% lightness and
+holds 2.42:1 on white. Rule of thumb: gold **text on a dark panel** is `--gold`;
+gold **on a light tile** is `--gold-deep`. Do not "unify" them into one token —
+one value cannot serve both backgrounds, and darkening `--gold` globally would
+halve the hero description's contrast.
 
 **Screen 3-scoped benefit-chip palette** (`beverages.css`, not `core.css` — see §2 on
 what stays shared vs. what a board owns). Keyed by drink slug, not by benefit

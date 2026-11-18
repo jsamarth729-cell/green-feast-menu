@@ -29,6 +29,15 @@
   --badge-warm:  #7A5230;
   --hero-bg:     #163019;
   --gold:        #FEFA67;
+  /* A DARK-BACKGROUND gold. 70% lightness, 99% saturation: 12.97:1 against
+     --hero-bg, which is the legibility work it was chosen for (hero
+     description, macro chips, BYOB tile). On WHITE it measures 1.10:1 —
+     effectively invisible — so never use it on a cream or white tile.
+     That is what --gold-deep below is for. */
+  --gold-deep:   #C9A227;
+  /* The on-white gold: same hue family (46°) but 47% lightness, so it reads
+     as metallic gold rather than lemon and actually holds an edge against a
+     white tile (2.42:1). Signature tile border + badge only. */
 
   /* Bottom strip heights. Tokenised so a screen laying an element
      against the strips can derive its own geometry instead of
@@ -228,7 +237,7 @@ body {
 .tile-badge.badge-loved     { background: var(--badge-warm); }
 /* Gold pill needs dark text — the other two are white-on-dark, so inverting
    it is part of what makes the Signature item read as a different class. */
-.tile-badge.badge-signature { background: var(--gold); color: var(--forest); }
+.tile-badge.badge-signature { background: var(--gold-deep); color: var(--forest); }
 
 /* Rupee mark — superscript, slightly smaller than the number */
 .tile-rupee {

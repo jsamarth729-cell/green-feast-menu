@@ -281,9 +281,17 @@
 /* 2-column grid */
 .bowl-grid {
   flex: 1;
+  /* min-height:0 and minmax(0,1fr) are load-bearing, not tidying. Without
+     them a flex item refuses to shrink below its content height, so the five
+     rows demanded 885px against 865px available, the grid overflowed
+     .main-content by ~20px, and padding-bottom ended up *underneath* the
+     upsell rail — the bottom row sat 2.2px off the rail instead of 22px.
+     Both properties are needed: min-height lets the grid shrink, minmax lets
+     the rows shrink with it. Chrome 69 supports both. */
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(5, 1fr);
+  grid-template-rows: repeat(5, minmax(0, 1fr));
   grid-gap: 8px;
   gap: 8px;
   padding-bottom: 22px;
@@ -380,39 +388,49 @@
 .bowl-tile.byob-tile {
   background: var(--forest);
 }
-/* White, not gold. Gold is now reserved for the Signature tile so that it is
-   the only gold-accented tile on the grid — that exclusivity is what makes it
-   stand out. Do not reintroduce gold here. */
-.byob-tile .tile-name { color: #FFFFFF; }
-.byob-tile .tile-desc { color: #FFFFFF; -webkit-line-clamp: 3; }
-.byob-tile .tile-price { color: #FFFFFF; }
+/* --gold, as DESIGN-PRINCIPLES §7's token table has always specified for this
+   tile. It briefly went white to make the Signature tile the only gold on the
+   grid; that is no longer the approach. The two tiles now carry gold in
+   different contexts — gold text on dark here, a --gold-deep border on white
+   there — which is why --gold's 12.97:1 against this dark forest tile is the
+   right value here and would be invisible there. */
+.byob-tile .tile-name { color: var(--gold); }
+.byob-tile .tile-desc { color: var(--gold); -webkit-line-clamp: 3; }
+.byob-tile .tile-price { color: var(--gold); }
 
 .byob-icon {
   width: 123px;
   height: 123px;
   border-radius: 50%;
   background: rgba(255,255,255,0.10);
-  border: 2px solid #FFFFFF;
+  border: 2px solid var(--gold);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 44px;
-  color: #FFFFFF;
+  color: var(--gold);
   font-weight: 300;
   line-height: 1;
 }
 
 /* ─── Signature tile ─────────────────────────────────────────────
-   The board's one gold-accented tile. DESIGN-PRINCIPLES §7 reserves gold for
-   what the customer should act on, and the BYOB tile gave up its gold for
-   this — being the only gold on the grid is what makes it read as special
-   from queue distance. box-sizing is border-box globally, so the border does
-   not change the tile's grid footprint. 3px, not 2px: a thinner rule
-   disappears at viewing distance on a 40" screen. */
+   The board's highlighted item. Uses --gold-deep, NOT --gold: this border
+   sits on a white tile, where --gold measures 1.10:1 and all but vanishes,
+   while --gold-deep holds at 2.42:1. 3px, not 2px: a thinner rule disappears
+   at viewing distance on a 40" screen.
+
+   The padding is 11px 12px against every other tile's 14px 15px, and that is
+   deliberate. box-sizing is border-box, so the 3px border leaves the tile's
+   grid footprint alone but still consumes 6px of its *inner* height — enough
+   to clip this tile's content once .bowl-grid's rows shrink to fit. Trimming
+   3px of padding per side gives back exactly what the border took, so the
+   inner box matches the other tiles. Change one and you must change the
+   other. */
 .bowl-tile.signature-tile {
-  border: 3px solid var(--gold);
-  box-shadow: 0 2px 14px rgba(184,149,106,0.28), 0 1px 3px rgba(40,63,40,0.06);
+  border: 3px solid var(--gold-deep);
+  padding: 11px 12px;
+  box-shadow: 0 2px 14px rgba(201,162,39,0.30), 0 1px 3px rgba(40,63,40,0.06);
 }
 
 /* ═══════════════════════════════════════════════════════════════
